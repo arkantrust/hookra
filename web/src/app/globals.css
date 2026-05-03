@@ -126,10 +126,7 @@
   html {
     @apply font-sans;
   }
-}
-
-@layer custom {
-  a {
-    @apply text-orange-500 hover:underline dark:text-orange-500;
+  button {
+    @apply cursor-pointer;
   }
 }
