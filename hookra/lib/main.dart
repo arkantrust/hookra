@@ -24,7 +24,6 @@ class AppBlocObserver extends BlocObserver {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
 
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
@@ -32,9 +31,13 @@ Future<void> main() async {
 
   Bloc.observer = const AppBlocObserver();
 
-  await initSupabase();
-
-  initServiceLocator();
-
-  runApp(const App());
+  try {
+    await dotenv.load(fileName: '.env');
+    await initSupabase();
+    initServiceLocator();
+    runApp(const App());
+  } catch (e, s) {
+    log('Startup error: $e', stackTrace: s);
+    runApp(MaterialApp(home: Scaffold(body: Center(child: Text('Error: $e')))));
+  }
 }

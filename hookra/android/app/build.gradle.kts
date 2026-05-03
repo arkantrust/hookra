@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "app.ddulce.hookra"
-    compileSdk = 35
+    compileSdk = 36
     // Install the latest ndk version through android studio.
     // Many dependencies like path_provider_android need atleast ndk version 27.0.12077973to work.
     // Different versions of ndk are usually placed at ~/Android/Sdk/ndk
