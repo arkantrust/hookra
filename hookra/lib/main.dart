@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'package:hookra/src/config/config.dart';
-import 'package:hookra/src/app/app.dart';
+import 'package:hookra/src/config/supabase.dart';
+import 'package:hookra/features/auth/ui/bloc/login_bloc.dart';
+import 'package:hookra/features/auth/ui/bloc/signup_bloc.dart';
+import 'package:hookra/features/auth/ui/screens/login_screen.dart';
+import 'package:hookra/features/auth/ui/screens/signup_screen.dart';
+import 'package:hookra/features/home/ui/screens/home_screen.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -34,10 +38,33 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: '.env');
     await initSupabase();
-    initServiceLocator();
-    runApp(const App());
+    runApp(const HookraApp());
   } catch (e, s) {
     log('Startup error: $e', stackTrace: s);
     runApp(MaterialApp(home: Scaffold(body: Center(child: Text('Error: $e')))));
+  }
+}
+
+class HookraApp extends StatelessWidget {
+  const HookraApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Hookra',
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/login',
+      routes: {
+        '/login': (_) => BlocProvider(
+          create: (_) => LoginBloc(),
+          child: const LoginScreen(),
+        ),
+        '/signup': (_) => BlocProvider(
+          create: (_) => SignupBloc(),
+          child: const SignupScreen(),
+        ),
+        '/home': (_) => const HomeScreen(),
+      },
+    );
   }
 }
