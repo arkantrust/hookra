@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "cloudflare.cloudflare-workers-bindings-extension",
+    "oxc.oxc-vscode",
+    "bradlc.vscode-tailwindcss",
+    "typescriptteam.native-preview"
+  ]
+}
