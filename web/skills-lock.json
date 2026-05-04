@@ -2,18 +2,21 @@
   "version": 1,
   "skills": {
     "accessibility": {
-      "source": "addyosmani/web-quality-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/accessibility/SKILL.md",
       "computedHash": "6462f04969f59f771150e6410e6a11fa397f2934be0b51e8650f495feed1e28d"
     },
     "best-practices": {
-      "source": "addyosmani/web-quality-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/best-practices/SKILL.md",
       "computedHash": "98dafea60ec1a7f5f70f6febcdd4b4fa3fe15723ad9c0b991c0818615bff7ba6"
     },
     "core-web-vitals": {
-      "source": "addyosmani/web-quality-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/core-web-vitals/SKILL.md",
       "computedHash": "fa437acc2249cea2cb28f190ba7faf8fdfac829d1c1aafa9ce938c6dd9338721"
     },
     "migrate-to-vinext": {
@@ -22,24 +25,40 @@
       "computedHash": "660f2e78a96c76792fd8a74b0ce714c69a67fed95de8698df4b32186b3cec097"
     },
     "next-best-practices": {
-      "source": "vercel-labs/next-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/next-best-practices/SKILL.md",
       "computedHash": "515ba75178bd44875812d9a560bdf14651f86709f89cf1d4f209638e879807f3"
     },
-    "performance": {
-      "source": "addyosmani/web-quality-skills",
+    "next-cache-components": {
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/next-cache-components/SKILL.md",
+      "computedHash": "a94b83ddcd2ff1c30722577f693b1bfe32f2e1a83abdd6c08c2d6cc6753b53c8"
+    },
+    "next-upgrade": {
+      "source": "arkantrust/next-skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/next-upgrade/SKILL.md",
+      "computedHash": "be6bbf6ab1dc2cc6f2505cea52d497920c04f5b532c0846ee201f6029b803fb0"
+    },
+    "performance": {
+      "source": "arkantrust/next-skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/performance/SKILL.md",
       "computedHash": "acbafe2fcbfc3a1a67db47c2f6299d5c0e16f543c4e683e38e74a8ccb54888fb"
     },
     "seo": {
-      "source": "addyosmani/web-quality-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/seo/SKILL.md",
       "computedHash": "f1fed683b76913d26fbf1aa1e008e6932f7771701fc3a79925b042236aa4681a"
     },
     "shadcn": {
-      "source": "shadcn/ui",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
-      "computedHash": "1ec42c9b918b315d8e5c6c856b78c3c4725fc93dea30b9b7e9975c69848fcce6"
+      "skillPath": ".agents/skills/shadcn/SKILL.md",
+      "computedHash": "80a6226e78f6d1fe464214ae0ef449d49d8ffaa3e7704f011e9b418c678ad4d1"
     },
     "supabase": {
       "source": "supabase/agent-skills",
@@ -54,19 +73,22 @@
       "computedHash": "d606a1146be6d54fb9e73f718b5320b9acac5ff2ba2d7230a555df4b5a923b4a"
     },
     "vercel-react-best-practices": {
-      "source": "vercel-labs/agent-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
-      "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
+      "skillPath": ".agents/skills/vercel-react-best-practices/SKILL.md",
+      "computedHash": "3219a1944e404ffc14d1d9d6aef6dd2e3855b81387ee0a044ccbfe14d34c2357"
     },
     "web-design-guidelines": {
-      "source": "vercel-labs/agent-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
+      "skillPath": ".agents/skills/web-design-guidelines/SKILL.md",
       "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
     },
     "web-quality-audit": {
-      "source": "addyosmani/web-quality-skills",
+      "source": "arkantrust/next-skills",
       "sourceType": "github",
-      "computedHash": "1168be21aa9fe7bdc6e6e053ca05b6ca5a45675a527c103cdf77bc56ce8159af"
+      "skillPath": ".agents/skills/web-quality-audit/SKILL.md",
+      "computedHash": "4a17c722fe443c075bdf4ed175925806dc1ef7cd10cac3b010899a9eb0c2526e"
     }
   }
 }
