@@ -13,6 +13,12 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Inicio'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.admin_panel_settings_outlined),
+            tooltip: 'Gestionar roles',
+            onPressed:
+                () => Navigator.pushNamed(context, '/organization/roles'),
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await Supabase.instance.client.auth.signOut();
@@ -27,7 +33,11 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+            const Icon(
+              Icons.check_circle_outline,
+              size: 64,
+              color: Colors.green,
+            ),
             const SizedBox(height: 16),
             const Text(
               '¡Bienvenido!',

@@ -10,6 +10,8 @@ import 'package:hookra/features/auth/ui/bloc/signup_bloc.dart';
 import 'package:hookra/features/auth/ui/screens/login_screen.dart';
 import 'package:hookra/features/auth/ui/screens/signup_screen.dart';
 import 'package:hookra/features/home/ui/screens/home_screen.dart';
+import 'package:hookra/features/organization_roles/ui/bloc/organization_roles_bloc.dart';
+import 'package:hookra/features/organization_roles/ui/screens/organization_roles_screen.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -55,15 +57,24 @@ class HookraApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
-        '/login': (_) => BlocProvider(
-          create: (_) => LoginBloc(),
-          child: const LoginScreen(),
-        ),
-        '/signup': (_) => BlocProvider(
-          create: (_) => SignupBloc(),
-          child: const SignupScreen(),
-        ),
+        '/login':
+            (_) => BlocProvider(
+              create: (_) => LoginBloc(),
+              child: const LoginScreen(),
+            ),
+        '/signup':
+            (_) => BlocProvider(
+              create: (_) => SignupBloc(),
+              child: const SignupScreen(),
+            ),
         '/home': (_) => const HomeScreen(),
+        '/organization/roles':
+            (_) => BlocProvider(
+              create:
+                  (_) =>
+                      OrganizationRolesBloc()..add(OrganizationRolesStarted()),
+              child: const OrganizationRolesScreen(),
+            ),
       },
     );
   }
