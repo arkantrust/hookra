@@ -56,12 +56,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Welcome back!',
+                    'Bienvenido de nuevo',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                   const Text(
-                    'Log in to manage your social presence with AI',
+                    'Inicia sesión para gestionar tu presencia en redes sociales con IA',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
