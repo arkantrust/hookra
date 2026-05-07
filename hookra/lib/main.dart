@@ -93,8 +93,9 @@ class _HookraAppState extends State<HookraApp> {
     _lastHandledUri = uriString;
 
     // Parse both query parameters and fragment parameters.
+    // Prefer query parameters (they survive across Android intents) and
+    // use fragment as a fallback.
     final Map<String, String> params = {};
-    params.addAll(uri.queryParameters);
     if (uri.fragment.isNotEmpty) {
       try {
         params.addAll(Uri.splitQueryString(uri.fragment));
@@ -102,6 +103,8 @@ class _HookraAppState extends State<HookraApp> {
         // ignore malformed fragment
       }
     }
+    // Add query parameters last so they override fragment values when present.
+    params.addAll(uri.queryParameters);
 
     // Detect common Supabase recovery tokens
     final hasAccessToken = params.containsKey('access_token');

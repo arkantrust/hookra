@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Authentication callback</title>
+  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:24px;color:#111}a{color:#0066cc}</style>
+</head>
+<body>
+  <h1>Processing sign-in...</h1>
+  <p id="status">Please wait while we open the app.</p>
+
+  <script>
+    (function(){
+      'use strict';
+      function parseParams(str) {
+        if (!str) return {};
+        // remove leading ? or #
+        str = str.replace(/^\?|^#/, '');
+        if (!str) return {};
+        return str.split('&').filter(Boolean).reduce(function(acc, pair){
+          var kv = pair.split('=');
+          var k = decodeURIComponent(kv[0] || '');
+          var v = decodeURIComponent(kv.slice(1).join('=') || '');
+          if (k) acc[k] = v;
+          return acc;
+        }, {});
+      }
+
+      try {
+        // Fragment may contain tokens (Supabase uses fragment by default).
+        var fragmentParams = parseParams(location.hash);
+        var queryParams = parseParams(location.search);
+        // Prefer query params (they are more reliable); fallback to fragment.
+        var params = Object.assign({}, fragmentParams, queryParams);
+
+        var isRecovery = params['type'] === 'recovery';
+        var access = params['access_token'];
+        var refresh = params['refresh_token'];
+
+        if (!isRecovery || (!access && !refresh)) {
+          document.getElementById('status').innerText = 'Missing or invalid recovery tokens. Please request a new recovery email from the app.';
+          return;
+        }
+
+        // Build app URL using query params to ensure reliable delivery to the app.
+        var appUrl = 'hookra://reset-password?';
+        var parts = [];
+        if (access) parts.push('access_token=' + encodeURIComponent(access));
+        if (refresh) parts.push('refresh_token=' + encodeURIComponent(refresh));
+        parts.push('type=' + encodeURIComponent('recovery'));
+        appUrl += parts.join('&');
+
+        // Attempt to open app by redirecting to the custom scheme.
+        // Using replace avoids keeping the callback page in history.
+        location.replace(appUrl);
+
+        // If the app isn't installed, show a fallback link after a short delay.
+        setTimeout(function(){
+          var status = document.getElementById('status');
+          status.innerHTML = 'If the app did not open, <a id="openApp" href="'+appUrl+'">tap here to open it</a> or install the app from the store.';
+        }, 1200);
+      } catch (e) {
+        document.getElementById('status').innerText = 'An unexpected error occurred. Please try again from the app.';
+      }
+    })();
+  </script>
+</body>
+</html>
