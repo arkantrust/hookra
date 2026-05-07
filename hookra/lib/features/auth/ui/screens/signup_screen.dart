@@ -48,12 +48,13 @@ class _SignupScreenState extends State<SignupScreen> {
         if (state is SignupSuccessState) {
           Navigator.pushReplacementNamed(context, '/home');
         } else if (state is SignupFailState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -68,6 +69,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
+                  const Text(
+                    'Amplía tu presencia en redes sociales coninformación basada en la inteligencia artificial',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
                   const SizedBox(height: 40),
                   Row(
                     children: [
@@ -75,12 +81,34 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: TextFormField(
                           controller: _firstNameController,
                           textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Nombre',
-                            border: OutlineInputBorder(),
+                            labelStyle: const TextStyle(
+                              color: Color(0xFF94A3B8),
+                            ),
+                            floatingLabelStyle: const TextStyle(
+                              color: Color(0xFF94A3B8),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFF8FAFC),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: Colors.black,
+                                width: 2,
+                              ),
+                            ),
+                            border: const OutlineInputBorder(),
                           ),
                           validator: (value) {
-                            if (value == null || value.trim().isEmpty) return 'Requerido';
+                            if (value == null || value.trim().isEmpty)
+                              return 'Requerido';
                             return null;
                           },
                         ),
@@ -90,12 +118,34 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: TextFormField(
                           controller: _lastNameController,
                           textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Apellido',
-                            border: OutlineInputBorder(),
+                            labelStyle: const TextStyle(
+                              color: Color(0xFF94A3B8),
+                            ),
+                            floatingLabelStyle: const TextStyle(
+                              color: Color(0xFF94A3B8),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFF8FAFC),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: Colors.black,
+                                width: 2,
+                              ),
+                            ),
+                            border: const OutlineInputBorder(),
                           ),
                           validator: (value) {
-                            if (value == null || value.trim().isEmpty) return 'Requerido';
+                            if (value == null || value.trim().isEmpty)
+                              return 'Requerido';
                             return null;
                           },
                         ),
@@ -108,9 +158,26 @@ class _SignupScreenState extends State<SignupScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Email',
-                      border: OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                      floatingLabelStyle: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFF8FAFC),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 2,
+                        ),
+                      ),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       final v = value?.trim() ?? '';
@@ -127,16 +194,40 @@ class _SignupScreenState extends State<SignupScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
+                      labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                      floatingLabelStyle: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFF8FAFC),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 2,
+                        ),
+                      ),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          color: const Color(0xFF94A3B8),
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed:
+                            () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Ingresa una contraseña';
+                      if (value == null || value.isEmpty)
+                        return 'Ingresa una contraseña';
                       if (value.length < 8) return 'Mínimo 8 caracteres';
                       return null;
                     },
@@ -149,16 +240,40 @@ class _SignupScreenState extends State<SignupScreen> {
                     onFieldSubmitted: (_) => _submit(),
                     decoration: InputDecoration(
                       labelText: 'Confirmar contraseña',
+                      labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                      floatingLabelStyle: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFF8FAFC),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 2,
+                        ),
+                      ),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                          color: const Color(0xFF94A3B8),
+                          _obscureConfirm
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
-                        onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                        onPressed:
+                            () => setState(
+                              () => _obscureConfirm = !_obscureConfirm,
+                            ),
                       ),
                     ),
                     validator: (value) {
-                      if (value != _passwordController.text) return 'Las contraseñas no coinciden';
+                      if (value != _passwordController.text)
+                        return 'Las contraseñas no coinciden';
                       return null;
                     },
                   ),
@@ -166,10 +281,26 @@ class _SignupScreenState extends State<SignupScreen> {
                   BlocBuilder<SignupBloc, SignupState>(
                     builder: (context, state) {
                       if (state is SignupLoadingState) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF70020F),
+                          ),
+                        );
                       }
                       return ElevatedButton(
                         onPressed: _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF70020F),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                         child: const Text('Registrarme'),
                       );
                     },
@@ -177,7 +308,23 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('¿Ya tienes cuenta? Inicia sesión'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF64748B),
+                    ),
+                    child: const Text.rich(
+                      TextSpan(
+                        text: '¿Ya tienes cuenta? ',
+                        children: [
+                          TextSpan(
+                            text: 'Inicia sesión',
+                            style: TextStyle(
+                              color: Color(0xFF70020F),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
