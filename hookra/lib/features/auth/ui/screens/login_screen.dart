@@ -144,7 +144,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 10),
+
+                  // Forgot password action (mobile-first)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.pushNamed(context, '/forgot-password'),
+                        child: const Text('Olvidaste tu contraseña?'),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
                   BlocBuilder<LoginBloc, LoginState>(
                     builder: (context, state) {
                       if (state is LoginLoadingState) {

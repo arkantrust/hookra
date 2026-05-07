@@ -19,4 +19,14 @@ class AuthRepoImpl extends AuthRepo {
   Future<void> login(String email, String password) async {
     await _source.login(email, password);
   }
+
+  @override
+  Future<void> sendPasswordReset(String email, {required String redirectTo}) async {
+    await _source.sendPasswordReset(email, redirectTo: redirectTo);
+  }
+
+  @override
+  Future<void> resetPassword(String newPassword) async {
+    await _source.updatePassword(newPassword);
+  }
 }

@@ -20,4 +20,23 @@ class AuthDataSource {
       password: password,
     );
   }
+
+  /// Request password recovery email. Provide `redirectTo` to ensure
+  /// the verification link returns into the mobile app (deep link).
+  Future<void> sendPasswordReset(String email, {required String redirectTo}) async {
+    // supabase.auth.resetPasswordForEmail will not reveal whether the
+    // email exists; it always returns success for security.
+    await Supabase.instance.client.auth.resetPasswordForEmail(
+      email,
+      redirectTo: redirectTo,
+    );
+  }
+
+  /// Update the user's password. This expects that the recovery link
+  /// has already been used to restore a session in the app (implicit flow).
+  Future<void> updatePassword(String password) async {
+    await Supabase.instance.client.auth.updateUser(
+      UserAttributes(password: password),
+    );
+  }
 }
