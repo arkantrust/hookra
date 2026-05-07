@@ -29,4 +29,14 @@ class AuthRepoImpl extends AuthRepo {
   Future<void> resetPassword(String newPassword) async {
     await _source.updatePassword(newPassword);
   }
+
+  /// Exchange refresh token for a session
+  Future<Map<String, dynamic>?> exchangeRefreshToken(String refreshToken) async {
+    return await _source.exchangeRefreshToken(refreshToken);
+  }
+
+  /// Update password using a provided access token (without relying on SDK session).
+  Future<void> resetPasswordWithAccessToken(String accessToken, String newPassword) async {
+    await _source.updatePasswordWithAccessToken(accessToken, newPassword);
+  }
 }

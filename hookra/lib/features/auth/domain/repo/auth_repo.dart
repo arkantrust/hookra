@@ -12,4 +12,9 @@ abstract class AuthRepo {
   /// Reset password when the user has a valid recovery session.
   /// Returns when password updated or throws if token invalid/expired.
   Future<void> resetPassword(String newPassword);
+  /// Exchange a refresh token for a session/result map.
+  Future<Map<String, dynamic>?> exchangeRefreshToken(String refreshToken);
+
+  /// Update password using an access token obtained from the recovery link.
+  Future<void> resetPasswordWithAccessToken(String accessToken, String newPassword);
 }

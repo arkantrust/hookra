@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hookra/features/auth/data/repo/auth_repo_impl.dart';
+import 'package:hookra/src/config/auth_token_holder.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -25,7 +27,24 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _inProgress = true);
     try {
-      await AuthRepoImpl().resetPassword(_passwordController.text);
+      final repo = AuthRepoImpl();
+
+      // Prefer SDK session if available
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session != null) {
+        debugPrint('Reset flow: using SDK current session');
+        await repo.resetPassword(_passwordController.text);
+      } else {
+        // Try token-based flow: consume short-lived access token passed via deep link
+        final accessToken = AuthTokenHolder.instance.consumeAccessToken();
+        if (accessToken != null) {
+          debugPrint('Reset flow: using access token from deep link (in-memory)');
+          await repo.resetPasswordWithAccessToken(accessToken, _passwordController.text);
+        } else {
+          debugPrint('Reset flow: no session or token available');
+          throw Exception('No valid recovery session');
+        }
+      }
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated. Please sign in with your new password.')));
       Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
