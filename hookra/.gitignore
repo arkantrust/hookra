@@ -53,3 +53,4 @@ supabase/.branches
 .env.keys
 .env.local
 .env.*.local
+.vercel
