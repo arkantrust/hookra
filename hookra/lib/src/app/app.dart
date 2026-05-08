@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:hookra/src/authentication/authentication.dart';
-import 'package:hookra/src/home/home.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/theme.dart';
@@ -30,23 +29,14 @@ class App extends StatelessWidget {
             create:
                 (context) => sl<AuthenticationBloc>()..add(AuthenticationSubscriptionRequested()),
           ),
-          BlocProvider(
-            create:
-                (context) =>
-                    sl<LocationPermissionBloc>()..add(const LocationPermissionCheckRequested()),
-          ),
         ],
         child: Builder(
           builder: (context) {
             return MaterialApp.router(
-              title: 'Triangul8',
+              title: 'Hookra',
               debugShowCheckedModeBanner: false,
               theme: darkTheme,
-              routerConfig:
-                  AppRouter(
-                    auth: context.read<AuthenticationBloc>(),
-                    location: context.read<LocationPermissionBloc>(),
-                  ).router,
+              routerConfig: AppRouter(auth: context.read<AuthenticationBloc>()).router,
             );
           },
         ),

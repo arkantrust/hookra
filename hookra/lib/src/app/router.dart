@@ -26,11 +26,9 @@ class AuthenticationRefreshStream extends ChangeNotifier {
 class AppRouter {
   final AuthenticationBloc auth;
 
-  final LocationPermissionBloc location;
-
   late final GoRouter router;
 
-  AppRouter({required this.auth, required this.location}) {
+  AppRouter({required this.auth}) {
     router = GoRouter(
       initialLocation: '/auth',
       debugLogDiagnostics: true,
@@ -38,31 +36,15 @@ class AppRouter {
       redirect: (context, state) {
         // The route is /auth/* (e.g., /auth/sign-in, /auth/sign-up, etc.)
         final goingToAuth = state.matchedLocation.startsWith('/auth/');
-        final goingToPermissions = state.matchedLocation == LocationPermissionPage.route().path;
 
         final isAuthenticated = auth.state.status == AuthenticationStatus.authenticated;
 
         // If not authenticated and not going to auth, redirect to auth
         if (!isAuthenticated && !goingToAuth) return SignInPage.route().path;
 
-        // If authenticated and not going to permissions, check location permissions
-        if (isAuthenticated && !goingToPermissions) {
-          if (location.state.status == LocationPermissionStatus.checking) {
-            return '/splash'; // Show splash while checking permissions
-          }
-
-          if (location.state.status == LocationPermissionStatus.granted) {
-            return null; // Allow navigation if permission is granted
-          }
-
-          // Redirect to permissions if not granted
-          return LocationPermissionPage.route().path;
-        }
-
         return null;
       },
       routes: [
-        LocationPermissionPage.route(), // route: /permissions/location
         ShellRoute(
           builder: (context, state, child) => MainLayout(child: child),
           routes: [
@@ -86,7 +68,7 @@ class AppRouter {
               AuthenticationStatus.unknown =>
                 '/splash', // Wait for the authentication status to be determined
               AuthenticationStatus.unauthenticated => SignInPage.route().path,
-              AuthenticationStatus.authenticated => LocationPermissionPage.route().path,
+              AuthenticationStatus.authenticated => HomePage.route().path,
             };
           },
         ),
