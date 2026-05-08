@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:hookra/src/auth/domain/failures/auth_failure.dart';
 import 'package:hookra/src/auth/domain/use_cases/sign_up_use_case.dart';
@@ -8,6 +9,7 @@ import 'package:hookra/src/auth/domain/value_objects/email.dart';
 import 'package:hookra/src/auth/domain/value_objects/name.dart';
 import 'package:hookra/src/auth/domain/value_objects/password.dart';
 import 'package:hookra/src/utils/network.dart';
+import 'package:hookra/src/organizations/organizations.dart';
 
 part 'sign_up_event.dart';
 part 'sign_up_state.dart';
@@ -76,6 +78,22 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       return;
     }
 
+    await _createDefaultOrganization(state.first.value);
+
     emit(state.copyWith(status: FormzSubmissionStatus.success, error: ''));
+  }
+
+  Future<void> _createDefaultOrganization(String firstName) async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+
+      final orgRepo = OrganizationRepositoryImpl();
+      final organization = await orgRepo.createOrganization(
+        'Organization of $firstName',
+        user.id,
+      );
+      await orgRepo.addMember(organization.id, user.id, 'owner');
+    } catch (_) {}
   }
 }

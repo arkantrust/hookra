@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'package:hookra/src/config/supabase.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/app.dart';
 

@@ -7,6 +7,7 @@ import 'package:hookra/src/app/main_layout.dart';
 import 'package:hookra/src/home/home.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/organizations/organizations.dart';
 
 class AuthRefreshStream extends ChangeNotifier {
   late final StreamSubscription _subscription;
@@ -51,6 +52,7 @@ class AppRouter {
           routes: [
             HomePage.route(), // route: /
             ProfilePage.route(), // route: /profile
+            OrganizationsScreen.route(), // route: /organizations
           ],
         ),
         SignInPage.route(), // route: /auth/sign-in
