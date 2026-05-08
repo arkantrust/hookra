@@ -1,4 +1,4 @@
-import 'package:hookra/src/models/name.dart';
+import 'package:hookra/src/auth/domain/value_objects/name.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -8,7 +8,6 @@ class MainLayout extends StatelessWidget {
 
   static const tabs = [
     _TabItem(icon: Icons.home, route: '/', label: 'Home'),
-    _TabItem(icon: Icons.report, route: '/reports', label: 'Reports'),
     _TabItem(icon: Icons.person, route: '/profile', label: 'Profile'),
   ];
 

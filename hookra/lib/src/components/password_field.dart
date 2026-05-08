@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
-import 'package:hookra/src/models/models.dart';
 import 'themed_text_field.dart';
+
+enum PasswordFieldError {
+  empty,
+  lessThan12Chars,
+  noNumber,
+  noUpper,
+  noLower,
+  hasSpaces,
+  noSymbol,
+}
 
 class PasswordField extends StatelessWidget {
   final String label;
   final void Function(String) onChanged;
   final void Function(String)? onSubmitted;
-  final PasswordValidationError? validationError;
+  final PasswordFieldError? validationError;
   final TextInputAction? textInputAction;
 
   const PasswordField({
@@ -19,14 +28,14 @@ class PasswordField extends StatelessWidget {
     this.textInputAction,
   });
 
-  String? _getError(PasswordValidationError? e) => switch (e) {
-    PasswordValidationError.empty => 'Escribe tu contraseña',
-    PasswordValidationError.lessThan12Chars => 'Debe tener al menos 12 caracteres',
-    PasswordValidationError.noNumber => 'Debe incluir al menos un número',
-    PasswordValidationError.noUpper => 'Debe incluir al menos una letra mayúscula',
-    PasswordValidationError.noLower => 'Debe incluir al menos una letra minúscula',
-    PasswordValidationError.hasSpaces => 'No debe contener espacios',
-    PasswordValidationError.noSymbol => 'Debe incluir al menos un carácter especial',
+  String? _getError(PasswordFieldError? e) => switch (e) {
+    PasswordFieldError.empty => 'Escribe tu contraseña',
+    PasswordFieldError.lessThan12Chars => 'Debe tener al menos 12 caracteres',
+    PasswordFieldError.noNumber => 'Debe incluir al menos un número',
+    PasswordFieldError.noUpper => 'Debe incluir al menos una letra mayúscula',
+    PasswordFieldError.noLower => 'Debe incluir al menos una letra minúscula',
+    PasswordFieldError.hasSpaces => 'No debe contener espacios',
+    PasswordFieldError.noSymbol => 'Debe incluir al menos un carácter especial',
     null => null,
   };
 

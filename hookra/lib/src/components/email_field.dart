@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hookra/src/components/components.dart';
-import 'package:hookra/src/models/models.dart';
+
+enum EmailFieldError { empty, noAtSymbol, noLocal, noDomain }
 
 class EmailField extends StatelessWidget {
   final void Function(String) onChanged;
   final void Function(String)? onSubmitted;
-  final EmailValidationError? validationError;
+  final EmailFieldError? validationError;
   final TextInputAction? textInputAction;
 
   const EmailField({
@@ -16,11 +17,11 @@ class EmailField extends StatelessWidget {
     this.textInputAction,
   });
 
-  String? _getError(EmailValidationError? e) => switch (e) {
-    EmailValidationError.empty => 'Escribe tu email',
-    EmailValidationError.noAtSymbol => 'No incluiste un @',
-    EmailValidationError.noLocal => 'No incluiste tu nombre de usuario',
-    EmailValidationError.noDomain => 'No incluiste el dominio',
+  String? _getError(EmailFieldError? e) => switch (e) {
+    EmailFieldError.empty => 'Escribe tu email',
+    EmailFieldError.noAtSymbol => 'No incluiste un @',
+    EmailFieldError.noLocal => 'No incluiste tu nombre de usuario',
+    EmailFieldError.noDomain => 'No incluiste el dominio',
     null => null,
   };
 
