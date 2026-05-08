@@ -1,4 +1,4 @@
-import 'package:hookra/src/models/user.dart';
+import 'package:hookra/src/profile/domain/entities/user.dart';
 import 'package:test/test.dart';
 
 void main() {

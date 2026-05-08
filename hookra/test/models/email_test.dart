@@ -1,4 +1,4 @@
-import 'package:hookra/src/models/email.dart';
+import 'package:hookra/src/auth/domain/value_objects/email.dart';
 import 'package:test/test.dart';
 
 void main() {

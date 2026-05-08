@@ -7,15 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:uni_links/uni_links.dart';
 
-import 'package:hookra/src/config/supabase.dart';
-import 'package:hookra/src/config/auth_token_holder.dart';
-import 'package:hookra/features/auth/ui/bloc/login_bloc.dart';
-import 'package:hookra/features/auth/ui/bloc/signup_bloc.dart';
-import 'package:hookra/features/auth/ui/screens/login_screen.dart';
-import 'package:hookra/features/auth/ui/screens/signup_screen.dart';
-import 'package:hookra/features/auth/ui/screens/forgot_password_screen.dart';
-import 'package:hookra/features/auth/ui/screens/reset_password_screen.dart';
-import 'package:hookra/features/home/ui/screens/home_screen.dart';
+import 'package:hookra/src/config/config.dart';
+import 'package:hookra/src/app/app.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -34,6 +27,7 @@ class AppBlocObserver extends BlocObserver {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
 
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
