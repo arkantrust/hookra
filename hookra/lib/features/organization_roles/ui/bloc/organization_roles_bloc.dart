@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/features/organization_roles/domain/model/organization_member.dart';
 import 'package:hookra/features/organization_roles/domain/usecases/get_organization_members_usecase.dart';
@@ -95,9 +97,13 @@ class OrganizationRolesBloc
     OrganizationRolesStarted event,
     Emitter<OrganizationRolesState> emit,
   ) async {
+    developer.log('OrganizationRolesBloc: _onStarted called');
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final context = await _getMembersUsecase.execute();
+      developer.log(
+        'OrganizationRolesBloc: Members loaded successfully: ${context.members.length} members',
+      );
       emit(
         state.copyWith(
           isLoading: false,
@@ -107,7 +113,11 @@ class OrganizationRolesBloc
           members: context.members,
         ),
       );
-    } catch (e) {
+    } catch (e, s) {
+      developer.log(
+        'OrganizationRolesBloc: Error loading members: $e',
+        stackTrace: s,
+      );
       emit(
         state.copyWith(
           isLoading: false,

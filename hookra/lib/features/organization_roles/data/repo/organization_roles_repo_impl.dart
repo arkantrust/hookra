@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:hookra/features/organization_roles/data/sources/organization_roles_data_source.dart';
 import 'package:hookra/features/organization_roles/domain/model/organization_member.dart';
 import 'package:hookra/features/organization_roles/domain/model/organization_members_context.dart';
@@ -34,7 +36,14 @@ class OrganizationRolesRepoImpl extends OrganizationRolesRepo {
         .toSet()
         .toList(growable: false);
 
-    final profilesById = await _source.getProfilesByIds(profileIds);
+    // Intenta obtener perfiles, pero si falla por RLS, usa fallback
+    Map<String, Map<String, dynamic>> profilesById = {};
+    try {
+      profilesById = await _source.getProfilesByIds(profileIds);
+    } catch (e) {
+      developer.log('Warning: Could not fetch profiles, using fallback: $e');
+      // Fallback: los miembros mostrarán UUID como nombre
+    }
 
     final members =
         memberRows.map((member) {

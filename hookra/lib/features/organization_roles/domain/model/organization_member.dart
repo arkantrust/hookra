@@ -56,7 +56,7 @@ class OrganizationMember {
     if (email.isNotEmpty) {
       return email;
     }
-    return profileId;
+    return profileId.substring(0, 8);
   }
 
   OrganizationMember copyWith({

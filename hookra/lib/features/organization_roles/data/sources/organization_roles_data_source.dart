@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class OrganizationRolesDataSource {
@@ -25,11 +27,32 @@ class OrganizationRolesDataSource {
   Future<List<Map<String, dynamic>>> getOrganizationMembersRows(
     String organizationId,
   ) async {
+    // Try RPC first (uses a SECURITY DEFINER function that joins profiles)
+    try {
+      final rpcResult = await _supabase.rpc(
+        'get_org_members_with_profiles',
+        params: {'org_uuid': organizationId},
+      );
+      developer.log('RPC result: $rpcResult');
+      if (rpcResult != null && rpcResult is List) {
+        return (rpcResult as List)
+            .map((row) => Map<String, dynamic>.from(row as Map))
+            .toList(growable: false);
+      }
+    } catch (e, s) {
+      developer.log(
+        'RPC call failed or returned unexpected format: $e',
+        stackTrace: s,
+      );
+    }
+
+    // Fallback: plain select from organization_members
     final rows = await _supabase
         .from('organization_members')
         .select('organization_id, profile_id, role')
         .eq('organization_id', organizationId);
 
+    developer.log('Organization members (fallback): $rows');
     return (rows as List)
         .map((row) => Map<String, dynamic>.from(row as Map))
         .toList(growable: false);
@@ -47,6 +70,8 @@ class OrganizationRolesDataSource {
         .select('id, first_name, last_name, email')
         .inFilter('id', profileIds);
 
+    developer.log('Profiles fetched: $rows for IDs: $profileIds');
+
     final profiles = <String, Map<String, dynamic>>{};
     for (final row in (rows as List)) {
       final profile = Map<String, dynamic>.from(row as Map);
@@ -56,6 +81,7 @@ class OrganizationRolesDataSource {
       }
     }
 
+    developer.log('Profiles map: $profiles');
     return profiles;
   }
 
