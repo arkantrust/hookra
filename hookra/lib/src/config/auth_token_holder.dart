@@ -2,14 +2,12 @@
 /// Tokens are stored only in memory and cleared after consumption.
 class AuthTokenHolder {
   String? _accessToken;
-  String? _refreshToken;
 
   AuthTokenHolder._internal();
   static final AuthTokenHolder instance = AuthTokenHolder._internal();
 
-  void setTokens({required String accessToken, String? refreshToken}) {
+  void setTokens({required String accessToken}) {
     _accessToken = accessToken;
-    _refreshToken = refreshToken;
   }
 
   /// Consume the access token (returns it and clears it from memory).
@@ -23,6 +21,5 @@ class AuthTokenHolder {
 
   void clear() {
     _accessToken = null;
-    _refreshToken = null;
   }
 }

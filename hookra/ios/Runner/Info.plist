@@ -55,10 +55,10 @@
 				<key>CFBundleTypeRole</key>
 				<string>Editor</string>
 				<key>CFBundleURLName</key>
-				<string>hookra</string>
+				<string>app.ddulce.hookra</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>hookra</string>
+					<string>app.ddulce.hookra</string>
 				</array>
 			</dict>
 		</array>

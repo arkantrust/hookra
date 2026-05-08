@@ -1,14 +1,16 @@
 import 'dart:developer';
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'package:hookra/src/config/config.dart';
+import 'package:hookra/src/config/auth_token_holder.dart';
 import 'package:hookra/src/app/app.dart';
+import 'package:hookra/src/auth/auth.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -27,7 +29,6 @@ class AppBlocObserver extends BlocObserver {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
 
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
@@ -38,13 +39,23 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: '.env');
     await initSupabase();
+    initServiceLocator();
     runApp(const HookraApp());
   } catch (e, s) {
     log('Startup error: $e', stackTrace: s);
-    runApp(MaterialApp(home: Scaffold(body: Center(child: Text('Error: $e')))));
+    runApp(
+      MaterialApp(
+        home: Scaffold(body: Center(child: Text('Error de inicio: $e'))),
+      ),
+    );
   }
 }
 
+/// Thin stateful wrapper around [App].
+///
+/// Sole responsibility: intercept Supabase password-recovery deep links,
+/// extract tokens into [AuthTokenHolder], and navigate to the reset-password
+/// screen via GoRouter. All actual app logic lives in [App].
 class HookraApp extends StatefulWidget {
   const HookraApp({super.key});
 
@@ -53,135 +64,113 @@ class HookraApp extends StatefulWidget {
 }
 
 class _HookraAppState extends State<HookraApp> {
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final _navigatorKey = GlobalKey<NavigatorState>();
   StreamSubscription<Uri?>? _sub;
   String? _lastHandledUri;
+  String? _pendingRoute; // For cold-start: navigate after first frame
 
   @override
   void initState() {
     super.initState();
-    // Handle the initial link if the app was launched from a deep link.
     _handleInitialUri();
-    // Listen to incoming links while the app is running.
-    _sub = uriLinkStream.listen((uri) {
-      _handleUri(uri);
-    }, onError: (err) {
-      // ignore
-    });
+    _sub = uriLinkStream.listen(
+      (uri) => _handleUri(uri),
+      onError: (_) {/* ignore link errors */},
+    );
   }
 
   Future<void> _handleInitialUri() async {
     try {
       final uri = await getInitialUri();
       _handleUri(uri);
-    } catch (e) {
-      // ignore
-    }
+    } catch (_) {/* ignore */}
   }
 
   void _handleUri(Uri? uri) async {
     if (uri == null) return;
-    // Avoid double-processing the same URI (cold-start + stream may both fire).
+
+    // Deduplicate: cold-start + foreground stream may both fire the same URI.
     final uriString = uri.toString();
-    if (_lastHandledUri != null && _lastHandledUri == uriString) return;
+    if (_lastHandledUri == uriString) return;
     _lastHandledUri = uriString;
 
-    // Parse both query parameters and fragment parameters.
-    // Prefer query parameters (they survive across Android intents) and
-    // use fragment as a fallback.
+    // Parse both query parameters (survive Android intents) and
+    // fragment parameters (Supabase implicit flow fallback).
     final Map<String, String> params = {};
     if (uri.fragment.isNotEmpty) {
       try {
         params.addAll(Uri.splitQueryString(uri.fragment));
-      } catch (_) {
-        // ignore malformed fragment
-      }
+      } catch (_) {/* ignore malformed fragment */}
     }
-    // Add query parameters last so they override fragment values when present.
+    // Query params take precedence over fragment params.
     params.addAll(uri.queryParameters);
 
-    // Detect common Supabase recovery tokens
     final hasAccessToken = params.containsKey('access_token');
     final hasRefreshToken = params.containsKey('refresh_token');
     final flowType = params['type'] ?? '';
 
-    // Safe debug logs (do NOT print tokens!)
-    // Log presence of tokens and where they were found.
-    final foundWhere = <String>[];
-    if (uri.queryParameters.isNotEmpty) foundWhere.add('query');
-    if (uri.fragment.isNotEmpty) foundWhere.add('fragment');
-    // Example: "Deep link received (found in: query,fragment)"
-    // Using debugPrint avoids accidental long-term logging.
-    debugPrint('Deep link received (found in: ${foundWhere.join(',')})');
+    // Safe debug log — never print token values.
+    final foundIn = <String>[];
+    if (uri.queryParameters.isNotEmpty) foundIn.add('query');
+    if (uri.fragment.isNotEmpty) foundIn.add('fragment');
+    debugPrint('Deep link received (params found in: ${foundIn.join(',')})');
 
-    // We only process Supabase recovery links (type=recovery)
-    if (uri.path.contains('reset-password') && flowType == 'recovery' && (hasAccessToken || hasRefreshToken)) {
-      // Prefer to exchange refresh token for fresh access token when possible.
+    // Only handle Supabase password-recovery links.
+    if (uri.path.contains('reset-password') &&
+        flowType == 'recovery' &&
+        (hasAccessToken || hasRefreshToken)) {
       String? accessToken = params['access_token'];
-      String? refreshToken = params['refresh_token'];
+      final String? refreshToken = params['refresh_token'];
 
-      // If we have a refresh token, try to exchange it for a session with Supabase REST token endpoint.
+      // Try to exchange refresh token for a fresh access token when possible.
       if (refreshToken != null && refreshToken.isNotEmpty) {
         try {
-          final exchanged = await _exchangeRefreshToken(refreshToken);
+          final repo = sl<AuthRepository>();
+          final exchanged = await repo.exchangeRefreshToken(refreshToken);
           if (exchanged != null && exchanged['access_token'] != null) {
-            accessToken = exchanged['access_token'];
-            refreshToken = exchanged['refresh_token'] ?? refreshToken;
-            debugPrint('Recovered session from refresh token (exchange succeeded).');
+            accessToken = exchanged['access_token'] as String;
+            debugPrint('Deep link: refresh token exchanged successfully.');
           } else {
-            debugPrint('Refresh token exchange failed.');
+            debugPrint('Deep link: refresh token exchange returned no result.');
           }
         } catch (e) {
-          debugPrint('Refresh token exchange error: $e');
+          debugPrint('Deep link: refresh token exchange error: $e');
         }
       }
 
-      // If we have an access token we can proceed to the reset screen and pass it via arguments.
       if (accessToken != null && accessToken.isNotEmpty) {
-        // Pass tokens in-memory via Navigator arguments (do NOT persist them).
-        _navigatorKey.currentState?.pushNamed(
-          '/reset-password',
-          arguments: {'access_token_present': true},
+        // Store token in-memory only — never logged, never persisted to disk.
+        AuthTokenHolder.instance.setTokens(
+          accessToken: accessToken,
         );
-        // Store the raw token in a short-lived in-memory holder inside the AuthDataSource
-        // so the ResetPasswordScreen can use it without serializing to disk.
-        // We DO NOT log the token itself.
-        AuthTokenHolder.instance.setTokens(accessToken: accessToken, refreshToken: refreshToken);
+        _navigateTo(ResetPasswordPage.route().path);
         return;
       }
     }
 
-    // If we reach here, push reset-password but without tokens; screen will show invalid/expired.
+    // Deep link is for reset-password but has no valid tokens → navigate anyway;
+    // the ResetPasswordBloc will surface an expired-token error.
     if (uri.path.contains('reset-password')) {
-      _navigatorKey.currentState?.pushNamed('/reset-password', arguments: {'access_token_present': false});
+      _navigateTo(ResetPasswordPage.route().path);
     }
   }
 
-  Future<Map<String, dynamic>?> _exchangeRefreshToken(String refreshToken) async {
-    try {
-      final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: '');
-      final anonKey = dotenv.get('SUPABASE_ANON_KEY', fallback: '');
-      if (supabaseUrl.isEmpty || anonKey.isEmpty) return null;
-
-      final uri = Uri.parse(supabaseUrl).replace(path: '/auth/v1/token');
-
-      final body = 'grant_type=refresh_token&refresh_token=${Uri.encodeComponent(refreshToken)}';
-      final httpClient = HttpClient();
-      final request = await httpClient.postUrl(uri);
-      request.headers.set('Content-Type', 'application/x-www-form-urlencoded');
-      request.headers.set('apikey', anonKey);
-      request.write(body);
-      final response = await request.close();
-      final responseBody = await response.transform(utf8.decoder).join();
-      httpClient.close(force: true);
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        final Map<String, dynamic> json = jsonDecode(responseBody) as Map<String, dynamic>;
-        return json;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      return null;
+  /// Navigate via GoRouter. Guards against the case where the router has not
+  /// yet been attached to the widget tree (cold-start timing).
+  void _navigateTo(String path) {
+    final ctx = _navigatorKey.currentContext;
+    if (ctx != null && ctx.mounted) {
+      GoRouter.of(ctx).go(path);
+    } else {
+      // Router not ready yet — defer to after the first frame.
+      _pendingRoute = path;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final deferredCtx = _navigatorKey.currentContext;
+        if (deferredCtx != null && deferredCtx.mounted && _pendingRoute != null) {
+          GoRouter.of(deferredCtx).go(_pendingRoute!);
+          _pendingRoute = null;
+        }
+      });
     }
   }
 
@@ -193,24 +182,7 @@ class _HookraAppState extends State<HookraApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Hookra',
-      navigatorKey: _navigatorKey,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        '/login': (_) => BlocProvider(
-              create: (_) => LoginBloc(),
-              child: const LoginScreen(),
-            ),
-        '/signup': (_) => BlocProvider(
-              create: (_) => SignupBloc(),
-              child: const SignupScreen(),
-            ),
-        '/forgot-password': (_) => const ForgotPasswordScreen(),
-        '/reset-password': (_) => const ResetPasswordScreen(),
-        '/home': (_) => const HomeScreen(),
-      },
-    );
+    // Delegate everything to App — this widget only manages deep links.
+    return App(navigatorKey: _navigatorKey);
   }
 }

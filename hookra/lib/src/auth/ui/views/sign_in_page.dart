@@ -95,15 +95,18 @@ class SignInPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
 
-                          // TODO: Forgot password?
+                          // Forgot password
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 8.0),
                             child: Align(
                               alignment: Alignment.centerRight,
-                              child: Text(
-                                'Olvidaste tu contraseña?',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.primaryContainer,
+                              child: GestureDetector(
+                                onTap: () => context.go(ForgotPasswordPage.route().path),
+                                child: Text(
+                                  '¿Olvidaste tu contraseña?',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                  ),
                                 ),
                               ),
                             ),

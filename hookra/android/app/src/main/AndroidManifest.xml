@@ -35,7 +35,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accept hookra://reset-password and any path under hookra:// -->
-                <data android:scheme="hookra" />
+                <data android:scheme="app.ddulce.hookra" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

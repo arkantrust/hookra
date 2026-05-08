@@ -4,15 +4,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final supabase = Supabase.instance.client;
 
 Future<void> initSupabase() async {
-  var url = dotenv.get('SUPABASE_URL', fallback: '');
-  var publishableKey = dotenv.get('SUPABASE_PUBLISHABLE_KEY', fallback: '');
-  if (url.isEmpty || publishableKey.isEmpty) {
-    throw Exception('Supabase URL and Publishable Key must be provided');
+  final url = dotenv.get('SUPABASE_URL', fallback: '');
+  final anonKey = dotenv.get('SUPABASE_ANON_KEY', fallback: '');
+  if (url.isEmpty || anonKey.isEmpty) {
+    throw Exception('SUPABASE_URL and SUPABASE_ANON_KEY must be provided in .env');
   }
 
   await Supabase.initialize(
     url: url,
-    anonKey: publishableKey, // We're now using assymetric JWTs but the parameter name is still anonKey for backward compatibility
+    anonKey: anonKey,
   );
 }
 
