@@ -78,9 +78,24 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       return;
     }
 
+    await _createProfile(state.first.value, state.last.value, state.email.value);
     await _createDefaultOrganization(state.first.value);
 
     emit(state.copyWith(status: FormzSubmissionStatus.success, error: ''));
+  }
+
+  Future<void> _createProfile(String firstName, String lastName, String email) async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+
+      await Supabase.instance.client.from('profiles').insert({
+        'id': user.id,
+        'first_name': firstName,
+        'last_name': lastName,
+        'email': email,
+      });
+    } catch (_) {}
   }
 
   Future<void> _createDefaultOrganization(String firstName) async {
