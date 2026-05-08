@@ -54,7 +54,9 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
   }
 
   String _mapError(String error) {
-    if (error.contains('already')) return 'Este correo ya está registrado';
+    if (error.contains('already') || error.contains('Email rate limit exceeded')) {
+      return 'Este correo ya está registrado. Si eliminaste tu cuenta, espera unos minutos e intenta de nuevo.';
+    }
     if (error.contains('weak')) return 'La contraseña es muy débil';
     if (error.contains('network') || error.contains('socket')) {
       return 'No estás conectado a internet';

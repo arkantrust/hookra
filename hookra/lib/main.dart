@@ -9,7 +9,8 @@ import 'package:hookra/features/auth/ui/bloc/login_bloc.dart';
 import 'package:hookra/features/auth/ui/bloc/signup_bloc.dart';
 import 'package:hookra/features/auth/ui/screens/login_screen.dart';
 import 'package:hookra/features/auth/ui/screens/signup_screen.dart';
-import 'package:hookra/features/home/ui/screens/home_screen.dart';
+import 'package:hookra/features/organizations/ui/screens/organizations_screen.dart';
+import 'package:hookra/features/organizations/ui/screens/organization_detail_screen.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -63,7 +64,7 @@ class HookraApp extends StatelessWidget {
           create: (_) => SignupBloc(),
           child: const SignupScreen(),
         ),
-        '/home': (_) => const HomeScreen(),
+        '/home': (_) => const OrganizationsScreen(),
       },
     );
   }

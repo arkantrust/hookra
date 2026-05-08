@@ -3,10 +3,13 @@ import 'package:hookra/features/auth/data/repo/auth_repo_impl.dart';
 import 'package:hookra/features/profile/domain/model/profile.dart';
 import 'package:hookra/features/profile/domain/repo/profile_repository.dart';
 import 'package:hookra/features/profile/data/repo/profile_repository_impl.dart';
+import 'package:hookra/features/organizations/domain/repo/organization_repository.dart';
+import 'package:hookra/features/organizations/data/repo/organization_repository_impl.dart';
 
 class SignupUsecase {
-  AuthRepo authRepo = AuthRepoImpl();
-  ProfileRepository profileRepo = ProfileRepositoryImpl();
+  final AuthRepo authRepo = AuthRepoImpl();
+  final ProfileRepository profileRepo = ProfileRepositoryImpl();
+  final OrganizationRepository orgRepo = OrganizationRepositoryImpl();
 
   Future<void> execute(
     String firstName,
@@ -18,5 +21,10 @@ class SignupUsecase {
     await profileRepo.saveProfile(
       Profile(id: userId, firstName: firstName, lastName: lastName, email: email),
     );
+    final organization = await orgRepo.createOrganization(
+      'Organization of $firstName',
+      userId,
+    );
+    await orgRepo.addMember(organization.id, userId, 'owner');
   }
 }
