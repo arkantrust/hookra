@@ -6,11 +6,11 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   static GoRoute route() {
-    return GoRoute(path: '/', builder: (context, state) => const OrganizationsScreen());
+    return GoRoute(path: '/', builder: (context, state) => const HomePage());
   }
 
   @override
   Widget build(BuildContext context) {
-    return const OrganizationsScreen();
+    return const OrganizationsPage();
   }
 }

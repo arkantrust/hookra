@@ -44,7 +44,7 @@ class AppRouter {
 
         // If authenticated and going to auth, redirect to home
         if (isAuthenticated && goingToAuth) return HomePage.route().path;
-        // return null;
+        return null; // Needed for this function
       },
       routes: [
         ShellRoute(
@@ -52,7 +52,7 @@ class AppRouter {
           routes: [
             HomePage.route(), // route: /
             ProfilePage.route(), // route: /profile
-            OrganizationsScreen.route(), // route: /organizations
+            OrganizationsPage.route(), // route: /organizations
           ],
         ),
         SignInPage.route(), // route: /auth/sign-in

@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:hookra/features/organizations/domain/model/organization_member.dart';
-import 'package:hookra/features/organizations/domain/model/organization_with_role.dart';
-import 'package:hookra/features/organizations/domain/repo/organization_repository.dart';
-import 'package:hookra/features/organizations/ui/screens/organization_detail_screen.dart';
+import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/organizations/domain/model/organization_with_role.dart';
+import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
+import 'package:hookra/src/organizations/ui/pages/organization_details_page.dart';
 
-class OrganizationsScreen extends StatefulWidget {
-  const OrganizationsScreen({super.key});
+class OrganizationsPage extends StatefulWidget {
+  const OrganizationsPage({super.key});
 
   static GoRoute route() {
     return GoRoute(
       path: '/organizations',
-      builder: (context, state) => const OrganizationsScreen(),
+      builder: (context, state) => const OrganizationsPage(),
     );
   }
 
   @override
-  State<OrganizationsScreen> createState() => _OrganizationsScreenState();
+  State<OrganizationsPage> createState() => _OrganizationsPageState();
 }
 
-class _OrganizationsScreenState extends State<OrganizationsScreen> {
+class _OrganizationsPageState extends State<OrganizationsPage> {
   final OrganizationRepository _repository = sl<OrganizationRepository>();
   late Future<List<OrganizationWithRole>> _organizationsFuture;
 
@@ -227,7 +227,7 @@ class _OrganizationCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => OrganizationDetailScreen(
+              builder: (_) => OrganizationDetailsPage(
                 organizationId: organization.id,
               ),
             ),

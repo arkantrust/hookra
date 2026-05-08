@@ -1,8 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:hookra/features/organizations/domain/model/organization.dart';
-import 'package:hookra/features/organizations/domain/model/organization_member.dart';
-import 'package:hookra/features/organizations/domain/model/organization_with_role.dart';
-import 'package:hookra/features/organizations/domain/repo/organization_repository.dart';
+import 'package:hookra/src/organizations/domain/model/organization.dart';
+import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/organizations/domain/model/organization_with_role.dart';
+import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
 import 'package:hookra/src/profile/profile.dart';
 
 class SupabaseOrganizationRepository extends OrganizationRepository {

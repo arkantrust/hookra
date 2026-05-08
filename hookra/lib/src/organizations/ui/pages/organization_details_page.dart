@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:hookra/features/organizations/domain/model/organization.dart';
-import 'package:hookra/features/organizations/domain/model/organization_member.dart';
-import 'package:hookra/features/organizations/domain/repo/organization_repository.dart';
+import 'package:hookra/src/organizations/domain/model/organization.dart';
+import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
 
-class OrganizationDetailScreen extends StatefulWidget {
+class OrganizationDetailsPage extends StatefulWidget {
   final String organizationId;
 
-  const OrganizationDetailScreen({
+  const OrganizationDetailsPage({
     super.key,
     required this.organizationId,
   });
 
   @override
-  State<OrganizationDetailScreen> createState() => _OrganizationDetailScreenState();
+  State<OrganizationDetailsPage> createState() => _OrganizationDetailsPageState();
 }
 
-class _OrganizationDetailScreenState extends State<OrganizationDetailScreen> {
+class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
   final OrganizationRepository _repository = sl<OrganizationRepository>();
   
   Organization? _organization;
