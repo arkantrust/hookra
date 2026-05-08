@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-// Generate color schemes from blue seed color
-var lightPalette = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.light);
+// Generate color schemes
+var lightPalette = ColorScheme.fromSeed(seedColor: Color(0xFF70020F), brightness: Brightness.light);
 
-var darkPalette = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark);
+var darkPalette = ColorScheme.fromSeed(seedColor: Color(0xFF70020F), brightness: Brightness.dark);
 
 ThemeData _appTheme(ColorScheme palette) {
   return ThemeData(

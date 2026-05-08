@@ -50,7 +50,7 @@ class SignUpPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Bienvenido a Triangul8',
+                              'Bienvenido a Hookra',
                               textScaler: MediaQuery.textScalerOf(context),
                               textAlign: TextAlign.center,
                               maxLines: 2,
@@ -170,9 +170,9 @@ class SignUpPage extends StatelessWidget {
                                   recognizer:
                                       TapGestureRecognizer()
                                         ..onTap = () => context.go(SignInPage.route().path),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(color: Colors.blue),
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                  ),
                                   text: 'Inicia sesión',
                                 ),
                               ],

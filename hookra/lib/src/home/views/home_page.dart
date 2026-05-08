@@ -23,7 +23,10 @@ class HomePage extends StatelessWidget {
                 const TextSpan(text: "We're still working on this, in the meantime visit our "),
                 TextSpan(
                   text: 'website',
-                  style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    decoration: TextDecoration.underline,
+                  ),
                   recognizer:
                       TapGestureRecognizer()
                         ..onTap =

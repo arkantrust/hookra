@@ -101,9 +101,9 @@ class SignInPage extends StatelessWidget {
                               alignment: Alignment.centerRight,
                               child: Text(
                                 'Olvidaste tu contraseña?',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.copyWith(color: Colors.blue),
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.primaryContainer,
+                                ),
                               ),
                             ),
                           ),
@@ -136,9 +136,9 @@ class SignInPage extends StatelessWidget {
                                   recognizer:
                                       TapGestureRecognizer()
                                         ..onTap = () => context.go(SignUpPage.route().path),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(color: Colors.blue),
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                  ),
                                   text: 'Regístrate',
                                 ),
                               ],
