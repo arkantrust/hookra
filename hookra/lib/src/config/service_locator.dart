@@ -17,6 +17,13 @@ void initServiceLocator() {
   // Use cases
   sl.registerFactory<SignInUseCase>(() => SignInUseCase(sl<AuthRepository>()));
   sl.registerFactory<SignUpUseCase>(() => SignUpUseCase(sl<AuthRepository>()));
+  sl.registerFactory<SignUpWithOrganizationUseCase>(
+    () => SignUpWithOrganizationUseCase(
+      sl<SignUpUseCase>(),
+      sl<GetUserUseCase>(),
+      sl<OrganizationRepository>(),
+    ),
+  );
   sl.registerFactory<SignOutUseCase>(() => SignOutUseCase(sl<AuthRepository>()));
   sl.registerFactory<WatchAuthStatusUseCase>(() => WatchAuthStatusUseCase(sl<AuthRepository>()));
   sl.registerFactory<GetUserUseCase>(() => GetUserUseCase(sl<UserRepository>()));
@@ -30,5 +37,5 @@ void initServiceLocator() {
     ),
   );
   sl.registerFactory<SignInBloc>(() => SignInBloc(signIn: sl<SignInUseCase>()));
-  sl.registerFactory<SignUpBloc>(() => SignUpBloc(signUp: sl<SignUpUseCase>()));
+  sl.registerFactory<SignUpBloc>(() => SignUpBloc(signUp: sl<SignUpWithOrganizationUseCase>()));
 }

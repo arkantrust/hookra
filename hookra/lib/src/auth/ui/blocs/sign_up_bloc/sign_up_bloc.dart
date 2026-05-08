@@ -1,12 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
-import 'package:hookra/src/config/config.dart';
-import 'package:hookra/src/organizations/organizations.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:hookra/src/auth/domain/failures/auth_failure.dart';
-import 'package:hookra/src/auth/domain/use_cases/sign_up_use_case.dart';
+import 'package:hookra/src/auth/domain/use_cases/sign_up_with_organization_use_case.dart';
 import 'package:hookra/src/auth/domain/value_objects/email.dart';
 import 'package:hookra/src/auth/domain/value_objects/name.dart';
 import 'package:hookra/src/auth/domain/value_objects/password.dart';
@@ -16,11 +13,9 @@ part 'sign_up_event.dart';
 part 'sign_up_state.dart';
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
-  final SignUpUseCase _signUp;
+  final SignUpWithOrganizationUseCase _signUp;
 
-  SignUpBloc({required SignUpUseCase signUp})
-    : _signUp = signUp,
-      super(SignUpState()) {
+  SignUpBloc({required SignUpWithOrganizationUseCase signUp}) : _signUp = signUp, super(SignUpState()) {
     on<SignUpFirstChanged>(_onFirstChanged);
     on<SignUpLastChanged>(_onLastChanged);
     on<SignUpEmailChanged>(_onEmailChanged);
@@ -79,39 +74,6 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       return;
     }
 
-    await _createProfile(state.first.value, state.last.value, state.email.value);
-    await _createDefaultOrganization(state.first.value);
-
     emit(state.copyWith(status: FormzSubmissionStatus.success, error: ''));
-  }
-
-    // TODO: Handle as use case
-  Future<void> _createProfile(String firstName, String lastName, String email) async {
-    try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return;
-
-      await Supabase.instance.client.from('profiles').insert({
-        'id': user.id,
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-      });
-    } catch (_) {}
-  }
-
-  // TODO: Handle as use case
-  Future<void> _createDefaultOrganization(String firstName) async {
-    try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return;
-
-      final orgRepo = sl<OrganizationRepository>();
-      final organization = await orgRepo.createOrganization(
-        'Organization of $firstName',
-        user.id,
-      );
-      await orgRepo.addMember(organization.id, user.id, 'owner');
-    } catch (_) {}
   }
 }
