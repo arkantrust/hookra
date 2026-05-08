@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hookra/src/components/components.dart';
 
+enum NameFieldError { empty }
+
 class NameField extends StatelessWidget {
   final String label;
-  final bool isEmpty;
+  final NameFieldError? validationError;
   final void Function(String) onChanged;
   final void Function(String)? onSubmitted;
   final TextInputAction? textInputAction;
@@ -12,10 +14,15 @@ class NameField extends StatelessWidget {
     super.key,
     required this.label,
     required this.onChanged,
-    required this.isEmpty,
+    required this.validationError,
     this.onSubmitted,
     this.textInputAction,
   });
+
+  String? _getError(NameFieldError? e) => switch (e) {
+    NameFieldError.empty => 'Escribe tu ${label.toLowerCase()}',
+    null => null,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,7 @@ class NameField extends StatelessWidget {
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       textInputAction: textInputAction,
-      error: isEmpty ? 'Escribe tu ${label.toLowerCase()}' : null,
+      error: _getError(validationError),
       enableSuggestions: true,
       textCapitalization: TextCapitalization.words,
       keyboardType: TextInputType.name,
