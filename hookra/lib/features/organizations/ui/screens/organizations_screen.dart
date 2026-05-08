@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hookra/src/config/config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hookra/features/organizations/domain/model/organization_member.dart';
 import 'package:hookra/features/organizations/domain/model/organization_with_role.dart';
 import 'package:hookra/features/organizations/domain/repo/organization_repository.dart';
-import 'package:hookra/features/organizations/data/repo/organization_repository_impl.dart';
 import 'package:hookra/features/organizations/ui/screens/organization_detail_screen.dart';
 
 class OrganizationsScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class OrganizationsScreen extends StatefulWidget {
 }
 
 class _OrganizationsScreenState extends State<OrganizationsScreen> {
-  final OrganizationRepository _repository = OrganizationRepositoryImpl();
+  final OrganizationRepository _repository = sl<OrganizationRepository>();
   late Future<List<OrganizationWithRole>> _organizationsFuture;
 
   @override

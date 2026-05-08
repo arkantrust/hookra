@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
+import 'package:hookra/src/config/config.dart';
+import 'package:hookra/src/organizations/organizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:hookra/src/auth/domain/failures/auth_failure.dart';
@@ -9,7 +11,6 @@ import 'package:hookra/src/auth/domain/value_objects/email.dart';
 import 'package:hookra/src/auth/domain/value_objects/name.dart';
 import 'package:hookra/src/auth/domain/value_objects/password.dart';
 import 'package:hookra/src/utils/network.dart';
-import 'package:hookra/src/organizations/organizations.dart';
 
 part 'sign_up_event.dart';
 part 'sign_up_state.dart';
@@ -84,6 +85,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     emit(state.copyWith(status: FormzSubmissionStatus.success, error: ''));
   }
 
+    // TODO: Handle as use case
   Future<void> _createProfile(String firstName, String lastName, String email) async {
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -98,12 +100,13 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     } catch (_) {}
   }
 
+  // TODO: Handle as use case
   Future<void> _createDefaultOrganization(String firstName) async {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) return;
 
-      final orgRepo = OrganizationRepositoryImpl();
+      final orgRepo = sl<OrganizationRepository>();
       final organization = await orgRepo.createOrganization(
         'Organization of $firstName',
         user.id,
