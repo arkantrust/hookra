@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
 import 'package:hookra/src/auth/domain/failures/auth_failure.dart';
-import 'package:hookra/src/auth/domain/use_cases/sign_up_use_case.dart';
+import 'package:hookra/src/auth/domain/use_cases/sign_up_with_organization_use_case.dart';
 import 'package:hookra/src/auth/domain/value_objects/email.dart';
 import 'package:hookra/src/auth/domain/value_objects/name.dart';
 import 'package:hookra/src/auth/domain/value_objects/password.dart';
@@ -13,9 +13,9 @@ part 'sign_up_event.dart';
 part 'sign_up_state.dart';
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
-  final SignUpUseCase _signUp;
+  final SignUpWithOrganizationUseCase _signUp;
 
-  SignUpBloc({required SignUpUseCase signUp})
+  SignUpBloc({required SignUpWithOrganizationUseCase signUp})
     : _signUp = signUp,
       super(SignUpState()) {
     on<SignUpFirstChanged>(_onFirstChanged);
@@ -41,17 +41,26 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     emit(state.copyWith(email: email));
   }
 
-  void _onPasswordChanged(SignUpPasswordChanged event, Emitter<SignUpState> emit) {
+  void _onPasswordChanged(
+    SignUpPasswordChanged event,
+    Emitter<SignUpState> emit,
+  ) {
     final password = Password.dirty(event.password);
     emit(state.copyWith(password: password));
   }
 
-  void _onConfirmChanged(SignUpConfirmChanged event, Emitter<SignUpState> emit) {
+  void _onConfirmChanged(
+    SignUpConfirmChanged event,
+    Emitter<SignUpState> emit,
+  ) {
     final confirm = Password.dirty(event.confirm);
     emit(state.copyWith(confirm: confirm));
   }
 
-  Future<void> _onSubmitted(SignUpSubmitted event, Emitter<SignUpState> emit) async {
+  Future<void> _onSubmitted(
+    SignUpSubmitted event,
+    Emitter<SignUpState> emit,
+  ) async {
     if (!state.isValid) return;
 
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress, error: ''));

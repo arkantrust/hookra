@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/organizations/organizations.dart';
 
 GetIt sl = GetIt.instance;
 
@@ -13,10 +14,23 @@ void initServiceLocator() {
   sl.registerSingleton<UserRepository>(
     SupabaseUserRepository(supabase: supabase),
   );
+  sl.registerSingleton<OrganizationRepository>(
+    SupabaseOrganizationRepository(
+      supabase: supabase,
+      userRepository: sl<UserRepository>(),
+    ),
+  );
 
     // Use cases
   sl.registerFactory<SignInUseCase>(() => SignInUseCase(sl<AuthRepository>()));
   sl.registerFactory<SignUpUseCase>(() => SignUpUseCase(sl<AuthRepository>()));
+  sl.registerFactory<SignUpWithOrganizationUseCase>(
+    () => SignUpWithOrganizationUseCase(
+      sl<SignUpUseCase>(),
+      sl<GetUserUseCase>(),
+      sl<OrganizationRepository>(),
+    ),
+  );
   sl.registerFactory<SignOutUseCase>(
     () => SignOutUseCase(sl<AuthRepository>()),
   );
@@ -25,6 +39,9 @@ void initServiceLocator() {
   );
   sl.registerFactory<GetUserUseCase>(
     () => GetUserUseCase(sl<UserRepository>()),
+  );
+  sl.registerFactory<UpdateMemberRoleUseCase>(
+    () => UpdateMemberRoleUseCase(sl<OrganizationRepository>()),
   );
 
   // BLoCs  
@@ -36,5 +53,13 @@ void initServiceLocator() {
     ),
   );
   sl.registerFactory<SignInBloc>(() => SignInBloc(signIn: sl<SignInUseCase>()));
-  sl.registerFactory<SignUpBloc>(() => SignUpBloc(signUp: sl<SignUpUseCase>()));
+  sl.registerFactory<SignUpBloc>(
+    () => SignUpBloc(signUp: sl<SignUpWithOrganizationUseCase>()),
+  );
+  sl.registerFactoryParam<OrganizationMembersBloc, String, void>(
+    (organizationId, _) => OrganizationMembersBloc(
+      repository: sl<OrganizationRepository>(),
+      updateMemberRoleUseCase: sl<UpdateMemberRoleUseCase>(),
+    ),
+  );
 }

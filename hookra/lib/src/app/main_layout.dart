@@ -28,7 +28,11 @@ class MainLayout extends StatelessWidget {
           selectedIndex: currentIndex,
           destinations: [
             for (final tab in tabs)
-              NavigationDestination(icon: Icon(tab.icon), label: tab.label, tooltip: tab.label),
+              NavigationDestination(
+                icon: Icon(tab.icon),
+                label: tab.label,
+                tooltip: tab.label,
+              ),
           ],
           onDestinationSelected: (index) {
             final newRoute = tabs[index].route;
@@ -45,5 +49,9 @@ class _TabItem {
   final String route;
   final String label;
 
-  const _TabItem({required this.icon, required this.route, required this.label});
+  const _TabItem({
+    required this.icon,
+    required this.route,
+    required this.label,
+  });
 }

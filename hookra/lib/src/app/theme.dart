@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
 // Generate color schemes
-var lightPalette = ColorScheme.fromSeed(seedColor: Color(0xFF70020F), brightness: Brightness.light);
+var lightPalette = ColorScheme.fromSeed(
+  seedColor: Color(0xFF70020F),
+  brightness: Brightness.light,
+);
 
-var darkPalette = ColorScheme.fromSeed(seedColor: Color(0xFF70020F), brightness: Brightness.dark);
+var darkPalette = ColorScheme.fromSeed(
+  seedColor: Color(0xFF70020F),
+  brightness: Brightness.dark,
+);
 
 ThemeData _appTheme(ColorScheme palette) {
   return ThemeData(
@@ -241,7 +247,11 @@ ThemeData _appTheme(ColorScheme palette) {
     ),
 
     // Divider Theme
-    dividerTheme: DividerThemeData(color: palette.outlineVariant, thickness: 1, space: 1),
+    dividerTheme: DividerThemeData(
+      color: palette.outlineVariant,
+      thickness: 1,
+      space: 1,
+    ),
 
     // Icon Theme
     iconTheme: IconThemeData(color: palette.onSurfaceVariant, size: 24),
@@ -385,7 +395,10 @@ ThemeData _appTheme(ColorScheme palette) {
         insets: const EdgeInsets.symmetric(horizontal: 16),
       ),
       labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      unselectedLabelStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
     ),
 
     // Expansion Tile Theme
@@ -397,7 +410,9 @@ ThemeData _appTheme(ColorScheme palette) {
       iconColor: palette.onSurfaceVariant,
       collapsedIconColor: palette.onSurfaceVariant,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      collapsedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
     ),
   );
 }

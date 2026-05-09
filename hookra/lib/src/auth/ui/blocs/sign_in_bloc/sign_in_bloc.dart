@@ -14,7 +14,9 @@ part 'sign_in_state.dart';
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
   final SignInUseCase _signIn;
 
-  SignInBloc({required SignInUseCase signIn}) : _signIn = signIn, super(SignInState()) {
+  SignInBloc({required SignInUseCase signIn})
+    : _signIn = signIn,
+      super(SignInState()) {
     on<SignInEmailChanged>(_onEmailChanged);
     on<SignInPasswordChanged>(_onPasswordChanged);
     on<SignInSubmitted>(_onSubmitted);
@@ -25,17 +27,26 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     emit(state.copyWith(email: email));
   }
 
-  void _onPasswordChanged(SignInPasswordChanged event, Emitter<SignInState> emit) {
+  void _onPasswordChanged(
+    SignInPasswordChanged event,
+    Emitter<SignInState> emit,
+  ) {
     final password = Password.dirty(event.password);
     emit(state.copyWith(password: password));
   }
 
-  Future<void> _onSubmitted(SignInSubmitted event, Emitter<SignInState> emit) async {
+  Future<void> _onSubmitted(
+    SignInSubmitted event,
+    Emitter<SignInState> emit,
+  ) async {
     if (!state.isValid) return;
 
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress, error: ''));
 
-    final res = await _signIn(email: state.email.value, password: state.password.value);
+    final res = await _signIn(
+      email: state.email.value,
+      password: state.password.value,
+    );
 
     if (res.isFailure) {
       final err = res.errorOrNull;
