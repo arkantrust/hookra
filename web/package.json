@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vinext dev",
-    "build": "tsgo --noEmit && rm -rf ./workers/ && vinext build",
+    "build": "tsgo --noEmit && rm -rf ./worker/ && vinext build",
     "start": "vinext start",
     "deploy": "vinext deploy",
     "lint": "oxlint --fix",
