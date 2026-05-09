@@ -1,19 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/app/main_layout.dart';
 
 import 'package:hookra/src/home/home.dart';
-import 'package:hookra/src/authentication/authentication.dart';
+import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/organizations/organizations.dart';
 
-class AuthenticationRefreshStream extends ChangeNotifier {
+class AuthRefreshStream extends ChangeNotifier {
   late final StreamSubscription _subscription;
 
-  AuthenticationRefreshStream(Stream<dynamic> stream) {
-    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  AuthRefreshStream(AuthBloc auth) {
+    _subscription = auth.stream.asBroadcastStream().listen((data) => notifyListeners());
   }
 
   @override
@@ -24,72 +24,39 @@ class AuthenticationRefreshStream extends ChangeNotifier {
 }
 
 class AppRouter {
-  final AuthenticationBloc auth;
-
-  final LocationPermissionBloc location;
+  final AuthBloc auth;
 
   late final GoRouter router;
 
-  AppRouter({required this.auth, required this.location}) {
+  AppRouter({required this.auth}) {
     router = GoRouter(
-      initialLocation: '/auth',
+      initialLocation: '/',
       debugLogDiagnostics: true,
-      refreshListenable: AuthenticationRefreshStream(auth.stream),
+      refreshListenable: AuthRefreshStream(auth),
       redirect: (context, state) {
         // The route is /auth/* (e.g., /auth/sign-in, /auth/sign-up, etc.)
-        final goingToAuth = state.matchedLocation.startsWith('/auth/');
-        final goingToPermissions = state.matchedLocation == LocationPermissionPage.route().path;
+        final goingToAuth = state.matchedLocation.startsWith('/auth');
 
-        final isAuthenticated = auth.state.status == AuthenticationStatus.authenticated;
+        final isAuthenticated = auth.state.status == AuthStatus.authenticated;
 
         // If not authenticated and not going to auth, redirect to auth
         if (!isAuthenticated && !goingToAuth) return SignInPage.route().path;
 
-        // If authenticated and not going to permissions, check location permissions
-        if (isAuthenticated && !goingToPermissions) {
-          if (location.state.status == LocationPermissionStatus.checking) {
-            return '/splash'; // Show splash while checking permissions
-          }
-
-          if (location.state.status == LocationPermissionStatus.granted) {
-            return null; // Allow navigation if permission is granted
-          }
-
-          // Redirect to permissions if not granted
-          return LocationPermissionPage.route().path;
-        }
-
-        return null;
+        // If authenticated and going to auth, redirect to home
+        if (isAuthenticated && goingToAuth) return HomePage.route().path;
+        return null; // Needed for this function
       },
       routes: [
-        LocationPermissionPage.route(), // route: /permissions/location
         ShellRoute(
           builder: (context, state, child) => MainLayout(child: child),
           routes: [
             HomePage.route(), // route: /
             ProfilePage.route(), // route: /profile
+            OrganizationsPage.route(), // route: /organizations
           ],
         ),
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
-        GoRoute(
-          path: '/splash',
-          builder: (context, state) {
-            return SafeArea(child: Scaffold(body: Center(child: CircularProgressIndicator())));
-          },
-        ),
-        GoRoute(
-          path: '/auth',
-          redirect: (context, state) {
-            final authStatus = context.read<AuthenticationBloc>().state.status;
-            return switch (authStatus) {
-              AuthenticationStatus.unknown =>
-                '/splash', // Wait for the authentication status to be determined
-              AuthenticationStatus.unauthenticated => SignInPage.route().path,
-              AuthenticationStatus.authenticated => LocationPermissionPage.route().path,
-            };
-          },
-        ),
       ],
       errorBuilder:
           (context, state) =>

@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:hookra/features/profile/domain/model/profile.dart';
 import 'package:hookra/src/organizations/domain/model/role.dart';
 
+enum OrganizationRole { owner, member, admin }
+
 class OrganizationMember extends Equatable {
   final String id;
   final String organizationId;

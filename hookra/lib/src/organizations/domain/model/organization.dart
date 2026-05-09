@@ -6,8 +6,8 @@ class Organization extends Equatable {
   final String slug;
   final String? logoUrl;
   final String ownerId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const Organization({
     required this.id,
@@ -15,8 +15,8 @@ class Organization extends Equatable {
     required this.slug,
     this.logoUrl,
     required this.ownerId,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Organization.fromJson(Map<String, dynamic> json) {
@@ -26,22 +26,27 @@ class Organization extends Equatable {
       slug: json['slug'] as String,
       logoUrl: json['logo_url'] as String?,
       ownerId: json['owner_id'] as String,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at'] as String) 
+          : null,
+      updatedAt: json['updated_at'] != null 
+          ? DateTime.parse(json['updated_at'] as String) 
+          : null,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'slug': slug,
-        'logo_url': logoUrl,
-        'owner_id': ownerId,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'slug': slug,
+      'logo_url': logoUrl,
+      'owner_id': ownerId,
+      if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+      if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
+    };
+  }
 
   @override
-  List<Object?> get props =>
-      [id, name, slug, logoUrl, ownerId, createdAt, updatedAt];
+  List<Object?> get props => [id, name, slug, logoUrl, ownerId, createdAt, updatedAt];
 }
