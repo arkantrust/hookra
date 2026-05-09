@@ -15,7 +15,9 @@ part 'sign_up_state.dart';
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   final SignUpWithOrganizationUseCase _signUp;
 
-  SignUpBloc({required SignUpWithOrganizationUseCase signUp}) : _signUp = signUp, super(SignUpState()) {
+  SignUpBloc({required SignUpWithOrganizationUseCase signUp})
+    : _signUp = signUp,
+      super(SignUpState()) {
     on<SignUpFirstChanged>(_onFirstChanged);
     on<SignUpLastChanged>(_onLastChanged);
     on<SignUpEmailChanged>(_onEmailChanged);
@@ -39,17 +41,26 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     emit(state.copyWith(email: email));
   }
 
-  void _onPasswordChanged(SignUpPasswordChanged event, Emitter<SignUpState> emit) {
+  void _onPasswordChanged(
+    SignUpPasswordChanged event,
+    Emitter<SignUpState> emit,
+  ) {
     final password = Password.dirty(event.password);
     emit(state.copyWith(password: password));
   }
 
-  void _onConfirmChanged(SignUpConfirmChanged event, Emitter<SignUpState> emit) {
+  void _onConfirmChanged(
+    SignUpConfirmChanged event,
+    Emitter<SignUpState> emit,
+  ) {
     final confirm = Password.dirty(event.confirm);
     emit(state.copyWith(confirm: confirm));
   }
 
-  Future<void> _onSubmitted(SignUpSubmitted event, Emitter<SignUpState> emit) async {
+  Future<void> _onSubmitted(
+    SignUpSubmitted event,
+    Emitter<SignUpState> emit,
+  ) async {
     if (!state.isValid) return;
 
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress, error: ''));

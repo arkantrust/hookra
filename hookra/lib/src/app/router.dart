@@ -13,7 +13,9 @@ class AuthRefreshStream extends ChangeNotifier {
   late final StreamSubscription _subscription;
 
   AuthRefreshStream(AuthBloc auth) {
-    _subscription = auth.stream.asBroadcastStream().listen((data) => notifyListeners());
+    _subscription = auth.stream.asBroadcastStream().listen(
+      (data) => notifyListeners(),
+    );
   }
 
   @override
@@ -59,8 +61,9 @@ class AppRouter {
         SignUpPage.route(), // route: /auth/sign-up
       ],
       errorBuilder:
-          (context, state) =>
-              SafeArea(child: Scaffold(body: Center(child: Text('Error: ${state.error}')))),
+          (context, state) => SafeArea(
+            child: Scaffold(body: Center(child: Text('Error: ${state.error}'))),
+          ),
     );
   }
 }

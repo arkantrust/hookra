@@ -13,7 +13,8 @@ import 'package:hookra/src/utils/result.dart';
 /// Caches the resulting [User] in memory until [dispose] is called.
 /// {@endtemplate}
 final class SupabaseUserRepository extends UserRepository {
-  SupabaseUserRepository({required SupabaseClient supabase}) : _supabase = supabase;
+  SupabaseUserRepository({required SupabaseClient supabase})
+    : _supabase = supabase;
 
   final SupabaseClient _supabase;
 
@@ -42,10 +43,15 @@ final class SupabaseUserRepository extends UserRepository {
         return Result.failure(const ServerUnreachable());
       }
     } catch (e, s) {
-      return Result.unknown(name: 'SupabaseUserRepository', error: e, stackTrace: s);
+      return Result.unknown(
+        name: 'SupabaseUserRepository',
+        error: e,
+        stackTrace: s,
+      );
     }
 
-    if (data == null || data.isEmpty) return Result.failure(const UserNotFound());
+    if (data == null || data.isEmpty)
+      return Result.failure(const UserNotFound());
     _user = User.fromJson(data);
     return Result.success(_user!);
   }

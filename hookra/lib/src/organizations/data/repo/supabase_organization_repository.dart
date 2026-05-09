@@ -15,6 +15,28 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
   final SupabaseClient _supabase;
   final UserRepository _userRepository;
 
+  static OrganizationRole _parseMemberRole(String? role) {
+    switch (role) {
+      case 'owner':
+        return OrganizationRole.owner;
+      case 'admin':
+        return OrganizationRole.admin;
+      default:
+        return OrganizationRole.member;
+    }
+  }
+
+  static String _roleToString(OrganizationRole role) {
+    switch (role) {
+      case OrganizationRole.owner:
+        return 'owner';
+      case OrganizationRole.admin:
+        return 'admin';
+      case OrganizationRole.member:
+        return 'member';
+    }
+  }
+
   @override
   Future<List<OrganizationWithRole>> getOrganizationsForCurrentUser() async {
     final user = await _userRepository.getUser();
@@ -43,7 +65,7 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
       final orgData = row['organization'] as Map<String, dynamic>;
       return OrganizationWithRole(
         organization: Organization.fromJson(orgData),
-        role: row['role'] == 'owner' ? OrganizationRole.owner : OrganizationRole.member,
+        role: _parseMemberRole(row['role'] as String?),
       );
     }).toList();
   }
@@ -64,7 +86,11 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
 
   // Should receive OrganizationRole
   @override
-  Future<void> addMember(String organizationId, String profileId, String role) async {
+  Future<void> addMember(
+    String organizationId,
+    String profileId,
+    String role,
+  ) async {
     final existing =
         await _supabase
             .from('organization_members')
@@ -103,18 +129,30 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
   @override
   Future<Organization?> getOrganizationById(String organizationId) async {
     final res =
-        await _supabase.from('organizations').select().eq('id', organizationId).maybeSingle();
+        await _supabase
+            .from('organizations')
+            .select()
+            .eq('id', organizationId)
+            .maybeSingle();
     if (res == null) return null;
     return Organization.fromJson(res);
   }
 
   @override
-  Future<void> updateOrganizationName(String organizationId, String name) async {
-    await _supabase.from('organizations').update({'name': name}).eq('id', organizationId);
+  Future<void> updateOrganizationName(
+    String organizationId,
+    String name,
+  ) async {
+    await _supabase
+        .from('organizations')
+        .update({'name': name})
+        .eq('id', organizationId);
   }
 
   @override
-  Future<List<MemberWithProfile>> getOrganizationMembers(String organizationId) async {
+  Future<List<MemberWithProfile>> getOrganizationMembers(
+    String organizationId,
+  ) async {
     final res = await _supabase
         .from('organization_members')
         .select('''
@@ -137,8 +175,21 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
         firstName: profile['first_name'] as String? ?? '',
         lastName: profile['last_name'] as String? ?? '',
         email: profile['email'] as String? ?? '',
-        role: row['role'] == 'owner' ? OrganizationRole.owner : OrganizationRole.member,
+        role: _parseMemberRole(row['role'] as String?),
       );
     }).toList();
+  }
+
+  @override
+  Future<void> updateMemberRole(
+    String organizationId,
+    String profileId,
+    OrganizationRole newRole,
+  ) async {
+    await _supabase
+        .from('organization_members')
+        .update({'role': _roleToString(newRole)})
+        .eq('organization_id', organizationId)
+        .eq('profile_id', profileId);
   }
 }

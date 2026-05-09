@@ -26,4 +26,9 @@ abstract class OrganizationRepository {
   Future<Organization?> getOrganizationById(String organizationId);
   Future<void> updateOrganizationName(String organizationId, String name);
   Future<List<MemberWithProfile>> getOrganizationMembers(String organizationId);
+  Future<void> updateMemberRole(
+    String organizationId,
+    String profileId,
+    OrganizationRole newRole,
+  );
 }

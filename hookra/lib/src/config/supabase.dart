@@ -12,7 +12,7 @@ Future<void> initSupabase() async {
 
   await Supabase.initialize(
     url: url,
-    anonKey: publishableKey, // We're now using assymetric JWTs but the parameter name is still anonKey for backward compatibility
+    anonKey:
+        publishableKey, // We're now using assymetric JWTs but the parameter name is still anonKey for backward compatibility
   );
 }
-

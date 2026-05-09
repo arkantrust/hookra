@@ -21,7 +21,8 @@ extension NameValidationErrorX on NameValidationError {
 extension PasswordValidationErrorX on PasswordValidationError {
   PasswordFieldError toFieldError() => switch (this) {
     PasswordValidationError.empty => PasswordFieldError.empty,
-    PasswordValidationError.lessThan12Chars => PasswordFieldError.lessThan12Chars,
+    PasswordValidationError.lessThan12Chars =>
+      PasswordFieldError.lessThan12Chars,
     PasswordValidationError.noNumber => PasswordFieldError.noNumber,
     PasswordValidationError.noUpper => PasswordFieldError.noUpper,
     PasswordValidationError.noLower => PasswordFieldError.noLower,

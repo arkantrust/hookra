@@ -10,7 +10,8 @@ import 'package:hookra/src/app/snack_bar.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  static GoRoute route() => GoRoute(path: '/profile', builder: (_, __) => const ProfilePage());
+  static GoRoute route() =>
+      GoRoute(path: '/profile', builder: (_, __) => const ProfilePage());
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,10 @@ class ProfilePage extends StatelessWidget {
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
-                                            const Icon(Icons.account_circle, size: 90),
+                                            const Icon(
+                                              Icons.account_circle,
+                                              size: 90,
+                                            ),
                                   )
                                   : AvifImage.asset(
                                     'assets/unknown-avatar.avif',
@@ -80,8 +84,16 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            _ProfileField(label: 'ID', value: user.id, icon: Icons.perm_identity_outlined),
-            _ProfileField(label: 'Email', value: user.email, icon: Icons.email_outlined),
+            _ProfileField(
+              label: 'ID',
+              value: user.id,
+              icon: Icons.perm_identity_outlined,
+            ),
+            _ProfileField(
+              label: 'Email',
+              value: user.email,
+              icon: Icons.email_outlined,
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton.small(
@@ -103,7 +115,11 @@ class _ProfileField extends StatelessWidget {
   final String value;
   final IconData icon;
 
-  const _ProfileField({required this.label, required this.value, required this.icon});
+  const _ProfileField({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +130,11 @@ class _ProfileField extends StatelessWidget {
         contentPadding: EdgeInsets.zero,
         title: Text(
           label,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: palette.primary),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            color: palette.primary,
+          ),
         ),
         subtitle: AutoSizeText(
           value,

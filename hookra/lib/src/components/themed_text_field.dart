@@ -38,7 +38,9 @@ class ThemedTextField extends StatelessWidget {
             (context) => TextField(
               key: key,
               obscureText:
-                  obscure ? context.select((_VisibilityCubit cubit) => cubit.state) : false,
+                  obscure
+                      ? context.select((_VisibilityCubit cubit) => cubit.state)
+                      : false,
               onChanged: onChanged,
               enableSuggestions: enableSuggestions,
               autocorrect: autocorrect,
