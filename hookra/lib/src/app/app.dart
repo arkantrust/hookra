@@ -8,11 +8,7 @@ import 'package:hookra/src/app/theme.dart';
 import 'package:hookra/src/app/router.dart';
 
 class App extends StatelessWidget {
-  /// Optional navigator key forwarded to GoRouter. Provided by [HookraApp]
-  /// so the deep link handler can call GoRouter.of(context).go(...).
-  final GlobalKey<NavigatorState>? navigatorKey;
-
-  const App({super.key, this.navigatorKey});
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +35,7 @@ class App extends StatelessWidget {
               title: 'Hookra',
               debugShowCheckedModeBanner: false,
               theme: darkTheme,
-              routerConfig: AppRouter(
-                auth: context.read<AuthBloc>(),
-                navigatorKey: navigatorKey,
-              ).router,
+              routerConfig: AppRouter(auth: context.read<AuthBloc>()).router,
             );
           },
         ),

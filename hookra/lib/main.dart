@@ -1,11 +1,12 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:hookra/src/config/config.dart';
-import 'package:hookra/src/app/uri_app_wrapper.dart';
+import 'package:hookra/src/app/app.dart';
+
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -35,7 +36,7 @@ Future<void> main() async {
     await dotenv.load(fileName: '.env');
     await initSupabase();
     initServiceLocator();
-    runApp(const UriAppWrapper());
+    runApp(const App());
   } catch (e, s) {
     log('Startup error: $e', stackTrace: s);
     runApp(

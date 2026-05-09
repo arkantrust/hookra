@@ -49,6 +49,7 @@
 		<false/>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs access to location to show your location on the map.</string>
+		<!-- Deep links configured as defined in https://supabase.com/docs/guides/auth/native-mobile-deep-linking -->
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>

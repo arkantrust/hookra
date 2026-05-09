@@ -27,12 +27,8 @@ class AppRouter {
 
   late final GoRouter router;
 
-  AppRouter({
-    required this.auth,
-    GlobalKey<NavigatorState>? navigatorKey,
-  }) {
+  AppRouter({required this.auth}) {
     router = GoRouter(
-      navigatorKey: navigatorKey,
       initialLocation: '/',
       debugLogDiagnostics: true,
       refreshListenable: AuthRefreshStream(auth),
@@ -45,12 +41,8 @@ class AppRouter {
         // If not authenticated and not going to auth, redirect to auth
         if (!isAuthenticated && !goingToAuth) return SignInPage.route().path;
 
-        // If authenticated and going to sign-in or sign-up, redirect to home.
-        // Allow /auth/forgot-password and /auth/reset-password even when authenticated
-        // in case a user navigates to those via deep link while logged in.
-        final goingToSignInOrUp = state.matchedLocation == SignInPage.route().path ||
-            state.matchedLocation == SignUpPage.route().path;
-        if (isAuthenticated && goingToSignInOrUp) return HomePage.route().path;
+        // If authenticated and going to auth, redirect to home
+        if (isAuthenticated && goingToAuth) return HomePage.route().path;
 
         return null;
       },
@@ -67,8 +59,10 @@ class AppRouter {
         ForgotPasswordPage.route(), // route: /auth/forgot-password
         ResetPasswordPage.route(), // route: /auth/reset-password
       ],
-      errorBuilder: (context, state) =>
-          SafeArea(child: Scaffold(body: Center(child: Text('Error: ${state.error}')))),
+      errorBuilder:
+          (context, state) => SafeArea(
+            child: Scaffold(body: Center(child: Text('Error: ${state.error}')))
+          ),
     );
   }
 }
