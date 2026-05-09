@@ -6,9 +6,3 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   workerd: true
-onlyBuiltDependencies:
-  - esbuild
-  - msw
-  - sharp
-  - unrs-resolver
-  - workerd
