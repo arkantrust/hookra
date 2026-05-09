@@ -36,7 +36,7 @@ class AppRouter {
       debugLogDiagnostics: true,
       refreshListenable: AuthRefreshStream(auth),
       redirect: (context, state) {
-        // The route is /auth/* (e.g., /auth/sign-in, /auth/sign-up, etc.)
+        // Routes under /auth/* are the unauthenticated flow.
         final goingToAuth = state.matchedLocation.startsWith('/auth');
 
         final isAuthenticated = auth.state.status == AuthStatus.authenticated;

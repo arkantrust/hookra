@@ -15,8 +15,8 @@ export 'ui/blocs/auth_bloc/auth_bloc.dart';
 export 'ui/blocs/sign_in_bloc/sign_in_bloc.dart';
 export 'ui/blocs/sign_up_bloc/sign_up_bloc.dart';
 export 'ui/mappers/field_error_mappers.dart';
+export 'ui/views/sign_in_page.dart';
+export 'ui/views/sign_up_page.dart';
 
 // Data
 export 'data/supabase_auth_repo.dart';
-export 'ui/views/sign_in_page.dart';
-export 'ui/views/sign_up_page.dart';

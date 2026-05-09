@@ -4,12 +4,16 @@ import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:hookra/src/app/snack_bar.dart';
 import 'package:hookra/src/config/service_locator.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/components/components.dart';
 import 'package:hookra/src/home/home.dart';
+
+// TODO: Get baseUrl from env
+const webUrl = 'https://hookra.ddulce.app';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
@@ -111,7 +115,7 @@ class SignInPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
 
-                          // TODO: Forgot password?
+                          // Forgot password
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 25.0,
@@ -119,15 +123,17 @@ class SignInPage extends StatelessWidget {
                             ),
                             child: Align(
                               alignment: Alignment.centerRight,
-                              child: Text(
-                                'Olvidaste tu contraseña?',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.copyWith(
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.primaryContainer,
+                              child: GestureDetector(
+                                onTap:
+                                    () => launchUrl(
+                                      Uri.parse('$webUrl/auth/forgot-password'),
+                                      mode: LaunchMode.externalApplication,
+                                    ),
+                                child: Text(
+                                  '¿Olvidaste tu contraseña?',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                  ),
                                 ),
                               ),
                             ),

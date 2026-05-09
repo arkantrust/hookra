@@ -26,8 +26,7 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create:
-                (context) => sl<AuthBloc>()..add(AuthSubscriptionRequested()),
+            create: (context) => sl<AuthBloc>()..add(AuthSubscriptionRequested()),
           ),
         ],
         child: Builder(

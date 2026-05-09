@@ -29,6 +29,16 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep links configured as defined in https://supabase.com/docs/guides/auth/native-mobile-deep-linking -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accept app.ddulce.hookra://reset-password and any path under app.ddulce.hookra:// -->
+                <!-- There are many types of deep links -->
+                <!-- https://developer.android.com/training/app-links/create-deeplinks#types-deep -->
+                <data android:scheme="app.ddulce.hookra" /> <!-- [YOUR_SCHEME]://[YOUR_HOSTNAME] -->
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

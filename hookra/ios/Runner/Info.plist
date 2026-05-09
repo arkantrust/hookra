@@ -49,5 +49,19 @@
 		<false/>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs access to location to show your location on the map.</string>
+		<!-- Deep links configured as defined in https://supabase.com/docs/guides/auth/native-mobile-deep-linking -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>app.ddulce.hookra</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>app.ddulce.hookra</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>
