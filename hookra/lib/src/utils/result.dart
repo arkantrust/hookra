@@ -12,7 +12,10 @@ class Result<T> {
   final StackTrace? stackTrace;
 
   /// Use this constructor for success results.
-  const Result.success(T value) : _value = value, _error = null, stackTrace = null;
+  const Result.success(T value)
+    : _value = value,
+      _error = null,
+      stackTrace = null;
 
   /// Use this constructor for failure results.
   Result.failure(Exception error, [StackTrace? stackTrace])
@@ -23,13 +26,19 @@ class Result<T> {
   }
 
   /// Use this constructor for void results (no value).
-  const Result.voidResult() : _value = null as T?, _error = null, stackTrace = null;
+  const Result.voidResult()
+    : _value = null as T?,
+      _error = null,
+      stackTrace = null;
 
   /// Use this constructor for unknown failures (e.g., caught errors that are not Exception).
   /// Specially useful for logging and debugging.
-  Result.unknown({required String name, required Object error, required StackTrace this.stackTrace})
-    : _value = null as T?,
-      _error = error is Exception ? error : Exception(error.toString()) {
+  Result.unknown({
+    required String name,
+    required Object error,
+    required StackTrace this.stackTrace,
+  }) : _value = null as T?,
+       _error = error is Exception ? error : Exception(error.toString()) {
     log('Unknown error in $name: $error', stackTrace: stackTrace);
   }
 

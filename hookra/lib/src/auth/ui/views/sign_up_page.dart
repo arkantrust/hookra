@@ -15,7 +15,10 @@ class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 
   static GoRoute route() {
-    return GoRoute(path: '/auth/sign-up', builder: (context, state) => const SignUpPage());
+    return GoRoute(
+      path: '/auth/sign-up',
+      builder: (context, state) => const SignUpPage(),
+    );
   }
 
   @override
@@ -32,7 +35,8 @@ class SignUpPage extends StatelessWidget {
             child: BlocListener<SignUpBloc, SignUpState>(
               listenWhen:
                   (previous, current) =>
-                      previous.status != current.status && current.status.isFailure,
+                      previous.status != current.status &&
+                      current.status.isFailure,
               listener: (context, state) {
                 if (state.status.isFailure) {
                   HapticFeedback.mediumImpact();
@@ -54,25 +58,30 @@ class SignUpPage extends StatelessWidget {
                               textScaler: MediaQuery.textScalerOf(context),
                               textAlign: TextAlign.center,
                               maxLines: 2,
-                              style: Theme.of(
-                                context,
-                              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                           const SizedBox(height: 50),
 
                           // Full Name
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
                             child: Row(
                               spacing: 8,
                               children: [
                                 Expanded(
                                   child: NameField(
                                     onChanged: (first) {
-                                      context.read<SignUpBloc>().add(SignUpFirstChanged(first));
+                                      context.read<SignUpBloc>().add(
+                                        SignUpFirstChanged(first),
+                                      );
                                     },
-                                    validationError: state.first.displayError?.toFieldError(),
+                                    validationError:
+                                        state.first.displayError
+                                            ?.toFieldError(),
                                     textInputAction: TextInputAction.next,
                                     label: 'Nombre',
                                   ),
@@ -80,9 +89,12 @@ class SignUpPage extends StatelessWidget {
                                 Expanded(
                                   child: NameField(
                                     onChanged: (last) {
-                                      context.read<SignUpBloc>().add(SignUpLastChanged(last));
+                                      context.read<SignUpBloc>().add(
+                                        SignUpLastChanged(last),
+                                      );
                                     },
-                                    validationError: state.last.displayError?.toFieldError(),
+                                    validationError:
+                                        state.last.displayError?.toFieldError(),
                                     textInputAction: TextInputAction.next,
                                     label: 'Apellido',
                                   ),
@@ -94,13 +106,19 @@ class SignUpPage extends StatelessWidget {
 
                           // Email
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
                             child: EmailField(
                               onChanged: (email) {
-                                context.read<SignUpBloc>().add(SignUpEmailChanged(email));
+                                context.read<SignUpBloc>().add(
+                                  SignUpEmailChanged(email),
+                                );
                               },
                               validationError: context.select(
-                                (SignUpBloc bloc) => bloc.state.email.displayError?.toFieldError(),
+                                (SignUpBloc bloc) =>
+                                    bloc.state.email.displayError
+                                        ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -109,16 +127,24 @@ class SignUpPage extends StatelessWidget {
 
                           // Password
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
                             child: PasswordField(
                               onChanged: (password) {
-                                context.read<SignUpBloc>().add(SignUpPasswordChanged(password));
+                                context.read<SignUpBloc>().add(
+                                  SignUpPasswordChanged(password),
+                                );
                               },
                               onSubmitted: (_) {
-                                context.read<SignUpBloc>().add(const SignUpSubmitted());
+                                context.read<SignUpBloc>().add(
+                                  const SignUpSubmitted(),
+                                );
                               },
                               validationError: context.select(
-                                (SignUpBloc bloc) => bloc.state.password.displayError?.toFieldError(),
+                                (SignUpBloc bloc) =>
+                                    bloc.state.password.displayError
+                                        ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.send,
                             ),
@@ -127,16 +153,24 @@ class SignUpPage extends StatelessWidget {
 
                           // Confirm Password
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
                             child: PasswordField(
                               onChanged: (confirm) {
-                                context.read<SignUpBloc>().add(SignUpConfirmChanged(confirm));
+                                context.read<SignUpBloc>().add(
+                                  SignUpConfirmChanged(confirm),
+                                );
                               },
                               onSubmitted: (_) {
-                                context.read<SignUpBloc>().add(const SignUpSubmitted());
+                                context.read<SignUpBloc>().add(
+                                  const SignUpSubmitted(),
+                                );
                               },
                               validationError: context.select(
-                                (SignUpBloc bloc) => bloc.state.confirm.displayError?.toFieldError(),
+                                (SignUpBloc bloc) =>
+                                    bloc.state.confirm.displayError
+                                        ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.send,
                             ),
@@ -146,12 +180,17 @@ class SignUpPage extends StatelessWidget {
                           // Sign Up
                           ThemedTextButton(
                             isInProgressOrSuccess: context.select(
-                              (SignUpBloc bloc) => bloc.state.status.isInProgressOrSuccess,
+                              (SignUpBloc bloc) =>
+                                  bloc.state.status.isInProgressOrSuccess,
                             ),
                             onPressed:
-                                context.select((SignUpBloc bloc) => bloc.state.isValid)
+                                context.select(
+                                      (SignUpBloc bloc) => bloc.state.isValid,
+                                    )
                                     ? () {
-                                      context.read<SignUpBloc>().add(const SignUpSubmitted());
+                                      context.read<SignUpBloc>().add(
+                                        const SignUpSubmitted(),
+                                      );
                                       context.go(HomePage.route().path);
                                     }
                                     : null,
@@ -169,9 +208,17 @@ class SignUpPage extends StatelessWidget {
                                 TextSpan(
                                   recognizer:
                                       TapGestureRecognizer()
-                                        ..onTap = () => context.go(SignInPage.route().path),
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                        ..onTap =
+                                            () => context.go(
+                                              SignInPage.route().path,
+                                            ),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.primaryContainer,
                                   ),
                                   text: 'Inicia sesión',
                                 ),

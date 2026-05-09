@@ -17,7 +17,8 @@ final class SupabaseAuthRepository extends AuthRepository {
 
   final _controller = StreamController<AuthStatus>();
 
-  SupabaseAuthRepository({required SupabaseClient supabase}) : _supabase = supabase;
+  SupabaseAuthRepository({required SupabaseClient supabase})
+    : _supabase = supabase;
 
   @override
   Future<Result> signUp({
@@ -50,23 +51,39 @@ final class SupabaseAuthRepository extends AuthRepository {
         return Result.failure(const ServerUnreachable());
       }
     } catch (e, s) {
-      return Result.unknown(name: 'SupabaseAuthRepository', error: e, stackTrace: s);
+      return Result.unknown(
+        name: 'SupabaseAuthRepository',
+        error: e,
+        stackTrace: s,
+      );
     }
   }
 
   @override
-  Future<Result> signIn({required String email, required String password}) async {
+  Future<Result> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
-      final res = await _supabase.auth.signInWithPassword(email: email, password: password);
+      final res = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
       if (res.session == null) return Result.failure(const NoSessionFound());
       _controller.add(AuthStatus.authenticated);
       return const Result.voidResult();
     } on AuthApiException catch (e) {
       if (e.code == 'invalid_credentials') {
         final emailExistsRes =
-            await _supabase.from('profiles').select().eq('email', email).maybeSingle();
+            await _supabase
+                .from('profiles')
+                .select()
+                .eq('email', email)
+                .maybeSingle();
         final exists = emailExistsRes?.isNotEmpty ?? false;
-        return Result.failure(exists ? const WrongPassword() : const EmailNotFound());
+        return Result.failure(
+          exists ? const WrongPassword() : const EmailNotFound(),
+        );
       }
       rethrow;
     } on AuthRetryableFetchException {
@@ -77,7 +94,11 @@ final class SupabaseAuthRepository extends AuthRepository {
         return Result.failure(const ServerUnreachable());
       }
     } catch (e, s) {
-      return Result.unknown(name: 'SupabaseAuthRepository', error: e, stackTrace: s);
+      return Result.unknown(
+        name: 'SupabaseAuthRepository',
+        error: e,
+        stackTrace: s,
+      );
     }
   }
 
@@ -95,13 +116,16 @@ final class SupabaseAuthRepository extends AuthRepository {
         return Result.failure(const ServerUnreachable());
       }
     } catch (e, s) {
-      return Result.unknown(name: 'SupabaseAuthRepository', error: e, stackTrace: s);
+      return Result.unknown(
+        name: 'SupabaseAuthRepository',
+        error: e,
+        stackTrace: s,
+      );
     }
   }
 
   @override
   Stream<AuthStatus> get status async* {
-
     yield AuthStatus.unknown;
     _supabase.auth.onAuthStateChange.listen((data) {
       final AuthChangeEvent event = data.event;

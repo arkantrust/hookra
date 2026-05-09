@@ -6,10 +6,7 @@ class OrganizationWithRole extends Equatable {
   final Organization organization;
   final OrganizationRole role;
 
-  const OrganizationWithRole({
-    required this.organization,
-    required this.role,
-  });
+  const OrganizationWithRole({required this.organization, required this.role});
 
   @override
   List<Object?> get props => [organization, role];

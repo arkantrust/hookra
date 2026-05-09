@@ -15,7 +15,10 @@ class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
   static GoRoute route() {
-    return GoRoute(path: '/auth/sign-in', builder: (context, state) => const SignInPage());
+    return GoRoute(
+      path: '/auth/sign-in',
+      builder: (context, state) => const SignInPage(),
+    );
   }
 
   @override
@@ -32,7 +35,8 @@ class SignInPage extends StatelessWidget {
             child: BlocListener<SignInBloc, SignInState>(
               listenWhen:
                   (previous, current) =>
-                      previous.status != current.status && current.status.isFailure,
+                      previous.status != current.status &&
+                      current.status.isFailure,
               listener: (context, state) {
                 if (state.status.isFailure) {
                   HapticFeedback.mediumImpact();
@@ -54,22 +58,27 @@ class SignInPage extends StatelessWidget {
                               textScaler: MediaQuery.textScalerOf(context),
                               textAlign: TextAlign.center,
                               maxLines: 2,
-                              style: Theme.of(
-                                context,
-                              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                           const SizedBox(height: 50),
 
                           // Email
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
                             child: EmailField(
                               onChanged: (email) {
-                                context.read<SignInBloc>().add(SignInEmailChanged(email));
+                                context.read<SignInBloc>().add(
+                                  SignInEmailChanged(email),
+                                );
                               },
                               validationError: context.select(
-                                (SignInBloc bloc) => bloc.state.email.displayError?.toFieldError(),
+                                (SignInBloc bloc) =>
+                                    bloc.state.email.displayError
+                                        ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -78,17 +87,24 @@ class SignInPage extends StatelessWidget {
 
                           // Password
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
                             child: PasswordField(
                               onChanged: (password) {
-                                context.read<SignInBloc>().add(SignInPasswordChanged(password));
+                                context.read<SignInBloc>().add(
+                                  SignInPasswordChanged(password),
+                                );
                               },
                               validationError: context.select(
                                 (SignInBloc bloc) =>
-                                    bloc.state.password.displayError?.toFieldError(),
+                                    bloc.state.password.displayError
+                                        ?.toFieldError(),
                               ),
                               onSubmitted: (_) {
-                                context.read<SignInBloc>().add(const SignInSubmitted());
+                                context.read<SignInBloc>().add(
+                                  const SignInSubmitted(),
+                                );
                               },
                               textInputAction: TextInputAction.send,
                             ),
@@ -97,13 +113,21 @@ class SignInPage extends StatelessWidget {
 
                           // TODO: Forgot password?
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                              vertical: 8.0,
+                            ),
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: Text(
                                 'Olvidaste tu contraseña?',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.primaryContainer,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.copyWith(
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.primaryContainer,
                                 ),
                               ),
                             ),
@@ -113,12 +137,17 @@ class SignInPage extends StatelessWidget {
                           // Sign In
                           ThemedTextButton(
                             isInProgressOrSuccess: context.select(
-                              (SignInBloc bloc) => bloc.state.status.isInProgressOrSuccess,
+                              (SignInBloc bloc) =>
+                                  bloc.state.status.isInProgressOrSuccess,
                             ),
                             onPressed:
-                                context.select((SignInBloc bloc) => bloc.state.isValid)
+                                context.select(
+                                      (SignInBloc bloc) => bloc.state.isValid,
+                                    )
                                     ? () {
-                                      context.read<SignInBloc>().add(const SignInSubmitted());
+                                      context.read<SignInBloc>().add(
+                                        const SignInSubmitted(),
+                                      );
                                       context.go(HomePage.route().path);
                                     }
                                     : null,
@@ -136,9 +165,17 @@ class SignInPage extends StatelessWidget {
                                 TextSpan(
                                   recognizer:
                                       TapGestureRecognizer()
-                                        ..onTap = () => context.go(SignUpPage.route().path),
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                        ..onTap =
+                                            () => context.go(
+                                              SignUpPage.route().path,
+                                            ),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.primaryContainer,
                                   ),
                                   text: 'Regístrate',
                                 ),

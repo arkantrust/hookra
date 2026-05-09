@@ -88,7 +88,11 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.business_outlined, size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.business_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'No organizations yet',
@@ -136,57 +140,62 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Create Organization'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(
-            labelText: 'Organization Name',
-            hintText: 'Enter organization name',
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameController.text.trim().isEmpty) {
-                return;
-              }
-              
-              try {
-                final user = Supabase.instance.client.auth.currentUser;
-                if (user != null) {
-                  final organization = await _repository.createOrganization(
-                    nameController.text.trim(),
-                    user.id,
-                  );
-                  await _repository.addMember(organization.id, user.id, 'member');
-                  
-                  if (dialogContext.mounted) {
-                    Navigator.pop(dialogContext);
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('Create Organization'),
+            content: TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Organization Name',
+                hintText: 'Enter organization name',
+              ),
+              autofocus: true,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (nameController.text.trim().isEmpty) {
+                    return;
                   }
-                  if (mounted) {
-                    setState(() {
-                      _loadOrganizations();
-                    });
+
+                  try {
+                    final user = Supabase.instance.client.auth.currentUser;
+                    if (user != null) {
+                      final organization = await _repository.createOrganization(
+                        nameController.text.trim(),
+                        user.id,
+                      );
+                      await _repository.addMember(
+                        organization.id,
+                        user.id,
+                        'member',
+                      );
+
+                      if (dialogContext.mounted) {
+                        Navigator.pop(dialogContext);
+                      }
+                      if (mounted) {
+                        setState(() {
+                          _loadOrganizations();
+                        });
+                      }
+                    }
+                  } catch (e) {
+                    if (dialogContext.mounted) {
+                      ScaffoldMessenger.of(
+                        dialogContext,
+                      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    }
                   }
-                }
-              } catch (e) {
-                if (dialogContext.mounted) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Create'),
+                },
+                child: const Text('Create'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
@@ -195,10 +204,7 @@ class _OrganizationCard extends StatelessWidget {
   final dynamic organization;
   final dynamic role;
 
-  const _OrganizationCard({
-    required this.organization,
-    required this.role,
-  });
+  const _OrganizationCard({required this.organization, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +214,9 @@ class _OrganizationCard extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Theme.of(context).primaryColor,
           child: Text(
-            organization.name.isNotEmpty ? organization.name[0].toUpperCase() : 'O',
+            organization.name.isNotEmpty
+                ? organization.name[0].toUpperCase()
+                : 'O',
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -227,9 +235,9 @@ class _OrganizationCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => OrganizationDetailsPage(
-                organizationId: organization.id,
-              ),
+              builder:
+                  (_) =>
+                      OrganizationDetailsPage(organizationId: organization.id),
             ),
           );
         },
