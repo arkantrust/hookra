@@ -6,7 +6,7 @@ import 'package:hookra/src/profile/profile.dart';
 GetIt sl = GetIt.instance;
 
 void initServiceLocator() {
-  // ── Repositories ──────────────────────────────────────────────────────────
+  // Repositories
   sl.registerSingleton<AuthRepository>(
     SupabaseAuthRepository(supabase: supabase),
   );
@@ -14,16 +14,18 @@ void initServiceLocator() {
     SupabaseUserRepository(supabase: supabase),
   );
 
-  // ── Use cases ─────────────────────────────────────────────────────────────
+    // Use cases
   sl.registerFactory<SignInUseCase>(() => SignInUseCase(sl<AuthRepository>()));
   sl.registerFactory<SignUpUseCase>(() => SignUpUseCase(sl<AuthRepository>()));
-  sl.registerFactory<SignOutUseCase>(() => SignOutUseCase(sl<AuthRepository>()));
+  sl.registerFactory<SignOutUseCase>(
+    () => SignOutUseCase(sl<AuthRepository>()),
+  );
   sl.registerFactory<WatchAuthStatusUseCase>(
     () => WatchAuthStatusUseCase(sl<AuthRepository>()),
   );
-  sl.registerFactory<GetUserUseCase>(() => GetUserUseCase(sl<UserRepository>()));
-
-  // Password recovery use cases
+  sl.registerFactory<GetUserUseCase>(
+    () => GetUserUseCase(sl<UserRepository>()),
+  );
   sl.registerFactory<SendPasswordResetUseCase>(
     () => SendPasswordResetUseCase(sl<AuthRepository>()),
   );
@@ -34,7 +36,7 @@ void initServiceLocator() {
     () => ResetPasswordWithTokenUseCase(sl<AuthRepository>()),
   );
 
-  // ── BLoCs ─────────────────────────────────────────────────────────────────
+  // BLoCs  
   sl.registerSingleton<AuthBloc>(
     AuthBloc(
       watchStatus: sl<WatchAuthStatusUseCase>(),
@@ -44,8 +46,6 @@ void initServiceLocator() {
   );
   sl.registerFactory<SignInBloc>(() => SignInBloc(signIn: sl<SignInUseCase>()));
   sl.registerFactory<SignUpBloc>(() => SignUpBloc(signUp: sl<SignUpUseCase>()));
-
-  // Password recovery BLoCs
   sl.registerFactory<ForgotPasswordBloc>(
     () => ForgotPasswordBloc(sendPasswordReset: sl<SendPasswordResetUseCase>()),
   );
