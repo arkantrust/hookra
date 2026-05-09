@@ -26,9 +26,6 @@ void initServiceLocator() {
   sl.registerFactory<GetUserUseCase>(
     () => GetUserUseCase(sl<UserRepository>()),
   );
-  sl.registerFactory<SendPasswordResetUseCase>(
-    () => SendPasswordResetUseCase(sl<AuthRepository>()),
-  );
 
   // BLoCs  
   sl.registerSingleton<AuthBloc>(
@@ -40,7 +37,4 @@ void initServiceLocator() {
   );
   sl.registerFactory<SignInBloc>(() => SignInBloc(signIn: sl<SignInUseCase>()));
   sl.registerFactory<SignUpBloc>(() => SignUpBloc(signUp: sl<SignUpUseCase>()));
-  sl.registerFactory<ForgotPasswordBloc>(
-    () => ForgotPasswordBloc(sendPasswordReset: sl<SendPasswordResetUseCase>()),
-  );
 }

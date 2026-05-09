@@ -100,27 +100,6 @@ final class SupabaseAuthRepository extends AuthRepository {
   }
 
   @override
-  Future<Result<void>> sendPasswordReset(
-    String email, {
-    required String redirectTo,
-  }) async {
-    try {
-      // Supabase never reveals whether the email exists — always returns 200.
-      await _supabase.auth.resetPasswordForEmail(email, redirectTo: redirectTo);
-      return const Result.voidResult();
-    } on AuthRetryableFetchException {
-      final connected = await hasInternetAccess();
-      if (!connected) {
-        return Result.failure(const NoInternetConnection());
-      } else {
-        return Result.failure(const ServerUnreachable());
-      }
-    } catch (e, s) {
-      return Result.unknown(name: 'SupabaseAuthRepository.sendPasswordReset', error: e, stackTrace: s);
-    }
-  }
-
-  @override
   Stream<AuthStatus> get status async* {
     yield AuthStatus.unknown;
     _supabase.auth.onAuthStateChange.listen((data) {

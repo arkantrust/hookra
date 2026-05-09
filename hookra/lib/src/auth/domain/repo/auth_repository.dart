@@ -26,13 +26,6 @@ abstract base class AuthRepository {
   /// Signs out the current user
   Future<Result<void>> signOut();
 
-  /// Sends a password recovery email to [email].
-  /// Always resolves successfully to prevent user enumeration.
-  Future<Result<void>> sendPasswordReset(
-    String email, {
-    required String redirectTo,
-  });
-
   /// Stream of [AuthStatus] which will emit the current status when the auth state changes.
   Stream<AuthStatus> get status;
 

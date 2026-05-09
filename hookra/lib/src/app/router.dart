@@ -56,7 +56,6 @@ class AppRouter {
         ),
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
-        ForgotPasswordPage.route(), // route: /auth/forgot-password
       ],
       errorBuilder:
           (context, state) => SafeArea(
