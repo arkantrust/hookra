@@ -11,7 +11,7 @@ The web app is deployed manually to Cloudflare Workers. This is intentional: [vi
 
 ## Prerequisites
 
-1. **Node v24.14.0 or LTS**
+1. **Node >=22** (`v24.14.0` recommended)
 2. **pnpm** latest.
 3. **Cloudflare auth.** One-time login is enough; no token needs to be stored:
    ```bash
