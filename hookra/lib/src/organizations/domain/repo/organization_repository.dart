@@ -1,5 +1,6 @@
 import 'package:hookra/src/organizations/domain/model/organization.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/organizations/domain/model/organization_with_role.dart';
 import 'package:hookra/src/organizations/domain/model/role.dart';
 
 class MemberWithProfile {

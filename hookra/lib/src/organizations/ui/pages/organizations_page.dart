@@ -6,6 +6,12 @@ import 'package:hookra/src/organizations/domain/model/organization_member.dart';
 import 'package:hookra/src/organizations/domain/model/organization_with_role.dart';
 import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
 import 'package:hookra/src/organizations/ui/pages/organization_details_page.dart';
+import 'package:hookra/src/organizations/data/repo/organization_repository_impl.dart';
+import 'package:hookra/src/organizations/data/sources/organization_data_source.dart';
+import 'package:hookra/src/organizations/domain/usecase/update_member_role_usecase.dart';
+import 'package:hookra/src/organizations/ui/bloc/organization_members_bloc.dart';
+import 'package:hookra/src/organizations/ui/organization_members_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrganizationsPage extends StatefulWidget {
   const OrganizationsPage({super.key});
@@ -124,9 +130,63 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateOrganizationDialog(context),
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'members',
+            onPressed: () => _openMembersPage(context),
+            tooltip: 'Manage Members',
+            child: const Icon(Icons.people),
+          ),
+          const SizedBox(width: 8),
+          FloatingActionButton(
+            heroTag: 'create',
+            onPressed: () => _showCreateOrganizationDialog(context),
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openMembersPage(BuildContext context) async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    final userId = user.id;
+    final dataSource = OrganizationDataSource();
+    final repository = OrganizationRepositoryImpl(dataSource);
+
+    final organization = await repository.getUserOrganization(userId);
+
+    if (organization == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No perteneces a ninguna organización')),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => OrganizationMembersBloc(
+            repository: repository,
+            updateRoleUseCase: UpdateMemberRoleUseCase(repository),
+            currentUserProfileId: userId,
+          )..add(LoadOrganizationMembers(organization.id)),
+          child: Scaffold(
+            appBar: AppBar(title: Text(organization.name)),
+            body: OrganizationMembersPage(
+              organizationId: organization.id,
+              currentUserProfileId: userId,
+            ),
+          ),
+        ),
       ),
     );
   }

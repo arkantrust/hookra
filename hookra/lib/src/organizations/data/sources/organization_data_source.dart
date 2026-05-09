@@ -1,8 +1,8 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:hookra/src/organizations/domain/model/organization.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
 import 'package:hookra/src/organizations/domain/model/role.dart';
-import 'package:hookra/features/profile/domain/model/profile.dart';
+import 'package:hookra/src/profile/domain/entities/user.dart';
 
 class OrganizationDataSource {
   final SupabaseClient _client = Supabase.instance.client;
@@ -40,9 +40,9 @@ class OrganizationDataSource {
       
       print('DEBUG: profile for $profileId: $profileResponse');
       
-      Profile? profile;
+      User? profile;
       if (profileResponse != null) {
-        profile = Profile(
+        profile = User(
           id: profileResponse['id'] as String,
           firstName: profileResponse['first_name'] as String,
           lastName: profileResponse['last_name'] as String,

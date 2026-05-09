@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:hookra/features/profile/domain/model/profile.dart';
 import 'package:hookra/src/organizations/domain/model/role.dart';
+import 'package:hookra/src/profile/domain/entities/user.dart';
 
 enum OrganizationRole { owner, member, admin }
 
@@ -11,7 +11,7 @@ class OrganizationMember extends Equatable {
   final OrgRole role;
   final String? invitedBy;
   final DateTime joinedAt;
-  final Profile? profile;
+  final User? profile;
 
   const OrganizationMember({
     required this.id,
@@ -30,7 +30,7 @@ class OrganizationMember extends Equatable {
     OrgRole? role,
     String? invitedBy,
     DateTime? joinedAt,
-    Profile? profile,
+    User? profile,
   }) {
     return OrganizationMember(
       id: id ?? this.id,
@@ -52,7 +52,7 @@ class OrganizationMember extends Equatable {
       invitedBy: json['invited_by'] as String?,
       joinedAt: DateTime.parse(json['joined_at'] as String),
       profile: json['profile'] != null
-          ? Profile(
+          ? User(
               id: json['profile']['id'] as String,
               firstName: json['profile']['first_name'] as String,
               lastName: json['profile']['last_name'] as String,

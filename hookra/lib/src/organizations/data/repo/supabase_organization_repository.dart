@@ -1,9 +1,11 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:hookra/src/organizations/domain/model/organization.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
 import 'package:hookra/src/organizations/domain/model/organization_with_role.dart';
 import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
+import 'package:hookra/src/organizations/domain/model/role.dart';
 import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/profile/domain/entities/user.dart';
 
 class SupabaseOrganizationRepository extends OrganizationRepository {
   SupabaseOrganizationRepository({
@@ -14,6 +16,128 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
 
   final SupabaseClient _supabase;
   final UserRepository _userRepository;
+
+  @override
+  Future<List<OrganizationMember>> getMembers(String organizationId) async {
+    final res = await _supabase
+        .from('organization_members')
+        .select('''
+          id,
+          organization_id,
+          profile_id,
+          role,
+          invited_by,
+          joined_at
+        ''')
+        .eq('organization_id', organizationId)
+        .order('joined_at', ascending: true);
+
+    final List<OrganizationMember> members = [];
+    for (final memberJson in res) {
+      final profileId = memberJson['profile_id'] as String;
+      final profileResponse = await _supabase
+          .from('profiles')
+          .select()
+          .eq('id', profileId)
+          .maybeSingle();
+
+      User? user;
+      if (profileResponse != null) {
+        user = User(
+          id: profileResponse['id'] as String,
+          firstName: profileResponse['first_name'] as String,
+          lastName: profileResponse['last_name'] as String,
+          email: profileResponse['email'] as String,
+        );
+      }
+
+      final member = OrganizationMember.fromJson(memberJson).copyWith(
+        profile: user,
+      );
+      members.add(member);
+    }
+    return members;
+  }
+
+  @override
+  Future<Organization?> getOrganization(String organizationId) async {
+    final res = await _supabase
+        .from('organizations')
+        .select()
+        .eq('id', organizationId)
+        .maybeSingle();
+    if (res == null) return null;
+    return Organization.fromJson(res);
+  }
+
+  @override
+  Future<OrganizationMember?> getMemberRole(String organizationId, String profileId) async {
+    final res = await _supabase
+        .from('organization_members')
+        .select()
+        .eq('organization_id', organizationId)
+        .eq('profile_id', profileId)
+        .maybeSingle();
+    if (res == null) return null;
+    return OrganizationMember.fromJson(res);
+  }
+
+  @override
+  Future<void> updateMemberRole(String memberId, OrgRole newRole) async {
+    await _supabase
+        .from('organization_members')
+        .update({'role': newRole.value})
+        .eq('id', memberId);
+  }
+
+  @override
+  Future<Organization?> getUserOrganization(String profileId) async {
+    final memberResponse = await _supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('profile_id', profileId)
+        .limit(1)
+        .maybeSingle();
+
+    if (memberResponse == null) return null;
+
+    final orgId = memberResponse['organization_id'];
+    final orgResponse = await _supabase
+        .from('organizations')
+        .select()
+        .eq('id', orgId)
+        .maybeSingle();
+
+    if (orgResponse == null) return null;
+    return Organization.fromJson(orgResponse);
+  }
+
+  @override
+  Future<List<Organization>> getUserOrganizations(String profileId) async {
+    final memberResponse = await _supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('profile_id', profileId);
+
+    if (memberResponse.isEmpty) return [];
+
+    final orgIds = memberResponse.map((m) => m['organization_id'] as String).toList();
+
+    final List<Organization> organizations = [];
+    for (final orgId in orgIds) {
+      final orgResponse = await _supabase
+          .from('organizations')
+          .select()
+          .eq('id', orgId)
+          .maybeSingle();
+      if (orgResponse != null) {
+        organizations.add(Organization.fromJson(orgResponse));
+      }
+    }
+    return organizations;
+  }
+
+  // End of role management methods
 
   @override
   Future<List<OrganizationWithRole>> getOrganizationsForCurrentUser() async {
