@@ -3,6 +3,10 @@ import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/authentication/authentication.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/home/home.dart';
+import 'package:hookra/src/organizations/data/repo/organization_repository_impl.dart';
+import 'package:hookra/src/organizations/data/sources/organization_data_source.dart';
+import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
+import 'package:hookra/src/organizations/domain/usecase/update_member_role_usecase.dart';
 
 GetIt sl = GetIt.instance;
 void initServiceLocator() {
@@ -23,5 +27,15 @@ void initServiceLocator() {
   );
   sl.registerFactory<SignInBloc>(
     () => SignInBloc(authenticationRepository: sl<AuthenticationRepository>()),
+  );
+
+  sl.registerLazySingleton<OrganizationDataSource>(
+    () => OrganizationDataSource(),
+  );
+  sl.registerLazySingleton<OrganizationRepository>(
+    () => OrganizationRepositoryImpl(sl<OrganizationDataSource>()),
+  );
+  sl.registerFactory<UpdateMemberRoleUseCase>(
+    () => UpdateMemberRoleUseCase(sl<OrganizationRepository>()),
   );
 }

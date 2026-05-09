@@ -4,6 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/home/blocs/location_permission_bloc/location_permission_bloc.dart';
+import 'package:hookra/src/authentication/authentication.dart';
+import 'package:hookra/src/organizations/data/repo/organization_repository_impl.dart';
+import 'package:hookra/src/organizations/data/sources/organization_data_source.dart';
+import 'package:hookra/src/organizations/domain/usecase/update_member_role_usecase.dart';
+import 'package:hookra/src/organizations/ui/bloc/organization_members_bloc.dart';
+import 'package:hookra/src/organizations/ui/organization_members_page.dart';
 
 class LocationPermissionPage extends StatelessWidget {
   const LocationPermissionPage({super.key});
@@ -22,8 +28,53 @@ class LocationPermissionPage extends StatelessWidget {
   }
 }
 
-class LocationPermissionView extends StatelessWidget {
+class LocationPermissionView extends StatefulWidget {
   const LocationPermissionView({super.key});
+
+  @override
+  State<LocationPermissionView> createState() => _LocationPermissionViewState();
+}
+
+class _LocationPermissionViewState extends State<LocationPermissionView> {
+  void _openMembersPage(BuildContext context) async {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState.status != AuthenticationStatus.authenticated) return;
+
+    final userId = authState.user.id;
+    final dataSource = OrganizationDataSource();
+    final repository = OrganizationRepositoryImpl(dataSource);
+
+    final organization = await repository.getUserOrganization(userId);
+
+    if (organization == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No perteneces a ninguna organización')),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => OrganizationMembersBloc(
+            repository: repository,
+            updateRoleUseCase: UpdateMemberRoleUseCase(repository),
+          )..add(LoadOrganizationMembers(organization.id)),
+          child: Scaffold(
+            appBar: AppBar(title: Text(organization.name)),
+            body: OrganizationMembersPage(
+              organizationId: organization.id,
+              currentUserProfileId: userId,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +84,10 @@ class LocationPermissionView extends StatelessWidget {
       },
       child: SafeArea(
         child: Scaffold(
+          floatingActionButton: FloatingActionButton.small(
+            onPressed: () => _openMembersPage(context),
+            child: const Icon(Icons.people),
+          ),
           body: BlocBuilder<LocationPermissionBloc, LocationPermissionState>(
             builder: (context, state) {
               return Center(
