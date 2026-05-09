@@ -1,6 +1,9 @@
 import 'package:hookra/src/auth/domain/repo/auth_repository.dart';
 import 'package:hookra/src/utils/result.dart';
 
+// TODO: Get baseUrl from env
+const webUrl = 'https://hookra.ddulce.app';
+
 /// {@template send_password_reset_use_case}
 /// Sends a password recovery email to [email].
 /// Always reports success to prevent user enumeration.
@@ -10,10 +13,6 @@ class SendPasswordResetUseCase {
 
   SendPasswordResetUseCase(this._repository);
 
-  Future<Result<void>> call({
-    required String email,
-    required String redirectTo,
-  }) {
-    return _repository.sendPasswordReset(email, redirectTo: redirectTo);
-  }
+  Future<Result<void>> call({required String email}) =>
+      _repository.sendPasswordReset(email, redirectTo: '$webUrl/auth/update-password');
 }

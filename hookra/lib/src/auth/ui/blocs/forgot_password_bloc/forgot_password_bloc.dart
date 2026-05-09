@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:formz/formz.dart';
 
 import 'package:hookra/src/auth/domain/use_cases/send_password_reset_use_case.dart';
@@ -35,14 +34,9 @@ class ForgotPasswordBloc extends Bloc<ForgotPasswordEvent, ForgotPasswordState> 
 
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
 
-    final redirectTo = dotenv.get(
-      'PASSWORD_RESET_CALLBACK',
-      fallback: 'https://hookra.ddulce.app',
-    );
-
     // We intentionally ignore failures here — always show success to prevent
     // user enumeration (attacker cannot learn whether an email is registered).
-    await _sendPasswordReset(email: state.email.value, redirectTo: redirectTo);
+    await _sendPasswordReset(email: state.email.value);
 
     emit(state.copyWith(status: FormzSubmissionStatus.success));
   }
