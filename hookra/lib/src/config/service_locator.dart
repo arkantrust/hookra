@@ -21,7 +21,7 @@ void initServiceLocator() {
     ),
   );
 
-    // Use cases
+  // Use cases
   sl.registerFactory<SignInUseCase>(() => SignInUseCase(sl<AuthRepository>()));
   sl.registerFactory<SignUpUseCase>(() => SignUpUseCase(sl<AuthRepository>()));
   sl.registerFactory<SignUpWithOrganizationUseCase>(
@@ -44,7 +44,7 @@ void initServiceLocator() {
     () => UpdateMemberRoleUseCase(sl<OrganizationRepository>()),
   );
 
-  // BLoCs  
+  // BLoCs
   sl.registerSingleton<AuthBloc>(
     AuthBloc(
       watchStatus: sl<WatchAuthStatusUseCase>(),
