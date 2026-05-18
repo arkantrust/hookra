@@ -30,3 +30,16 @@ class UpdateMemberRole extends OrganizationMembersEvent {
   @override
   List<Object?> get props => [organizationId, profileId, newRole];
 }
+
+class UpdateOrganizationName extends OrganizationMembersEvent {
+  final String organizationId;
+  final String name;
+
+  const UpdateOrganizationName({
+    required this.organizationId,
+    required this.name,
+  });
+
+  @override
+  List<Object?> get props => [organizationId, name];
+}

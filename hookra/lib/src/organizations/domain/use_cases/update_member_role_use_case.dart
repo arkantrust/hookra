@@ -11,16 +11,7 @@ class UpdateMemberRoleUseCase {
     required String organizationId,
     required String profileId,
     required OrganizationRole newRole,
-  }) async {
-    try {
-      await _repository.updateMemberRole(organizationId, profileId, newRole);
-      return const Result.voidResult();
-    } catch (e, st) {
-      return Result.unknown(
-        name: 'UpdateMemberRoleUseCase',
-        error: e,
-        stackTrace: st,
-      );
-    }
+  }) {
+    return _repository.updateMemberRole(organizationId, profileId, newRole);
   }
 }

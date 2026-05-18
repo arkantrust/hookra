@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hookra/src/config/config.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hookra/src/auth/auth.dart';
+import 'package:hookra/src/config/service_locator.dart';
+import 'package:hookra/src/organizations/domain/model/organization.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
-import 'package:hookra/src/organizations/domain/model/organization_with_role.dart';
-import 'package:hookra/src/organizations/domain/repo/organization_repository.dart';
-import 'package:hookra/src/organizations/ui/pages/organization_details_page.dart';
+import 'package:hookra/src/organizations/ui/blocs/organizations_bloc/organizations_bloc.dart';
 
-class OrganizationsPage extends StatefulWidget {
+class OrganizationsPage extends StatelessWidget {
   const OrganizationsPage({super.key});
 
   static GoRoute route() {
@@ -18,125 +18,127 @@ class OrganizationsPage extends StatefulWidget {
   }
 
   @override
-  State<OrganizationsPage> createState() => _OrganizationsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<OrganizationsBloc>()..add(const OrganizationsLoadRequested()),
+      child: const _OrganizationsView(),
+    );
+  }
 }
 
-class _OrganizationsPageState extends State<OrganizationsPage> {
-  final OrganizationRepository _repository = sl<OrganizationRepository>();
-  late Future<List<OrganizationWithRole>> _organizationsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadOrganizations();
-  }
-
-  void _loadOrganizations() {
-    _organizationsFuture = _repository.getOrganizationsForCurrentUser();
-  }
+class _OrganizationsView extends StatelessWidget {
+  const _OrganizationsView();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Organizations'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await Supabase.instance.client.auth.signOut();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
-            },
+    return BlocConsumer<OrganizationsBloc, OrganizationsState>(
+      listener: (context, state) {
+        if (state.status == OrganizationsStatus.createFailure &&
+            state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${state.errorMessage}')),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Organizations'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  context.read<AuthBloc>().add(AuthSignOutPressed());
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: FutureBuilder<List<OrganizationWithRole>>(
-        future: _organizationsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          body: _buildBody(context, state),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showCreateOrganizationDialog(context),
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
+    );
+  }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Error: ${snapshot.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _loadOrganizations();
-                      });
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          }
+  Widget _buildBody(BuildContext context, OrganizationsState state) {
+    if (state.status == OrganizationsStatus.loading ||
+        state.status == OrganizationsStatus.initial) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-          final organizations = snapshot.data ?? [];
-
-          if (organizations.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.business_outlined,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No organizations yet',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Create your first organization to get started',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                _loadOrganizations();
-              });
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: organizations.length,
-              itemBuilder: (context, index) {
-                final orgWithRole = organizations[index];
-                return _OrganizationCard(
-                  organization: orgWithRole.organization,
-                  role: orgWithRole.role,
-                );
+    if (state.status == OrganizationsStatus.failure) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(state.errorMessage ?? 'An error occurred'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                context
+                    .read<OrganizationsBloc>()
+                    .add(const OrganizationsLoadRequested());
               },
+              child: const Text('Retry'),
             ),
+          ],
+        ),
+      );
+    }
+
+    if (state.organizations.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.business_outlined,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No organizations yet',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Create your first organization to get started',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        context
+            .read<OrganizationsBloc>()
+            .add(const OrganizationsLoadRequested());
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: state.organizations.length,
+        itemBuilder: (context, index) {
+          final orgWithRole = state.organizations[index];
+          return _OrganizationCard(
+            organization: orgWithRole.organization,
+            role: orgWithRole.role,
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateOrganizationDialog(context),
-        child: const Icon(Icons.add),
       ),
     );
   }
 
   void _showCreateOrganizationDialog(BuildContext context) {
     final nameController = TextEditingController();
+    final currentUserId = context.read<AuthBloc>().state.user.id;
 
     showDialog(
       context: context,
@@ -157,40 +159,17 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  if (nameController.text.trim().isEmpty) {
-                    return;
-                  }
+                onPressed: () {
+                  final name = nameController.text.trim();
+                  if (name.isEmpty || currentUserId.isEmpty) return;
 
-                  try {
-                    final user = Supabase.instance.client.auth.currentUser;
-                    if (user != null) {
-                      final organization = await _repository.createOrganization(
-                        nameController.text.trim(),
-                        user.id,
-                      );
-                      await _repository.addMember(
-                        organization.id,
-                        user.id,
-                        'member',
-                      );
-
-                      if (dialogContext.mounted) {
-                        Navigator.pop(dialogContext);
-                      }
-                      if (mounted) {
-                        setState(() {
-                          _loadOrganizations();
-                        });
-                      }
-                    }
-                  } catch (e) {
-                    if (dialogContext.mounted) {
-                      ScaffoldMessenger.of(
-                        dialogContext,
-                      ).showSnackBar(SnackBar(content: Text('Error: $e')));
-                    }
-                  }
+                  context.read<OrganizationsBloc>().add(
+                    OrganizationsCreateRequested(
+                      name: name,
+                      ownerId: currentUserId,
+                    ),
+                  );
+                  Navigator.pop(dialogContext);
                 },
                 child: const Text('Create'),
               ),
@@ -201,8 +180,8 @@ class _OrganizationsPageState extends State<OrganizationsPage> {
 }
 
 class _OrganizationCard extends StatelessWidget {
-  final dynamic organization;
-  final dynamic role;
+  final Organization organization;
+  final OrganizationRole role;
 
   const _OrganizationCard({required this.organization, required this.role});
 
@@ -231,16 +210,7 @@ class _OrganizationCard extends StatelessWidget {
           ),
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (_) =>
-                      OrganizationDetailsPage(organizationId: organization.id),
-            ),
-          );
-        },
+        onTap: () => context.push('/organizations/${organization.id}'),
       ),
     );
   }
