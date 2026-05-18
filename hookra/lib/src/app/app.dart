@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:hookra/src/auth/auth.dart';
+import 'package:hookra/src/organizations/organizations.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/theme.dart';
@@ -20,6 +21,10 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider<UserRepository>(
           create: (_) => sl<UserRepository>(),
+          dispose: (repo) => repo.dispose(),
+        ),
+        RepositoryProvider<OrganizationRepository>(
+          create: (_) => sl<OrganizationRepository>(),
           dispose: (repo) => repo.dispose(),
         ),
       ],

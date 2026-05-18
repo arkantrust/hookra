@@ -43,7 +43,8 @@ class Result<T> {
   }
 
   /// Check if the result is a success.
-  bool get isSuccess => _value != null && _error == null;
+  /// Returns true for both value results and void results when no error occurred.
+  bool get isSuccess => _error == null;
 
   /// Check if the result is a failure.
   bool get isFailure => _error != null;
