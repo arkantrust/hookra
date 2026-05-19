@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_avif/flutter_avif.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -101,6 +102,15 @@ class ProfilePage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.small(
+        heroTag: 'signout',
+        onPressed: () {
+          HapticFeedback.mediumImpact();
+          context.read<AuthBloc>().add(AuthSignOutPressed());
+        },
+        tooltip: 'Cerrar sesión',
+        child: const Icon(Icons.logout),
       ),
     );
   }
