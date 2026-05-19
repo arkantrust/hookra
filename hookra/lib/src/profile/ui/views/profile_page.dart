@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/domain/entities/user.dart';
+import 'package:hookra/src/settings/settings.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -258,7 +259,7 @@ class _ProfileCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () {},
+                onPressed: () => context.push(EditProfilePage.route().path),
                 icon: const Icon(Icons.edit_outlined, size: 16),
                 label: const Text('Editar Perfil'),
                 style: FilledButton.styleFrom(
