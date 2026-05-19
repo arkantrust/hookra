@@ -8,6 +8,7 @@ import 'package:hookra/src/home/home.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/settings/settings.dart';
 
 class AuthRefreshStream extends ChangeNotifier {
   late final StreamSubscription _subscription;
@@ -60,6 +61,7 @@ class AppRouter {
         // Detail pages live outside the shell — they are full-screen without the
         // bottom navigation bar, but still protected by the top-level redirect.
         OrganizationDetailsPage.route(), // route: /organizations/:id
+        EditProfilePage.route(), // route: /settings/edit-profile
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
       ],
