@@ -20,8 +20,7 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: palette.surfaceContainerLowest,
       appBar: AppBar(
         backgroundColor: palette.surface,
-        leading: Icon(Icons.menu, color: palette.onSurface),
-        titleSpacing: 0,
+        titleSpacing: 20,
         title: Text(
           'PERFIL',
           style: TextStyle(
@@ -31,12 +30,6 @@ class ProfilePage extends StatelessWidget {
             color: palette.primary,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: _AvatarChip(user: user, palette: palette, radius: 18),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
