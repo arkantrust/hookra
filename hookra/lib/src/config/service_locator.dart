@@ -3,6 +3,7 @@ import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/teams/teams.dart';
 
 GetIt sl = GetIt.instance;
 
@@ -60,6 +61,26 @@ void initServiceLocator() {
     (organizationId, _) => OrganizationMembersBloc(
       repository: sl<OrganizationRepository>(),
       updateMemberRoleUseCase: sl<UpdateMemberRoleUseCase>(),
+    ),
+  );
+
+  sl.registerSingleton<TeamRepository>(
+    SupabaseTeamRepository(supabase: supabase),
+  );
+
+  sl.registerFactory<GetTeamsUseCase>(
+    () => GetTeamsUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<CreateTeamUseCase>(
+    () => CreateTeamUseCase(sl<TeamRepository>()),
+  );
+
+  sl.registerFactoryParam<TeamsBloc, String, String>(
+    (organizationId, creatorId) => TeamsBloc(
+      organizationId: organizationId,
+      creatorId: creatorId,
+      getTeams: sl<GetTeamsUseCase>(),
+      createTeam: sl<CreateTeamUseCase>(),
     ),
   );
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/config/config.dart';
+import 'package:hookra/src/teams/teams.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hookra/src/organizations/domain/auth/role_auth.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
@@ -19,7 +20,8 @@ class OrganizationDetailsPage extends StatefulWidget {
 }
 
 class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
-  late final OrganizationMembersBloc _bloc;
+  late final OrganizationMembersBloc _membersBloc;
+  late final TeamsBloc _teamsBloc;
   final TextEditingController _nameController = TextEditingController();
   bool _isEditing = false;
   final _roleAuth = const RoleAuthorization();
@@ -27,17 +29,28 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = OrganizationMembersBloc(
+    _membersBloc = OrganizationMembersBloc(
       repository: sl<OrganizationRepository>(),
       updateMemberRoleUseCase: sl(),
     );
-    _bloc.add(LoadMembers(widget.organizationId));
+    _membersBloc.add(LoadMembers(widget.organizationId));
+
+    final currentUserId =
+        Supabase.instance.client.auth.currentUser?.id ?? '';
+    _teamsBloc = TeamsBloc(
+      organizationId: widget.organizationId,
+      creatorId: currentUserId,
+      getTeams: sl<GetTeamsUseCase>(),
+      createTeam: sl<CreateTeamUseCase>(),
+    );
+    _teamsBloc.add(const LoadTeams());
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _bloc.close();
+    _membersBloc.close();
+    _teamsBloc.close();
     super.dispose();
   }
 
@@ -50,7 +63,7 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
         widget.organizationId,
         _nameController.text.trim(),
       );
-      _bloc.add(LoadMembers(widget.organizationId));
+      _membersBloc.add(LoadMembers(widget.organizationId));
 
       if (mounted) {
         setState(() => _isEditing = false);
@@ -60,9 +73,8 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -71,8 +83,11 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
   Widget build(BuildContext context) {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
 
-    return BlocProvider.value(
-      value: _bloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _membersBloc),
+        BlocProvider.value(value: _teamsBloc),
+      ],
       child: BlocConsumer<OrganizationMembersBloc, OrganizationMembersState>(
         listener: (context, state) {
           if (state.status == OrganizationMembersStatus.loaded &&
@@ -88,14 +103,8 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
           }
         },
         builder: (context, state) {
-          if (state.status == OrganizationMembersStatus.loading) {
-            return Scaffold(
-              appBar: AppBar(title: const Text('Organization')),
-              body: const Center(child: CircularProgressIndicator()),
-            );
-          }
-
-          if (state.status == OrganizationMembersStatus.initial) {
+          if (state.status == OrganizationMembersStatus.loading ||
+              state.status == OrganizationMembersStatus.initial) {
             return Scaffold(
               appBar: AppBar(title: const Text('Organization')),
               body: const Center(child: CircularProgressIndicator()),
@@ -109,21 +118,21 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
             );
           }
 
-          final currentUserRole =
-              state.members
-                  .where((m) => m.profileId == currentUserId)
-                  .firstOrNull
-                  ?.role;
+          final currentUserRole = state.members
+              .where((m) => m.profileId == currentUserId)
+              .firstOrNull
+              ?.role;
 
           final canEditName =
               currentUserRole == OrganizationRole.owner &&
               currentUserId != null;
 
-          return Scaffold(
-            appBar: AppBar(
-              title:
-                  _isEditing
-                      ? TextField(
+          return DefaultTabController(
+            length: 2,
+            child: Scaffold(
+              appBar: AppBar(
+                title: _isEditing
+                    ? TextField(
                         controller: _nameController,
                         style: const TextStyle(color: Colors.white),
                         decoration: const InputDecoration(
@@ -133,124 +142,139 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
                         ),
                         autofocus: true,
                       )
-                      : Text(state.organization!.name),
-              actions: [
-                if (_isEditing)
-                  IconButton(
-                    icon: const Icon(Icons.check),
-                    onPressed: _saveName,
-                  )
-                else if (canEditName)
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => setState(() => _isEditing = true),
-                  ),
-              ],
-            ),
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_isEditing)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _saveName,
-                            child: const Text('Save'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {
-                              _nameController.text = state.organization!.name;
-                              setState(() => _isEditing = false);
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                        ),
-                      ],
+                    : Text(state.organization!.name),
+                actions: [
+                  if (_isEditing)
+                    IconButton(
+                      icon: const Icon(Icons.check),
+                      onPressed: _saveName,
+                    )
+                  else if (canEditName)
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => setState(() => _isEditing = true),
                     ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Members (${state.members.length})',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                ],
+                bottom: const TabBar(
+                  tabs: [
+                    Tab(text: 'Members'),
+                    Tab(text: 'Teams'),
+                  ],
                 ),
-                Expanded(
-                  child:
-                      state.members.isEmpty
-                          ? const Center(child: Text('No members yet'))
-                          : ListView.builder(
-                            itemCount: state.members.length,
-                            itemBuilder: (context, index) {
-                              final member = state.members[index];
-                              final isCurrentUser =
-                                  member.profileId == currentUserId;
-
-                              final canChangeRole =
-                                  currentUserId != null &&
-                                  currentUserRole != null &&
-                                  _roleAuth.canChangeRole(
-                                    actorRole: currentUserRole,
-                                    targetRole: member.role,
-                                    targetProfileId: member.profileId,
-                                    organization: state.organization!,
-                                    currentUserId: currentUserId,
-                                  );
-
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  child: Text(
-                                    member.firstName.isNotEmpty
-                                        ? member.firstName[0].toUpperCase()
-                                        : '?',
-                                  ),
+              ),
+              body: TabBarView(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_isEditing)
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: _saveName,
+                                  child: const Text('Save'),
                                 ),
-                                title: Text(
-                                  '${member.firstName} ${member.lastName}'
-                                      .trim(),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    _nameController.text =
+                                        state.organization!.name;
+                                    setState(() => _isEditing = false);
+                                  },
+                                  child: const Text('Cancel'),
                                 ),
-                                subtitle: Text(member.email),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    RolePicker(
-                                      role: member.role,
-                                      isInteractive: canChangeRole,
-                                      onRoleSelected: (newRole) {
-                                        _bloc.add(
-                                          UpdateMemberRole(
-                                            organizationId:
-                                                widget.organizationId,
-                                            profileId: member.profileId,
-                                            newRole: newRole,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    if (isCurrentUser)
-                                      const Padding(
-                                        padding: EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          '(You)',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'Members (${state.members.length})',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: state.members.isEmpty
+                            ? const Center(child: Text('No members yet'))
+                            : ListView.builder(
+                                itemCount: state.members.length,
+                                itemBuilder: (context, index) {
+                                  final member = state.members[index];
+                                  final isCurrentUser =
+                                      member.profileId == currentUserId;
+
+                                  final canChangeRole =
+                                      currentUserId != null &&
+                                      currentUserRole != null &&
+                                      _roleAuth.canChangeRole(
+                                        actorRole: currentUserRole,
+                                        targetRole: member.role,
+                                        targetProfileId: member.profileId,
+                                        organization: state.organization!,
+                                        currentUserId: currentUserId,
+                                      );
+
+                                  return ListTile(
+                                    leading: CircleAvatar(
+                                      child: Text(
+                                        member.firstName.isNotEmpty
+                                            ? member.firstName[0].toUpperCase()
+                                            : '?',
                                       ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                ),
-              ],
+                                    ),
+                                    title: Text(
+                                      '${member.firstName} ${member.lastName}'
+                                          .trim(),
+                                    ),
+                                    subtitle: Text(member.email),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        RolePicker(
+                                          role: member.role,
+                                          isInteractive: canChangeRole,
+                                          onRoleSelected: (newRole) {
+                                            _membersBloc.add(
+                                              UpdateMemberRole(
+                                                organizationId:
+                                                    widget.organizationId,
+                                                profileId: member.profileId,
+                                                newRole: newRole,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        if (isCurrentUser)
+                                          const Padding(
+                                            padding:
+                                                EdgeInsets.only(left: 8),
+                                            child: Text(
+                                              '(You)',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                  const TeamsTab(),
+                ],
+              ),
             ),
           );
         },
