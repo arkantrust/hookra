@@ -61,6 +61,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
     final palette = Theme.of(context).colorScheme;
 
     return BlocListener<EditProfileBloc, EditProfileState>(
+      listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
         if (state.status == FormzSubmissionStatus.success &&
             state.updatedUser != null) {
