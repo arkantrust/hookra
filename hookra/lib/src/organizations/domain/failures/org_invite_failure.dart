@@ -9,3 +9,15 @@ class UserNotFound extends OrgInviteFailure {
 class AlreadyMember extends OrgInviteFailure {
   const AlreadyMember();
 }
+
+class InviteNotFound extends OrgInviteFailure {
+  const InviteNotFound();
+}
+
+class InviteExpired extends OrgInviteFailure {
+  const InviteExpired();
+}
+
+class NotInvitedUser extends OrgInviteFailure {
+  const NotInvitedUser();
+}
