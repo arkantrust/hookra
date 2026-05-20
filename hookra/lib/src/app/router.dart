@@ -39,11 +39,15 @@ class AppRouter {
       redirect: (context, state) {
         // Routes under /auth/* are the unauthenticated flow.
         final goingToAuth = state.matchedLocation.startsWith('/auth');
+        // /invite is publicly accessible — users can view invite details without auth.
+        final goingToInvite = state.matchedLocation.startsWith('/invite');
 
         final isAuthenticated = auth.state.status == AuthStatus.authenticated;
 
         // If not authenticated and not going to auth, redirect to auth
-        if (!isAuthenticated && !goingToAuth) return SignInPage.route().path;
+        if (!isAuthenticated && !goingToAuth && !goingToInvite) {
+          return SignInPage.route().path;
+        }
 
         // If authenticated and going to auth, redirect to home
         if (isAuthenticated && goingToAuth) return HomePage.route().path;
@@ -61,6 +65,7 @@ class AppRouter {
         // Detail pages live outside the shell — they are full-screen without the
         // bottom navigation bar, but still protected by the top-level redirect.
         OrganizationDetailsPage.route(), // route: /organizations/:id
+        AcceptInvitePage.route(), // route: /invite?token=
         EditProfilePage.route(), // route: /settings/edit-profile
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
