@@ -399,6 +399,22 @@ CREATE TABLE IF NOT EXISTS "public"."content_versions" (
 ALTER TABLE "public"."content_versions" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."org_invites" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "organization_id" "uuid" NOT NULL,
+    "email" "text" NOT NULL,
+    "role" "public"."org_role" DEFAULT 'member'::"public"."org_role" NOT NULL,
+    "token" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_by" "uuid",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "expires_at" timestamp with time zone DEFAULT ("now"() + '7 days'::interval) NOT NULL,
+    "accepted_at" timestamp with time zone
+);
+
+
+ALTER TABLE "public"."org_invites" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."organization_members" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "organization_id" "uuid" NOT NULL,
@@ -511,6 +527,16 @@ ALTER TABLE ONLY "public"."content_versions"
 
 ALTER TABLE ONLY "public"."content_versions"
     ADD CONSTRAINT "content_versions_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."org_invites"
+    ADD CONSTRAINT "org_invites_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."org_invites"
+    ADD CONSTRAINT "org_invites_token_key" UNIQUE ("token");
 
 
 
@@ -710,6 +736,16 @@ ALTER TABLE ONLY "public"."content_versions"
 
 
 
+ALTER TABLE ONLY "public"."org_invites"
+    ADD CONSTRAINT "org_invites_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."profiles"("id") ON DELETE SET NULL;
+
+
+
+ALTER TABLE ONLY "public"."org_invites"
+    ADD CONSTRAINT "org_invites_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."organization_members"
     ADD CONSTRAINT "organization_members_invited_by_fkey" FOREIGN KEY ("invited_by") REFERENCES "public"."profiles"("id") ON DELETE SET NULL;
 
@@ -859,6 +895,25 @@ CREATE POLICY "content_versions: insert via trigger only" ON "public"."content_v
 
 CREATE POLICY "content_versions: team members can read" ON "public"."content_versions" FOR SELECT TO "authenticated" USING (("content_id" IN ( SELECT "content"."id"
    FROM "public"."content")));
+
+
+
+ALTER TABLE "public"."org_invites" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "org_invites: anyone can accept" ON "public"."org_invites" FOR UPDATE TO "authenticated" USING (true) WITH CHECK (true);
+
+
+
+CREATE POLICY "org_invites: anyone can read by token" ON "public"."org_invites" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "org_invites: owner and admin can delete" ON "public"."org_invites" FOR DELETE TO "authenticated" USING (("public"."get_org_role"("auth"."uid"(), "organization_id") = ANY (ARRAY['owner'::"public"."org_role", 'admin'::"public"."org_role"])));
+
+
+
+CREATE POLICY "org_invites: owner and admin can insert" ON "public"."org_invites" FOR INSERT TO "authenticated" WITH CHECK (("public"."get_org_role"("auth"."uid"(), "organization_id") = ANY (ARRAY['owner'::"public"."org_role", 'admin'::"public"."org_role"])));
 
 
 
@@ -1241,6 +1296,12 @@ GRANT ALL ON TABLE "public"."content" TO "service_role";
 GRANT ALL ON TABLE "public"."content_versions" TO "anon";
 GRANT ALL ON TABLE "public"."content_versions" TO "authenticated";
 GRANT ALL ON TABLE "public"."content_versions" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."org_invites" TO "anon";
+GRANT ALL ON TABLE "public"."org_invites" TO "authenticated";
+GRANT ALL ON TABLE "public"."org_invites" TO "service_role";
 
 
 

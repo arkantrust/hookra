@@ -5,11 +5,6 @@ import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
 import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
-import 'package:hookra/src/organizations/domain/repo/invite_repository.dart';
-import 'package:hookra/src/organizations/domain/use_cases/create_invite_use_case.dart';
-import 'package:hookra/src/organizations/domain/use_cases/get_invite_by_token_use_case.dart';
-import 'package:hookra/src/organizations/domain/use_cases/accept_invite_use_case.dart';
-import 'package:hookra/src/organizations/ui/blocs/invite_bloc/invite_bloc.dart';
 
 GetIt sl = GetIt.instance;
 
@@ -28,10 +23,7 @@ void initServiceLocator() {
     ),
   );
   sl.registerSingleton<InviteRepository>(
-    SupabaseInviteRepository(
-      supabase: supabase,
-      organizationRepository: sl<OrganizationRepository>(),
-    ),
+    SupabaseInviteRepository(supabase: supabase),
   );
 
   // Use cases
@@ -70,12 +62,6 @@ void initServiceLocator() {
   );
   sl.registerFactory<CreateInviteUseCase>(
     () => CreateInviteUseCase(sl<InviteRepository>()),
-  );
-  sl.registerFactory<GetInviteByTokenUseCase>(
-    () => GetInviteByTokenUseCase(sl<InviteRepository>()),
-  );
-  sl.registerFactory<AcceptInviteUseCase>(
-    () => AcceptInviteUseCase(sl<InviteRepository>()),
   );
 
   // BLoCs

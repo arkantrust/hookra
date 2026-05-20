@@ -8,7 +8,5 @@ abstract class InviteRepository {
     String email,
     OrganizationRole role,
   );
-  Future<Result<OrgInvite>> getInviteByToken(String token);
-  Future<Result<void>> acceptInvite(String token, String profileId);
   Future<void> dispose();
 }
