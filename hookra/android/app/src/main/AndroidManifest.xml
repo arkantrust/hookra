@@ -1,18 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <application
         android:label="Hookra"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBYMzrO2x41ZGlEaXW46TwASfFlHrmdUws"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -37,7 +32,7 @@
                 <!-- Accept app.ddulce.hookra://reset-password and any path under app.ddulce.hookra:// -->
                 <!-- There are many types of deep links -->
                 <!-- https://developer.android.com/training/app-links/create-deeplinks#types-deep -->
-                <data android:scheme="app.ddulce.hookra" /> <!-- [YOUR_SCHEME]://[YOUR_HOSTNAME] -->
+                <data android:scheme="app.ddulce.hookra" android:host="*" /> <!-- [YOUR_SCHEME]://[YOUR_HOSTNAME] -->
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

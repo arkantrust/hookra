@@ -8,18 +8,12 @@ plugins {
 android {
     namespace = "app.ddulce.hookra"
     compileSdk = 36
-    // Install the latest ndk version through android studio.
-    // Many dependencies like path_provider_android need atleast ndk version 27.0.12077973to work.
-    // Different versions of ndk are usually placed at ~/Android/Sdk/ndk
-    ndkVersion = "29.0.13113456"
+    // Install the latest ndk version by deleting all ndk versions installed in ~/Android/Sdk/ndk
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
