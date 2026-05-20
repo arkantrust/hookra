@@ -57,6 +57,9 @@ class AppRouter {
             OrganizationsPage.route(), // route: /organizations
           ],
         ),
+        // Detail pages live outside the shell — they are full-screen without the
+        // bottom navigation bar, but still protected by the top-level redirect.
+        OrganizationDetailsPage.route(), // route: /organizations/:id
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
       ],

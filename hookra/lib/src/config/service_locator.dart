@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/auth/auth.dart';
+import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
 import 'package:hookra/src/teams/teams.dart';
@@ -29,7 +30,7 @@ void initServiceLocator() {
     () => SignUpWithOrganizationUseCase(
       sl<SignUpUseCase>(),
       sl<GetUserUseCase>(),
-      sl<OrganizationRepository>(),
+      sl<CreateOrganizationUseCase>(),
     ),
   );
   sl.registerFactory<SignOutUseCase>(
@@ -40,6 +41,18 @@ void initServiceLocator() {
   );
   sl.registerFactory<GetUserUseCase>(
     () => GetUserUseCase(sl<UserRepository>()),
+  );
+  sl.registerFactory<GetOrganizationsUseCase>(
+    () => GetOrganizationsUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<CreateOrganizationUseCase>(
+    () => CreateOrganizationUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<GetOrganizationDetailsUseCase>(
+    () => GetOrganizationDetailsUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<UpdateOrganizationNameUseCase>(
+    () => UpdateOrganizationNameUseCase(sl<OrganizationRepository>()),
   );
   sl.registerFactory<UpdateMemberRoleUseCase>(
     () => UpdateMemberRoleUseCase(sl<OrganizationRepository>()),
@@ -57,10 +70,17 @@ void initServiceLocator() {
   sl.registerFactory<SignUpBloc>(
     () => SignUpBloc(signUp: sl<SignUpWithOrganizationUseCase>()),
   );
-  sl.registerFactoryParam<OrganizationMembersBloc, String, void>(
-    (organizationId, _) => OrganizationMembersBloc(
-      repository: sl<OrganizationRepository>(),
-      updateMemberRoleUseCase: sl<UpdateMemberRoleUseCase>(),
+  sl.registerFactory<OrganizationsBloc>(
+    () => OrganizationsBloc(
+      getOrganizations: sl<GetOrganizationsUseCase>(),
+      createOrganization: sl<CreateOrganizationUseCase>(),
+    ),
+  );
+  sl.registerFactory<OrganizationMembersBloc>(
+    () => OrganizationMembersBloc(
+      getDetails: sl<GetOrganizationDetailsUseCase>(),
+      updateMemberRole: sl<UpdateMemberRoleUseCase>(),
+      updateOrgName: sl<UpdateOrganizationNameUseCase>(),
     ),
   );
 

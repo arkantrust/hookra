@@ -48,7 +48,7 @@ class Result<T> {
     log('Unknown error in $name: $error', stackTrace: stackTrace);
   }
 
-  /// Check if the result is a success.
+/// Check if the result is a success.
   bool get isSuccess => _isVoid || (_value != null && _error == null);
 
   /// Check if the result is a failure.

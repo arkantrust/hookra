@@ -9,7 +9,6 @@ import 'package:hookra/src/app/snack_bar.dart';
 import 'package:hookra/src/config/service_locator.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/components/components.dart';
-import 'package:hookra/src/home/home.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -191,7 +190,6 @@ class SignUpPage extends StatelessWidget {
                                       context.read<SignUpBloc>().add(
                                         const SignUpSubmitted(),
                                       );
-                                      context.go(HomePage.route().path);
                                     }
                                     : null,
                             text: 'Registrarme',
