@@ -4,6 +4,7 @@ import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/settings/settings.dart';
 
 GetIt sl = GetIt.instance;
 
@@ -47,6 +48,9 @@ void initServiceLocator() {
   sl.registerFactory<CreateOrganizationUseCase>(
     () => CreateOrganizationUseCase(sl<OrganizationRepository>()),
   );
+  sl.registerFactory<UpdateProfileUseCase>(
+    () => UpdateProfileUseCase(sl<UserRepository>()),
+  );
   sl.registerFactory<GetOrganizationDetailsUseCase>(
     () => GetOrganizationDetailsUseCase(sl<OrganizationRepository>()),
   );
@@ -68,6 +72,9 @@ void initServiceLocator() {
   sl.registerFactory<SignInBloc>(() => SignInBloc(signIn: sl<SignInUseCase>()));
   sl.registerFactory<SignUpBloc>(
     () => SignUpBloc(signUp: sl<SignUpWithOrganizationUseCase>()),
+  );
+  sl.registerFactory<EditProfileBloc>(
+    () => EditProfileBloc(updateProfile: sl<UpdateProfileUseCase>()),
   );
   sl.registerFactory<OrganizationsBloc>(
     () => OrganizationsBloc(

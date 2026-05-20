@@ -4,8 +4,8 @@ import 'package:flutter_avif/flutter_avif.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/auth/auth.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:hookra/src/app/snack_bar.dart';
+import 'package:hookra/src/profile/domain/entities/user.dart';
+import 'package:hookra/src/settings/settings.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -16,167 +16,201 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.select((AuthBloc bloc) => bloc.state.user);
-    final name = '${user.firstName} ${user.lastName}';
     final palette = Theme.of(context).colorScheme;
 
-    return SafeArea(
-      child: Scaffold(
-        body: Column(
+    return Scaffold(
+      backgroundColor: palette.surfaceContainerLowest,
+      appBar: AppBar(
+        backgroundColor: palette.surface,
+        titleSpacing: 20,
+        title: Text(
+          'PERFIL',
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+            fontSize: 16,
+            color: palette.primary,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _ProfileCard(user: user, palette: palette),
+            const SizedBox(height: 12),
+            _EmailCard(email: user.email, palette: palette),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.small(
+        heroTag: 'signout',
+        onPressed: () {
+          HapticFeedback.mediumImpact();
+          context.read<AuthBloc>().add(AuthSignOutPressed());
+        },
+        tooltip: 'Cerrar sesión',
+        child: const Icon(Icons.logout),
+      ),
+    );
+  }
+}
+
+class _ProfileCard extends StatelessWidget {
+  final User user;
+  final ColorScheme palette;
+
+  const _ProfileCard({required this.user, required this.palette});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: palette.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Column(
           children: [
             Stack(
               children: [
-                ClipPath(
-                  clipper: _CustomDrawClip(),
-                  child: Container(
-                    height: MediaQuery.sizeOf(context).height * 0.32,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [palette.secondary, palette.primary],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
+                CircleAvatar(
+                  radius: 52,
+                  backgroundColor: palette.surfaceContainerHighest,
+                  child: ClipOval(
+                    child: user.avatarUrl != null
+                        ? AvifImage.network(
+                            user.avatarUrl!,
+                            width: 104,
+                            height: 104,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.person,
+                              size: 56,
+                              color: palette.onSurfaceVariant,
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            size: 56,
+                            color: palette.onSurfaceVariant,
+                          ),
                   ),
                 ),
-                Positioned.fill(
-                  top: 48,
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 48,
-                        backgroundColor: Colors.white,
-                        child: ClipOval(
-                          child:
-                              user.avatarUrl != null
-                                  ? AvifImage.network(
-                                    user.avatarUrl!,
-                                    width: 90,
-                                    height: 90,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(
-                                              Icons.account_circle,
-                                              size: 90,
-                                            ),
-                                  )
-                                  : AvifImage.asset(
-                                    'assets/unknown-avatar.avif',
-                                    width: 90,
-                                    height: 90,
-                                    fit: BoxFit.cover,
-                                  ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: palette.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: palette.surface, width: 2),
+                    ),
+                    child: Icon(
+                      Icons.camera_alt_outlined,
+                      size: 14,
+                      color: palette.onPrimary,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _ProfileField(
-              label: 'ID',
-              value: user.id,
-              icon: Icons.perm_identity_outlined,
+            const SizedBox(height: 14),
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${user.firstName} ',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: palette.onSurface,
+                    ),
+                  ),
+                  TextSpan(
+                    text: user.lastName,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: palette.primary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            _ProfileField(
-              label: 'Email',
-              value: user.email,
-              icon: Icons.email_outlined,
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => context.push(EditProfilePage.route().path),
+                icon: const Icon(Icons.edit_outlined, size: 16),
+                label: const Text('Editar Perfil'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: palette.primary,
+                  foregroundColor: palette.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.small(
-          heroTag: 'signout',
-          onPressed: () {
-            HapticFeedback.mediumImpact();
-            context.read<AuthBloc>().add(AuthSignOutPressed());
-          },
-          tooltip: 'Cerrar sesión',
-          child: const Icon(Icons.logout),
-        ),
       ),
     );
   }
 }
 
-class _ProfileField extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
+class _EmailCard extends StatelessWidget {
+  final String email;
+  final ColorScheme palette;
 
-  const _ProfileField({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
+  const _EmailCard({required this.email, required this.palette});
 
   @override
   Widget build(BuildContext context) {
-    final palette = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    return Card(
+      elevation: 0,
+      color: palette.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-            color: palette.primary,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: palette.primaryContainer,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            Icons.email_outlined,
+            size: 20,
+            color: palette.onPrimaryContainer,
           ),
         ),
-        subtitle: AutoSizeText(
-          value,
-          maxLines: 1,
-          minFontSize: 8,
-          maxFontSize: 16,
-          overflow: TextOverflow.ellipsis,
+        title: Text(
+          'CORREO ELECTRÓNICO',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.2,
+            color: palette.onSurfaceVariant,
+          ),
         ),
-        leading: Container(
-          margin: EdgeInsets.only(left: 8),
-          child: Icon(icon, color: palette.primary),
+        subtitle: Text(
+          email,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: palette.onSurface,
+          ),
         ),
-        onTap: () async {
-          await Clipboard.setData(ClipboardData(text: value));
-          HapticFeedback.mediumImpact();
-          if (context.mounted) {
-            context.showSnackBar('Copiado!');
-          }
-        },
       ),
     );
   }
-}
-
-class _CustomDrawClip extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, size.height - 60);
-    path.cubicTo(
-      size.width * 0.25,
-      size.height,
-      size.width * 0.75,
-      size.height - 100,
-      size.width,
-      size.height - 60,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
