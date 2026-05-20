@@ -5,12 +5,6 @@ import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/organizations/organizations.dart';
 import 'package:hookra/src/teams/teams.dart';
-import 'package:hookra/src/organizations/domain/auth/role_auth.dart';
-import 'package:hookra/src/organizations/domain/use_cases/get_organization_details_use_case.dart';
-import 'package:hookra/src/organizations/domain/use_cases/update_member_role_use_case.dart';
-import 'package:hookra/src/organizations/domain/use_cases/update_organization_name_use_case.dart';
-import 'package:hookra/src/organizations/ui/blocs/organization_members_bloc/organization_members_bloc.dart';
-import 'package:hookra/src/organizations/ui/components/role_picker.dart';
 
 class OrganizationDetailsPage extends StatefulWidget {
   final String organizationId;
@@ -139,8 +133,7 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
               ?.role;
 
           final canEditName =
-              currentUserRole == OrganizationRole.owner &&
-              currentUserId != null;
+              currentUserRole == OrganizationRole.owner;
 
           return DefaultTabController(
             length: 2,
@@ -228,8 +221,7 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
                                       member.profileId == currentUserId;
 
                                   final canChangeRole =
-                                      currentUserId != null &&
-                                      currentUserRole != null &&
+                                    currentUserRole != null &&
                                       _roleAuth.canChangeRole(
                                         actorRole: currentUserRole,
                                         targetRole: member.role,
