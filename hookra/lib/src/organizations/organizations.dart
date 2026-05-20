@@ -1,4 +1,5 @@
 export 'domain/failures/organization_failure.dart';
+export 'domain/failures/org_invite_failure.dart';
 export 'domain/model/member_with_profile.dart';
 export 'domain/model/organization.dart';
 export 'domain/model/organization_member.dart';

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/organizations/domain/failures/org_invite_failure.dart';
 import 'package:hookra/src/organizations/domain/use_cases/create_invite_use_case.dart';
 
 part 'invite_event.dart';
@@ -31,7 +32,11 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
 
     result.fold(
       (invite) => emit(InviteState.success('$_deepLinkScheme${invite!.token}')),
-      (error) => emit(InviteState.failure(error.toString())),
+      (error) => emit(InviteState.failure(switch (error) {
+            UserNotFound() => 'El correo no tiene una cuenta en Hookra',
+            AlreadyMember() => 'Este usuario ya es miembro de la organización',
+            _ => 'Ocurrió un error al generar la invitación',
+          })),
     );
   }
 }

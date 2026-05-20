@@ -16,6 +16,21 @@ class InviteModal extends StatefulWidget {
 class _InviteModalState extends State<InviteModal> {
   final _emailController = TextEditingController();
   OrganizationRole _selectedRole = OrganizationRole.member;
+  bool _isValidEmail = false;
+
+  bool _validateEmail(String value) {
+    final at = value.indexOf('@');
+    return at > 0 && at < value.length - 1;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(() {
+      final valid = _validateEmail(_emailController.text.trim());
+      if (valid != _isValidEmail) setState(() => _isValidEmail = valid);
+    });
+  }
 
   @override
   void dispose() {
@@ -82,7 +97,7 @@ class _InviteModalState extends State<InviteModal> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: isLoading ? null : _submit,
+                  onPressed: isLoading || !_isValidEmail ? null : _submit,
                   child: isLoading
                       ? const SizedBox(
                           height: 20,
@@ -101,7 +116,7 @@ class _InviteModalState extends State<InviteModal> {
 
   void _submit() {
     final email = _emailController.text.trim();
-    if (email.isEmpty) return;
+    if (!_isValidEmail) return;
 
     context.read<InviteBloc>().add(
           InviteSubmitted(
