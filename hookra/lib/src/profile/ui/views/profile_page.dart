@@ -57,41 +57,6 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class _AvatarChip extends StatelessWidget {
-  final User user;
-  final ColorScheme palette;
-  final double radius;
-
-  const _AvatarChip({
-    required this.user,
-    required this.palette,
-    required this.radius,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: palette.primaryContainer,
-      child: user.avatarUrl != null
-          ? ClipOval(
-              child: AvifImage.network(
-                user.avatarUrl!,
-                width: radius * 2,
-                height: radius * 2,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Icon(
-                  Icons.person,
-                  size: radius,
-                  color: palette.onPrimaryContainer,
-                ),
-              ),
-            )
-          : Icon(Icons.person, size: radius, color: palette.onPrimaryContainer),
-    );
-  }
-}
-
 class _ProfileCard extends StatelessWidget {
   final User user;
   final ColorScheme palette;
