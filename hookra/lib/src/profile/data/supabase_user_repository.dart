@@ -70,7 +70,8 @@ final class SupabaseUserRepository extends UserRepository {
           .update({'first_name': firstName, 'last_name': lastName})
           .eq('id', supabaseUser.id)
           .select('id, first_name, last_name, email, avatar_url')
-          .single();
+          .maybeSingle();
+      if (data == null) return Result.failure(const UserNotFound());
       _user = User.fromJson(data);
       return Result.success(_user!);
     } on PostgrestException {
