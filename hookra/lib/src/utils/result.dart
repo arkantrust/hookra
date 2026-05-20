@@ -8,6 +8,8 @@ class Result<T> {
 
   final Exception? _error;
 
+  final bool _isVoid;
+
   /// Optionally provide a stack trace for unknown errors.
   final StackTrace? stackTrace;
 
@@ -15,12 +17,14 @@ class Result<T> {
   const Result.success(T value)
     : _value = value,
       _error = null,
+      _isVoid = false,
       stackTrace = null;
 
   /// Use this constructor for failure results.
   Result.failure(Exception error, [StackTrace? stackTrace])
     : _value = null as T?,
       _error = error,
+      _isVoid = false,
       stackTrace = stackTrace ?? StackTrace.current {
     log(_error.toString(), stackTrace: stackTrace);
   }
@@ -29,6 +33,7 @@ class Result<T> {
   const Result.voidResult()
     : _value = null as T?,
       _error = null,
+      _isVoid = true,
       stackTrace = null;
 
   /// Use this constructor for unknown failures (e.g., caught errors that are not Exception).
@@ -38,20 +43,24 @@ class Result<T> {
     required Object error,
     required StackTrace this.stackTrace,
   }) : _value = null as T?,
-       _error = error is Exception ? error : Exception(error.toString()) {
+       _error = error is Exception ? error : Exception(error.toString()),
+       _isVoid = false {
     log('Unknown error in $name: $error', stackTrace: stackTrace);
   }
 
   /// Check if the result is a success.
-  bool get isSuccess => _value != null && _error == null;
+  bool get isSuccess => _isVoid || (_value != null && _error == null);
 
   /// Check if the result is a failure.
-  bool get isFailure => _error != null;
+  bool get isFailure => !_isVoid && _error != null;
 
   /// Get value (throws if failure)
   T get value {
     if (isFailure) {
       throw _error!;
+    }
+    if (_isVoid) {
+      throw StateError('Cannot get value from void result');
     }
     return _value!;
   }
@@ -66,7 +75,7 @@ class Result<T> {
 
   /// Get value or null
   T? get valueOrNull {
-    if (isFailure) {
+    if (isFailure || _isVoid) {
       return null;
     }
     return _value;

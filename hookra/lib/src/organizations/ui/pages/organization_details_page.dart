@@ -42,6 +42,9 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
       creatorId: currentUserId,
       getTeams: sl<GetTeamsUseCase>(),
       createTeam: sl<CreateTeamUseCase>(),
+      joinTeam: sl<JoinTeamUseCase>(),
+      leaveTeam: sl<LeaveTeamUseCase>(),
+      getCurrentTeam: sl<GetCurrentTeamUseCase>(),
     );
     _teamsBloc.add(const LoadTeams());
   }

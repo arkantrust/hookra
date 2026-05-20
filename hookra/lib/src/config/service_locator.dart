@@ -74,6 +74,15 @@ void initServiceLocator() {
   sl.registerFactory<CreateTeamUseCase>(
     () => CreateTeamUseCase(sl<TeamRepository>()),
   );
+  sl.registerFactory<JoinTeamUseCase>(
+    () => JoinTeamUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<LeaveTeamUseCase>(
+    () => LeaveTeamUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<GetCurrentTeamUseCase>(
+    () => GetCurrentTeamUseCase(sl<TeamRepository>()),
+  );
 
   sl.registerFactoryParam<TeamsBloc, String, String>(
     (organizationId, creatorId) => TeamsBloc(
@@ -81,6 +90,9 @@ void initServiceLocator() {
       creatorId: creatorId,
       getTeams: sl<GetTeamsUseCase>(),
       createTeam: sl<CreateTeamUseCase>(),
+      joinTeam: sl<JoinTeamUseCase>(),
+      leaveTeam: sl<LeaveTeamUseCase>(),
+      getCurrentTeam: sl<GetCurrentTeamUseCase>(),
     ),
   );
 }
