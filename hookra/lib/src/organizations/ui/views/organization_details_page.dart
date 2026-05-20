@@ -5,7 +5,10 @@ import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/config/service_locator.dart';
 import 'package:hookra/src/organizations/domain/auth/role_auth.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/organizations/ui/blocs/invite_bloc/invite_bloc.dart';
 import 'package:hookra/src/organizations/ui/blocs/organization_members_bloc/organization_members_bloc.dart';
+import 'package:hookra/src/organizations/ui/components/invite_link_dialog.dart';
+import 'package:hookra/src/organizations/ui/components/invite_modal.dart';
 import 'package:hookra/src/organizations/ui/components/role_picker.dart';
 
 class OrganizationDetailsPage extends StatelessWidget {
@@ -24,9 +27,14 @@ class OrganizationDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<OrganizationMembersBloc>()
-        ..add(LoadMembers(organizationId)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) =>
+              sl<OrganizationMembersBloc>()..add(LoadMembers(organizationId)),
+        ),
+        BlocProvider(create: (_) => sl<InviteBloc>()),
+      ],
       child: _OrganizationDetailsView(organizationId: organizationId),
     );
   }
@@ -59,7 +67,22 @@ class _OrganizationDetailsViewState extends State<_OrganizationDetailsView> {
       (AuthBloc bloc) => bloc.state.user.id,
     );
 
-    return BlocConsumer<OrganizationMembersBloc, OrganizationMembersState>(
+    return BlocListener<InviteBloc, InviteState>(
+      listener: (context, state) {
+        if (state.status == InviteStatus.success) {
+          Navigator.pop(context); // cierra el modal
+          showDialog(
+            context: context,
+            builder: (_) => InviteLinkDialog(inviteLink: state.inviteLink!),
+          );
+        } else if (state.status == InviteStatus.failure) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage ?? 'Error al generar invitación')),
+          );
+        }
+      },
+      child: BlocConsumer<OrganizationMembersBloc, OrganizationMembersState>(
       listener: (context, state) {
         if (state.status == OrganizationMembersStatus.loaded &&
             state.organization != null &&
@@ -99,6 +122,11 @@ class _OrganizationDetailsViewState extends State<_OrganizationDetailsView> {
             currentUserRole == OrganizationRole.owner &&
             currentUserId.isNotEmpty;
 
+        final canInvite =
+            currentUserId.isNotEmpty &&
+            (currentUserRole == OrganizationRole.owner ||
+                currentUserRole == OrganizationRole.admin);
+
         return Scaffold(
           appBar: AppBar(
             title:
@@ -115,6 +143,21 @@ class _OrganizationDetailsViewState extends State<_OrganizationDetailsView> {
                     )
                     : Text(state.organization!.name),
             actions: [
+              if (!_isEditing && canInvite)
+                IconButton(
+                  icon: const Icon(Icons.person_add_outlined),
+                  tooltip: 'Invitar miembro',
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<InviteBloc>(),
+                      child: InviteModal(
+                        organizationId: widget.organizationId,
+                      ),
+                    ),
+                  ),
+                ),
               if (_isEditing)
                 IconButton(
                   icon: const Icon(Icons.check),
@@ -232,6 +275,7 @@ class _OrganizationDetailsViewState extends State<_OrganizationDetailsView> {
           ),
         );
       },
+    ),
     );
   }
 

@@ -5,12 +5,14 @@ class RolePicker extends StatelessWidget {
   final OrganizationRole role;
   final bool isInteractive;
   final void Function(OrganizationRole) onRoleSelected;
+  final List<OrganizationRole> allowedRoles;
 
   const RolePicker({
     super.key,
     required this.role,
     required this.isInteractive,
     required this.onRoleSelected,
+    this.allowedRoles = OrganizationRole.values,
   });
 
   Color _getRoleColor(OrganizationRole role) {
@@ -64,11 +66,7 @@ class RolePicker extends StatelessWidget {
       offset: const Offset(0, 40),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       itemBuilder:
-          (context) => [
-            _buildMenuItem(OrganizationRole.owner),
-            _buildMenuItem(OrganizationRole.admin),
-            _buildMenuItem(OrganizationRole.member),
-          ],
+          (context) => allowedRoles.map(_buildMenuItem).toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(

@@ -4,6 +4,7 @@ import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
 import 'package:hookra/src/settings/settings.dart';
 
 GetIt sl = GetIt.instance;
@@ -21,6 +22,9 @@ void initServiceLocator() {
       supabase: supabase,
       userRepository: sl<UserRepository>(),
     ),
+  );
+  sl.registerSingleton<InviteRepository>(
+    SupabaseInviteRepository(supabase: supabase),
   );
 
   // Use cases
@@ -60,6 +64,9 @@ void initServiceLocator() {
   sl.registerFactory<UpdateMemberRoleUseCase>(
     () => UpdateMemberRoleUseCase(sl<OrganizationRepository>()),
   );
+  sl.registerFactory<CreateInviteUseCase>(
+    () => CreateInviteUseCase(sl<InviteRepository>()),
+  );
 
   // BLoCs
   sl.registerSingleton<AuthBloc>(
@@ -88,5 +95,8 @@ void initServiceLocator() {
       updateMemberRole: sl<UpdateMemberRoleUseCase>(),
       updateOrgName: sl<UpdateOrganizationNameUseCase>(),
     ),
+  );
+  sl.registerFactory<InviteBloc>(
+    () => InviteBloc(createInvite: sl<CreateInviteUseCase>()),
   );
 }
