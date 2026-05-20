@@ -12,7 +12,7 @@ export 'domain/use_cases/update_member_role_use_case.dart';
 export 'domain/use_cases/update_organization_name_use_case.dart';
 export 'data/repo/supabase_organization_repository.dart';
 export 'ui/views/organizations_page.dart';
-export 'ui/views/organization_details_page.dart';
+export 'ui/pages/organization_details_page.dart';
 export 'ui/blocs/organizations_bloc/organizations_bloc.dart';
 export 'ui/blocs/organization_members_bloc/organization_members_bloc.dart';
 export 'ui/components/role_picker.dart';
