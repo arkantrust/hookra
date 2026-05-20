@@ -57,6 +57,38 @@ final class SupabaseUserRepository extends UserRepository {
   }
 
   @override
+  Future<Result<User>> updateUser({
+    required String firstName,
+    required String lastName,
+  }) async {
+    final supabaseUser = _supabase.auth.currentUser;
+    if (supabaseUser == null) return Result.failure(const UserNotFound());
+
+    try {
+      final data = await _supabase
+          .from('profiles')
+          .update({'first_name': firstName, 'last_name': lastName})
+          .eq('id', supabaseUser.id)
+          .select('id, first_name, last_name, email, avatar_url')
+          .maybeSingle();
+      if (data == null) return Result.failure(const UserNotFound());
+      _user = User.fromJson(data);
+      return Result.success(_user!);
+    } on PostgrestException {
+      final connected = await hasInternetAccess();
+      return Result.failure(
+        connected ? const ServerUnreachable() : const NoInternetConnection(),
+      );
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseUserRepository.updateUser',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
   Future<void> dispose() async {
     _user = null;
   }
