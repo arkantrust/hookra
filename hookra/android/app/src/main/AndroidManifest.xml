@@ -8,6 +8,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
+            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -29,7 +30,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accept app.ddulce.hookra://reset-password and any path under app.ddulce.hookra:// -->
+                <!-- Accept any path under app.ddulce.hookra://* -->
                 <!-- There are many types of deep links -->
                 <!-- https://developer.android.com/training/app-links/create-deeplinks#types-deep -->
                 <data android:scheme="app.ddulce.hookra" android:host="*" /> <!-- [YOUR_SCHEME]://[YOUR_HOSTNAME] -->
