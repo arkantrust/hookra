@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,20 +34,64 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => sl<AuthBloc>()..add(AuthSubscriptionRequested()),
+            create: (context) =>
+                sl<AuthBloc>()..add(AuthSubscriptionRequested()),
           ),
         ],
-        child: Builder(
-          builder: (context) {
-            return MaterialApp.router(
-              title: 'Hookra',
-              debugShowCheckedModeBanner: false,
-              theme: darkTheme,
-              routerConfig: AppRouter(auth: context.read<AuthBloc>()).router,
-            );
-          },
-        ),
+        child: const _AppView(),
       ),
+    );
+  }
+}
+
+class _AppView extends StatefulWidget {
+  const _AppView();
+
+  @override
+  State<_AppView> createState() => _AppViewState();
+}
+
+class _AppViewState extends State<_AppView> {
+  late final AppRouter _appRouter;
+  StreamSubscription<String>? _linkSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _appRouter = AppRouter(auth: context.read<AuthBloc>());
+    _initDeepLinks();
+  }
+
+  void _initDeepLinks() {
+    final appLinks = AppLinks();
+    _linkSub = appLinks.stringLinkStream.listen(
+      (link) => WidgetsBinding.instance.addPostFrameCallback(
+        (_) { if (mounted) _handleLink(link); },
+      ),
+    );
+  }
+
+  void _handleLink(String link) {
+    final uri = Uri.parse(link);
+    if (uri.host == 'invite') {
+      final token = uri.queryParameters['token'];
+      if (token != null) _appRouter.router.go('/invite?token=$token');
+    }
+  }
+
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Hookra',
+      debugShowCheckedModeBanner: false,
+      theme: darkTheme,
+      routerConfig: _appRouter.router,
     );
   }
 }

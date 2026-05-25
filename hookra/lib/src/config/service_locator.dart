@@ -68,6 +68,12 @@ void initServiceLocator() {
   sl.registerFactory<CreateInviteUseCase>(
     () => CreateInviteUseCase(sl<InviteRepository>()),
   );
+  sl.registerFactory<GetInviteByTokenUseCase>(
+    () => GetInviteByTokenUseCase(sl<InviteRepository>()),
+  );
+  sl.registerFactory<AcceptInviteUseCase>(
+    () => AcceptInviteUseCase(sl<InviteRepository>()),
+  );
 
   // BLoCs
   sl.registerSingleton<AuthBloc>(
@@ -132,5 +138,11 @@ void initServiceLocator() {
 
   sl.registerFactory<InviteBloc>(
     () => InviteBloc(createInvite: sl<CreateInviteUseCase>()),
+  );
+  sl.registerFactory<AcceptInviteBloc>(
+    () => AcceptInviteBloc(
+      getInviteByToken: sl<GetInviteByTokenUseCase>(),
+      acceptInvite: sl<AcceptInviteUseCase>(),
+    ),
   );
 }
