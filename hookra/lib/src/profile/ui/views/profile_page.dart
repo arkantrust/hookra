@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_avif/flutter_avif.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/auth/auth.dart';
@@ -11,7 +10,7 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   static GoRoute route() =>
-      GoRoute(path: '/profile', builder: (_, __) => const ProfilePage());
+      GoRoute(path: '/profile', builder: (_, _) => const ProfilePage());
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +62,12 @@ class _ProfileCard extends StatelessWidget {
 
   const _ProfileCard({required this.user, required this.palette});
 
+  Widget _avatarPlaceholder(ColorScheme palette) => Icon(
+        Icons.person,
+        size: 56,
+        color: palette.onSurfaceVariant,
+      );
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -78,25 +83,17 @@ class _ProfileCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 52,
                   backgroundColor: palette.surfaceContainerHighest,
-                  child: ClipOval(
-                    child: user.avatarUrl != null
-                        ? AvifImage.network(
-                            user.avatarUrl!,
-                            width: 104,
-                            height: 104,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.person,
-                              size: 56,
-                              color: palette.onSurfaceVariant,
-                            ),
-                          )
-                        : Icon(
-                            Icons.person,
-                            size: 56,
-                            color: palette.onSurfaceVariant,
-                          ),
-                  ),
+                  child: user.avatarUrl != null
+                      ? Image.network(
+                          user.avatarUrl!,
+                          width: 104,
+                          height: 104,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (_, child, progress) =>
+                              progress == null ? child : _avatarPlaceholder(palette),
+                          errorBuilder: (_, _, _) => _avatarPlaceholder(palette),
+                        )
+                      : _avatarPlaceholder(palette),
                 ),
                 Positioned(
                   bottom: 0,
