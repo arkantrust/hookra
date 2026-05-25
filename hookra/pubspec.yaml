@@ -24,7 +24,6 @@ dependencies:
   formz: ^0.8.0
   
   go_router: ^17.2.3
-  flutter_avif: ^3.1.0
   get_it: ^9.2.1
 
   flutter_native_splash: ^2.4.7
