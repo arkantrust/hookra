@@ -1,12 +1,12 @@
 import 'package:get_it/get_it.dart';
-import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/auth/auth.dart';
+import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
-import 'package:hookra/src/profile/profile.dart';
-import 'package:hookra/src/organizations/organizations.dart';
-import 'package:hookra/src/teams/teams.dart';
 import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
+import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/settings/settings.dart';
+import 'package:hookra/src/teams/teams.dart';
 
 GetIt sl = GetIt.instance;
 
@@ -120,8 +120,8 @@ void initServiceLocator() {
   sl.registerFactory<LeaveTeamUseCase>(
     () => LeaveTeamUseCase(sl<TeamRepository>()),
   );
-  sl.registerFactory<GetCurrentTeamUseCase>(
-    () => GetCurrentTeamUseCase(sl<TeamRepository>()),
+  sl.registerFactory<GetUserTeamIdsUseCase>(
+    () => GetUserTeamIdsUseCase(sl<TeamRepository>()),
   );
 
   sl.registerFactoryParam<TeamsBloc, String, String>(
@@ -132,7 +132,7 @@ void initServiceLocator() {
       createTeam: sl<CreateTeamUseCase>(),
       joinTeam: sl<JoinTeamUseCase>(),
       leaveTeam: sl<LeaveTeamUseCase>(),
-      getCurrentTeam: sl<GetCurrentTeamUseCase>(),
+      getUserTeamIds: sl<GetUserTeamIdsUseCase>(),
     ),
   );
 

@@ -13,13 +13,13 @@ class TeamsTab extends StatelessWidget {
       listenWhen: (prev, curr) {
         if (prev.status == TeamsStatus.joining &&
             curr.status == TeamsStatus.loaded &&
-            prev.currentTeamId != curr.currentTeamId) {
+            prev.lastActionTeamId != curr.lastActionTeamId) {
           return true;
         }
         if (prev.status == TeamsStatus.leaving &&
             curr.status == TeamsStatus.loaded &&
-            prev.currentTeamId != null &&
-            curr.currentTeamId == null) {
+            prev.lastActionTeamId != null &&
+            curr.lastActionTeamId == null) {
           return true;
         }
         return prev.status != curr.status &&
@@ -35,7 +35,7 @@ class TeamsTab extends StatelessWidget {
             ),
           );
         } else if (state.status == TeamsStatus.joining &&
-            state.currentTeamId != null) {
+            state.lastActionTeamId != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('¡Unión exitosa!'),
@@ -43,7 +43,7 @@ class TeamsTab extends StatelessWidget {
             ),
           );
         } else if (state.status == TeamsStatus.leaving &&
-            state.currentTeamId == null) {
+            state.lastActionTeamId == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('¡Saliste del equipo exitosamente!'),
@@ -70,25 +70,24 @@ class TeamsTab extends StatelessWidget {
                 ),
               )
             else
-              ListView.builder(
-                itemCount: state.teams.length,
-                itemBuilder: (context, index) {
-                  final team = state.teams[index];
-                  final isInThisTeam = state.isInTeam(team.id);
-                  return TeamCard(
-                    team: team,
-                    isInTeam: isInThisTeam,
-                    isInAnotherTeam: state.isInAnyTeam && !isInThisTeam,
-                    onJoin: () {
-                      context.read<TeamsBloc>().add(JoinTeam(team.id));
-                    },
-                    onLeave: () {
-                      context.read<TeamsBloc>().add(LeaveTeam(team.id));
-                    },
-                    isJoiningOrLeaving: isLoading,
-                  );
-                },
-              ),
+               ListView.builder(
+                 itemCount: state.teams.length,
+                 itemBuilder: (context, index) {
+                   final team = state.teams[index];
+                   final isInThisTeam = state.isInTeam(team.id);
+                   return TeamCard(
+                     team: team,
+                     isInTeam: isInThisTeam,
+                     onJoin: () {
+                       context.read<TeamsBloc>().add(JoinTeam(team.id));
+                     },
+                     onLeave: () {
+                       context.read<TeamsBloc>().add(LeaveTeam(team.id));
+                     },
+                     isJoiningOrLeaving: isLoading,
+                   );
+                 },
+               ),
             Positioned(
               right: 16,
               bottom: 16,
