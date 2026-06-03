@@ -6,7 +6,6 @@ class TeamCard extends StatelessWidget {
     super.key,
     required this.team,
     required this.isInTeam,
-    required this.isInAnotherTeam,
     required this.onJoin,
     required this.onLeave,
     this.isJoiningOrLeaving = false,
@@ -14,7 +13,6 @@ class TeamCard extends StatelessWidget {
 
   final Team team;
   final bool isInTeam;
-  final bool isInAnotherTeam;
   final VoidCallback onJoin;
   final VoidCallback onLeave;
   final bool isJoiningOrLeaving;
@@ -44,8 +42,7 @@ class TeamCard extends StatelessWidget {
               : IconButton(
                   icon: const Icon(Icons.add_circle_outline),
                   tooltip: 'Join team',
-                  onPressed: isInAnotherTeam ? null : onJoin,
-                  color: isInAnotherTeam ? Colors.grey : null,
+                  onPressed: onJoin,
                 ),
     );
   }

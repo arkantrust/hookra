@@ -1,11 +1,11 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hookra/src/teams/domain/entities/team.dart';
 import 'package:hookra/src/teams/domain/repo/team_repository.dart';
 import 'package:hookra/src/utils/result.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final class SupabaseTeamRepository extends TeamRepository {
   SupabaseTeamRepository({required SupabaseClient supabase})
-      : _supabase = supabase;
+    : _supabase = supabase;
 
   final SupabaseClient _supabase;
 
@@ -68,53 +68,27 @@ final class SupabaseTeamRepository extends TeamRepository {
   }
 
   @override
-  Future<Result<bool>> hasUserTeam(
-    String profileId,
-    String organizationId,
-  ) async {
+  Future<Result<List<String>>> getTeamIdsForUser({
+    required String profileId,
+    required String organizationId,
+  }) async {
     try {
       final data = await _supabase
           .from('team_members')
           .select('team_id, teams!inner(organization_id)')
           .eq('profile_id', profileId)
-          .eq('teams.organization_id', organizationId)
-          .maybeSingle();
+          .eq('teams.organization_id', organizationId);
 
-      return Result.success(data != null);
-    } catch (e, s) {
-      return Result.unknown(
-        name: 'SupabaseTeamRepository.hasUserTeam',
-        error: e,
-        stackTrace: s,
-      );
-    }
-  }
-
-  @override
-  Future<Result<Team?>> getCurrentTeamForUser(
-    String profileId,
-    String organizationId,
-  ) async {
-    try {
-      final data = await _supabase
-          .from('team_members')
-          .select('''
-            team_id,
-            teams:teams(id, organization_id, name, description, logo_url, created_by, created_at)
-          ''')
-          .eq('profile_id', profileId)
-          .eq('teams.organization_id', organizationId)
-          .maybeSingle();
-
-      if (data == null || data['teams'] == null) {
-        return Result.success(null);
+      final teamIds = <String>{};
+      for (final row in data as List) {
+        final teamId = row['team_id'] as String?;
+        if (teamId != null) teamIds.add(teamId);
       }
 
-      final team = Team.fromJson(data['teams'] as Map<String, dynamic>);
-      return Result.success(team);
+      return Result.success(teamIds.toList());
     } catch (e, s) {
       return Result.unknown(
-        name: 'SupabaseTeamRepository.getCurrentTeamForUser',
+        name: 'SupabaseTeamRepository.getTeamIdsForUser',
         error: e,
         stackTrace: s,
       );
@@ -131,12 +105,13 @@ final class SupabaseTeamRepository extends TeamRepository {
       final existing = await _supabase
           .from('team_members')
           .select('id, teams!inner(organization_id)')
+          .eq('team_id', teamId)
           .eq('profile_id', profileId)
           .eq('teams.organization_id', organizationId)
           .maybeSingle();
 
       if (existing != null) {
-        return Result.failure(Exception('User is already in a team'));
+        return Result.voidResult();
       }
 
       await _supabase.from('team_members').insert({

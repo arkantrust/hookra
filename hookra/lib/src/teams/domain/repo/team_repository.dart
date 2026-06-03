@@ -10,15 +10,10 @@ abstract base class TeamRepository {
     required String creatorProfileId,
   });
 
-  Future<Result<bool>> hasUserTeam(
-    String profileId,
-    String organizationId,
-  );
-
-  Future<Result<Team?>> getCurrentTeamForUser(
-    String profileId,
-    String organizationId,
-  );
+  Future<Result<List<String>>> getTeamIdsForUser({
+    required String profileId,
+    required String organizationId,
+  });
 
   Future<Result<void>> joinTeam({
     required String teamId,

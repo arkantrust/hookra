@@ -10,23 +10,10 @@ class TeamsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<TeamsBloc, TeamsState>(
-      listenWhen: (prev, curr) {
-        if (prev.status == TeamsStatus.joining &&
-            curr.status == TeamsStatus.loaded &&
-            prev.currentTeamId != curr.currentTeamId) {
-          return true;
-        }
-        if (prev.status == TeamsStatus.leaving &&
-            curr.status == TeamsStatus.loaded &&
-            prev.currentTeamId != null &&
-            curr.currentTeamId == null) {
-          return true;
-        }
-        return prev.status != curr.status &&
-            (curr.status == TeamsStatus.error ||
-                curr.status == TeamsStatus.joining ||
-                curr.status == TeamsStatus.leaving);
-      },
+      listenWhen: (prev, curr) =>
+          curr.status == TeamsStatus.error ||
+          (curr.lastAction != TeamsAction.none &&
+              prev.lastAction != curr.lastAction),
       listener: (context, state) {
         if (state.status == TeamsStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -34,16 +21,14 @@ class TeamsTab extends StatelessWidget {
               content: Text(state.errorMessage ?? 'An error occurred'),
             ),
           );
-        } else if (state.status == TeamsStatus.joining &&
-            state.currentTeamId != null) {
+        } else if (state.lastAction == TeamsAction.joined) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('¡Unión exitosa!'),
               duration: Duration(seconds: 2),
             ),
           );
-        } else if (state.status == TeamsStatus.leaving &&
-            state.currentTeamId == null) {
+        } else if (state.lastAction == TeamsAction.left) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('¡Saliste del equipo exitosamente!'),
@@ -70,25 +55,24 @@ class TeamsTab extends StatelessWidget {
                 ),
               )
             else
-              ListView.builder(
-                itemCount: state.teams.length,
-                itemBuilder: (context, index) {
-                  final team = state.teams[index];
-                  final isInThisTeam = state.isInTeam(team.id);
-                  return TeamCard(
-                    team: team,
-                    isInTeam: isInThisTeam,
-                    isInAnotherTeam: state.isInAnyTeam && !isInThisTeam,
-                    onJoin: () {
-                      context.read<TeamsBloc>().add(JoinTeam(team.id));
-                    },
-                    onLeave: () {
-                      context.read<TeamsBloc>().add(LeaveTeam(team.id));
-                    },
-                    isJoiningOrLeaving: isLoading,
-                  );
-                },
-              ),
+               ListView.builder(
+                 itemCount: state.teams.length,
+                 itemBuilder: (context, index) {
+                   final team = state.teams[index];
+                   final isInThisTeam = state.isInTeam(team.id);
+                   return TeamCard(
+                     team: team,
+                     isInTeam: isInThisTeam,
+                     onJoin: () {
+                       context.read<TeamsBloc>().add(JoinTeam(team.id));
+                     },
+                     onLeave: () {
+                       context.read<TeamsBloc>().add(LeaveTeam(team.id));
+                     },
+                     isJoiningOrLeaving: isLoading,
+                   );
+                 },
+               ),
             Positioned(
               right: 16,
               bottom: 16,

@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/teams/domain/entities/team.dart';
 import 'package:hookra/src/teams/domain/use_cases/create_team_use_case.dart';
-import 'package:hookra/src/teams/domain/use_cases/get_current_team_use_case.dart';
 import 'package:hookra/src/teams/domain/use_cases/get_teams_use_case.dart';
+import 'package:hookra/src/teams/domain/use_cases/get_user_team_ids_use_case.dart';
 import 'package:hookra/src/teams/domain/use_cases/join_team_use_case.dart';
 import 'package:hookra/src/teams/domain/use_cases/leave_team_use_case.dart';
 
@@ -18,15 +18,15 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
     required CreateTeamUseCase createTeam,
     required JoinTeamUseCase joinTeam,
     required LeaveTeamUseCase leaveTeam,
-    required GetCurrentTeamUseCase getCurrentTeam,
-  })  : _organizationId = organizationId,
-        _creatorId = creatorId,
-        _getTeams = getTeams,
-        _createTeam = createTeam,
-        _joinTeam = joinTeam,
-        _leaveTeam = leaveTeam,
-        _getCurrentTeam = getCurrentTeam,
-        super(const TeamsState()) {
+    required GetUserTeamIdsUseCase getUserTeamIds,
+  }) : _organizationId = organizationId,
+       _creatorId = creatorId,
+       _getTeams = getTeams,
+       _createTeam = createTeam,
+       _joinTeam = joinTeam,
+       _leaveTeam = leaveTeam,
+       _getUserTeamIds = getUserTeamIds,
+       super(const TeamsState()) {
     on<LoadTeams>(_onLoadTeams);
     on<CreateTeam>(_onCreateTeam);
     on<JoinTeam>(_onJoinTeam);
@@ -39,47 +39,66 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
   final CreateTeamUseCase _createTeam;
   final JoinTeamUseCase _joinTeam;
   final LeaveTeamUseCase _leaveTeam;
-  final GetCurrentTeamUseCase _getCurrentTeam;
+  final GetUserTeamIdsUseCase _getUserTeamIds;
 
-  Future<void> _onLoadTeams(
-    LoadTeams event,
-    Emitter<TeamsState> emit,
-  ) async {
-    emit(state.copyWith(status: TeamsStatus.loading));
+  Future<void> _onLoadTeams(LoadTeams event, Emitter<TeamsState> emit) async {
+    emit(
+      state.copyWith(
+        status: TeamsStatus.loading,
+        lastAction: TeamsAction.none,
+        lastActionTeamId: null,
+      ),
+    );
 
     final teamsResult = await _getTeams(_organizationId);
-    final currentTeamResult = await _getCurrentTeam(
+    if (teamsResult.isFailure) {
+      emit(
+        state.copyWith(
+          status: TeamsStatus.error,
+          errorMessage: teamsResult.error.toString(),
+          lastAction: TeamsAction.none,
+          lastActionTeamId: null,
+        ),
+      );
+      return;
+    }
+
+    final memberTeamsResult = await _getUserTeamIds(
       profileId: _creatorId,
       organizationId: _organizationId,
     );
 
-    String? currentTeamId;
-    if (currentTeamResult.isSuccess && currentTeamResult.valueOrNull != null) {
-      currentTeamId = currentTeamResult.valueOrNull!.id;
-    }
-
-    teamsResult.fold(
-      (teams) => emit(
-        state.copyWith(
-          status: TeamsStatus.loaded,
-          teams: teams ?? [],
-          currentTeamId: currentTeamId,
-        ),
-      ),
-      (error) => emit(
+    if (memberTeamsResult.isFailure) {
+      emit(
         state.copyWith(
           status: TeamsStatus.error,
-          errorMessage: error.toString(),
+          errorMessage: memberTeamsResult.error.toString(),
+          lastAction: TeamsAction.none,
+          lastActionTeamId: null,
         ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        status: TeamsStatus.loaded,
+        teams: teamsResult.value,
+        memberTeamIds: memberTeamsResult.value,
+        lastAction: TeamsAction.none,
+        lastActionTeamId: null,
       ),
     );
   }
 
-  Future<void> _onCreateTeam(
-    CreateTeam event,
-    Emitter<TeamsState> emit,
-  ) async {
-    emit(state.copyWith(status: TeamsStatus.creating));
+  Future<void> _onCreateTeam(CreateTeam event, Emitter<TeamsState> emit) async {
+    emit(
+      state.copyWith(
+        status: TeamsStatus.creating,
+        lastAction: TeamsAction.none,
+        lastActionTeamId: null,
+      ),
+    );
     final result = await _createTeam(
       organizationId: _organizationId,
       name: event.name,
@@ -87,23 +106,40 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
     );
     result.fold(
       (team) {
-        final updated = [if (team != null) team, ...state.teams];
-        emit(state.copyWith(status: TeamsStatus.loaded, teams: updated));
+        final updatedTeams = [if (team != null) team, ...state.teams];
+        final updatedMemberIds = {
+          ...state.memberTeamIds,
+          if (team != null) team.id,
+        }.toList();
+        emit(
+          state.copyWith(
+            status: TeamsStatus.loaded,
+            teams: updatedTeams,
+            memberTeamIds: updatedMemberIds,
+            lastAction: TeamsAction.none,
+            lastActionTeamId: null,
+          ),
+        );
       },
       (error) => emit(
         state.copyWith(
           status: TeamsStatus.error,
           errorMessage: error.toString(),
+          lastAction: TeamsAction.none,
+          lastActionTeamId: null,
         ),
       ),
     );
   }
 
-  Future<void> _onJoinTeam(
-    JoinTeam event,
-    Emitter<TeamsState> emit,
-  ) async {
-    emit(state.copyWith(status: TeamsStatus.joining));
+  Future<void> _onJoinTeam(JoinTeam event, Emitter<TeamsState> emit) async {
+    emit(
+      state.copyWith(
+        status: TeamsStatus.joining,
+        lastAction: TeamsAction.none,
+        lastActionTeamId: null,
+      ),
+    );
     final result = await _joinTeam(
       teamId: event.teamId,
       profileId: _creatorId,
@@ -112,25 +148,38 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
 
     result.fold(
       (_) {
-        emit(state.copyWith(
-          status: TeamsStatus.loaded,
-          currentTeamId: event.teamId,
-        ));
+        final updatedMemberIds = {
+          ...state.memberTeamIds,
+          event.teamId,
+        }.toList();
+        emit(
+          state.copyWith(
+            status: TeamsStatus.loaded,
+            memberTeamIds: updatedMemberIds,
+            lastAction: TeamsAction.joined,
+            lastActionTeamId: event.teamId,
+          ),
+        );
       },
       (error) => emit(
         state.copyWith(
           status: TeamsStatus.error,
           errorMessage: error.toString(),
+          lastAction: TeamsAction.none,
+          lastActionTeamId: null,
         ),
       ),
     );
   }
 
-  Future<void> _onLeaveTeam(
-    LeaveTeam event,
-    Emitter<TeamsState> emit,
-  ) async {
-    emit(state.copyWith(status: TeamsStatus.leaving));
+  Future<void> _onLeaveTeam(LeaveTeam event, Emitter<TeamsState> emit) async {
+    emit(
+      state.copyWith(
+        status: TeamsStatus.leaving,
+        lastAction: TeamsAction.none,
+        lastActionTeamId: null,
+      ),
+    );
     final result = await _leaveTeam(
       teamId: event.teamId,
       profileId: _creatorId,
@@ -138,15 +187,23 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
 
     result.fold(
       (_) {
-        emit(state.copyWith(
-          status: TeamsStatus.loaded,
-          clearCurrentTeam: true,
-        ));
+        final updatedMemberIds = List<String>.from(state.memberTeamIds)
+          ..remove(event.teamId);
+        emit(
+          state.copyWith(
+            status: TeamsStatus.loaded,
+            memberTeamIds: updatedMemberIds,
+            lastAction: TeamsAction.left,
+            lastActionTeamId: event.teamId,
+          ),
+        );
       },
       (error) => emit(
         state.copyWith(
           status: TeamsStatus.error,
           errorMessage: error.toString(),
+          lastAction: TeamsAction.none,
+          lastActionTeamId: null,
         ),
       ),
     );
