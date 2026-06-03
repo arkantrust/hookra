@@ -25,20 +25,24 @@ final class TeamsState extends Equatable {
 
   bool get isInAnyTeam => memberTeamIds.isNotEmpty;
 
+  static const _sentinel = Object();
+
   TeamsState copyWith({
     TeamsStatus? status,
     List<Team>? teams,
     String? errorMessage,
     List<String>? memberTeamIds,
     TeamsAction? lastAction,
-    String? lastActionTeamId,
+    Object? lastActionTeamId = _sentinel,
   }) => TeamsState(
     status: status ?? this.status,
     teams: teams ?? this.teams,
     errorMessage: errorMessage ?? this.errorMessage,
     memberTeamIds: memberTeamIds ?? this.memberTeamIds,
     lastAction: lastAction ?? this.lastAction,
-    lastActionTeamId: lastActionTeamId ?? this.lastActionTeamId,
+    lastActionTeamId: identical(lastActionTeamId, _sentinel)
+        ? this.lastActionTeamId
+        : lastActionTeamId as String?,
   );
 
   @override
