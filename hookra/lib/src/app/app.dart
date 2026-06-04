@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/organizations/organizations.dart';
 import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/theme.dart';
 import 'package:hookra/src/app/router.dart';
@@ -37,6 +38,7 @@ class App extends StatelessWidget {
             create: (context) =>
                 sl<AuthBloc>()..add(AuthSubscriptionRequested()),
           ),
+          BlocProvider<SelectionCubit>.value(value: sl<SelectionCubit>()),
         ],
         child: const _AppView(),
       ),
@@ -87,11 +89,19 @@ class _AppViewState extends State<_AppView> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Hookra',
-      debugShowCheckedModeBanner: false,
-      theme: lightTheme,
-      routerConfig: _appRouter.router,
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (prev, curr) => prev.status != curr.status,
+      listener: (context, state) {
+        if (state.status == AuthStatus.unauthenticated) {
+          context.read<SelectionCubit>().clear();
+        }
+      },
+      child: MaterialApp.router(
+        title: 'Hookra',
+        debugShowCheckedModeBanner: false,
+        theme: lightTheme,
+        routerConfig: _appRouter.router,
+      ),
     );
   }
 }

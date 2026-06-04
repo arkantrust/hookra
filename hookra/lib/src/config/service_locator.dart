@@ -5,6 +5,7 @@ import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
 import 'package:hookra/src/organizations/organizations.dart';
 import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/settings/settings.dart';
 import 'package:hookra/src/teams/teams.dart';
 
@@ -125,6 +126,13 @@ void initServiceLocator() {
   );
   sl.registerFactory<GetTeamMembersUseCase>(
     () => GetTeamMembersUseCase(sl<TeamRepository>()),
+  );
+
+  sl.registerSingleton<SelectionCubit>(
+    SelectionCubit(
+      getOrganizations: sl<GetOrganizationsUseCase>(),
+      getTeams: sl<GetTeamsUseCase>(),
+    ),
   );
 
   sl.registerFactoryParam<TeamsBloc, String, String>(
