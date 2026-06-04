@@ -1,8 +1,13 @@
 import 'package:get_it/get_it.dart';
-import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/auth/auth.dart';
-import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/config/config.dart';
+import 'package:hookra/src/onboarding/onboarding.dart';
+import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/profile/profile.dart';
+import 'package:hookra/src/selection/selection.dart';
+import 'package:hookra/src/settings/settings.dart';
+import 'package:hookra/src/teams/teams.dart';
 
 GetIt sl = GetIt.instance;
 
@@ -20,6 +25,9 @@ void initServiceLocator() {
       userRepository: sl<UserRepository>(),
     ),
   );
+  sl.registerSingleton<InviteRepository>(
+    SupabaseInviteRepository(supabase: supabase),
+  );
 
   // Use cases
   sl.registerFactory<SignInUseCase>(() => SignInUseCase(sl<AuthRepository>()));
@@ -28,7 +36,7 @@ void initServiceLocator() {
     () => SignUpWithOrganizationUseCase(
       sl<SignUpUseCase>(),
       sl<GetUserUseCase>(),
-      sl<OrganizationRepository>(),
+      sl<CreateOrganizationUseCase>(),
     ),
   );
   sl.registerFactory<SignOutUseCase>(
@@ -40,8 +48,32 @@ void initServiceLocator() {
   sl.registerFactory<GetUserUseCase>(
     () => GetUserUseCase(sl<UserRepository>()),
   );
+  sl.registerFactory<GetOrganizationsUseCase>(
+    () => GetOrganizationsUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<CreateOrganizationUseCase>(
+    () => CreateOrganizationUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<UpdateProfileUseCase>(
+    () => UpdateProfileUseCase(sl<UserRepository>()),
+  );
+  sl.registerFactory<GetOrganizationDetailsUseCase>(
+    () => GetOrganizationDetailsUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<UpdateOrganizationNameUseCase>(
+    () => UpdateOrganizationNameUseCase(sl<OrganizationRepository>()),
+  );
   sl.registerFactory<UpdateMemberRoleUseCase>(
     () => UpdateMemberRoleUseCase(sl<OrganizationRepository>()),
+  );
+  sl.registerFactory<CreateInviteUseCase>(
+    () => CreateInviteUseCase(sl<InviteRepository>()),
+  );
+  sl.registerFactory<GetInviteByTokenUseCase>(
+    () => GetInviteByTokenUseCase(sl<InviteRepository>()),
+  );
+  sl.registerFactory<AcceptInviteUseCase>(
+    () => AcceptInviteUseCase(sl<InviteRepository>()),
   );
 
   // BLoCs
@@ -56,10 +88,72 @@ void initServiceLocator() {
   sl.registerFactory<SignUpBloc>(
     () => SignUpBloc(signUp: sl<SignUpWithOrganizationUseCase>()),
   );
-  sl.registerFactoryParam<OrganizationMembersBloc, String, void>(
-    (organizationId, _) => OrganizationMembersBloc(
-      repository: sl<OrganizationRepository>(),
-      updateMemberRoleUseCase: sl<UpdateMemberRoleUseCase>(),
+  sl.registerFactory<EditProfileBloc>(
+    () => EditProfileBloc(updateProfile: sl<UpdateProfileUseCase>()),
+  );
+  sl.registerFactory<OrganizationsBloc>(
+    () => OrganizationsBloc(
+      getOrganizations: sl<GetOrganizationsUseCase>(),
+      createOrganization: sl<CreateOrganizationUseCase>(),
+    ),
+  );
+  sl.registerFactory<OrganizationMembersBloc>(
+    () => OrganizationMembersBloc(
+      getDetails: sl<GetOrganizationDetailsUseCase>(),
+      updateMemberRole: sl<UpdateMemberRoleUseCase>(),
+      updateOrgName: sl<UpdateOrganizationNameUseCase>(),
+    ),
+  );
+
+  sl.registerSingleton<TeamRepository>(
+    SupabaseTeamRepository(supabase: supabase),
+  );
+
+  sl.registerFactory<GetTeamsUseCase>(
+    () => GetTeamsUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<CreateTeamUseCase>(
+    () => CreateTeamUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<JoinTeamUseCase>(
+    () => JoinTeamUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<LeaveTeamUseCase>(
+    () => LeaveTeamUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<GetUserTeamIdsUseCase>(
+    () => GetUserTeamIdsUseCase(sl<TeamRepository>()),
+  );
+  sl.registerFactory<GetTeamMembersUseCase>(
+    () => GetTeamMembersUseCase(sl<TeamRepository>()),
+  );
+
+  sl.registerSingleton<SelectionCubit>(
+    SelectionCubit(
+      getOrganizations: sl<GetOrganizationsUseCase>(),
+      getTeams: sl<GetTeamsUseCase>(),
+    ),
+  );
+
+  sl.registerFactoryParam<TeamsBloc, String, String>(
+    (organizationId, creatorId) => TeamsBloc(
+      organizationId: organizationId,
+      creatorId: creatorId,
+      getTeams: sl<GetTeamsUseCase>(),
+      createTeam: sl<CreateTeamUseCase>(),
+      joinTeam: sl<JoinTeamUseCase>(),
+      leaveTeam: sl<LeaveTeamUseCase>(),
+      getUserTeamIds: sl<GetUserTeamIdsUseCase>(),
+    ),
+  );
+
+  sl.registerFactory<InviteBloc>(
+    () => InviteBloc(createInvite: sl<CreateInviteUseCase>()),
+  );
+  sl.registerFactory<AcceptInviteBloc>(
+    () => AcceptInviteBloc(
+      getInviteByToken: sl<GetInviteByTokenUseCase>(),
+      acceptInvite: sl<AcceptInviteUseCase>(),
     ),
   );
 }

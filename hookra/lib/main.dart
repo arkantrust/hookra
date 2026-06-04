@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/app.dart';
@@ -24,7 +25,8 @@ class AppBlocObserver extends BlocObserver {
 }
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
@@ -37,6 +39,7 @@ Future<void> main() async {
     await initSupabase();
     initServiceLocator();
     runApp(const App());
+    FlutterNativeSplash.remove();
   } catch (e, s) {
     log('Startup error: $e', stackTrace: s);
     runApp(

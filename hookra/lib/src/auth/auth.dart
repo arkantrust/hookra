@@ -3,7 +3,6 @@ export 'domain/failures/auth_failure.dart';
 export 'domain/repo/auth_repository.dart';
 export 'domain/use_cases/sign_in_use_case.dart';
 export 'domain/use_cases/sign_up_use_case.dart';
-export 'domain/use_cases/sign_up_with_organization_use_case.dart';
 export 'domain/use_cases/sign_out_use_case.dart';
 export 'domain/use_cases/watch_auth_status_use_case.dart';
 export 'domain/value_objects/email.dart';

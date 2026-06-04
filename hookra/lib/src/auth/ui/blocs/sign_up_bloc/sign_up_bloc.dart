@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
 import 'package:hookra/src/auth/domain/failures/auth_failure.dart';
-import 'package:hookra/src/auth/domain/use_cases/sign_up_with_organization_use_case.dart';
+import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/auth/domain/value_objects/email.dart';
 import 'package:hookra/src/auth/domain/value_objects/name.dart';
 import 'package:hookra/src/auth/domain/value_objects/password.dart';

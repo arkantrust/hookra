@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 node_modules/
+.vercel/
 
 # IntelliJ related
 *.iml
@@ -33,6 +34,7 @@ node_modules/
 **/.pub-cache/
 **/.pub/
 **/build/
+/coverage/
 
 # Symbolication related
 app.*.symbols
