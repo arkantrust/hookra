@@ -1,4 +1,5 @@
 import 'package:hookra/src/teams/domain/entities/team.dart';
+import 'package:hookra/src/teams/domain/entities/team_member.dart';
 import 'package:hookra/src/utils/result.dart';
 
 abstract base class TeamRepository {
@@ -25,6 +26,8 @@ abstract base class TeamRepository {
     required String teamId,
     required String profileId,
   });
+
+  Future<Result<List<TeamMember>>> getTeamMembers(String teamId);
 
   void dispose();
 }

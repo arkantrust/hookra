@@ -8,6 +8,7 @@ class TeamCard extends StatelessWidget {
     required this.isInTeam,
     required this.onJoin,
     required this.onLeave,
+    required this.onViewMembers,
     this.isJoiningOrLeaving = false,
   });
 
@@ -15,35 +16,48 @@ class TeamCard extends StatelessWidget {
   final bool isInTeam;
   final VoidCallback onJoin;
   final VoidCallback onLeave;
+  final VoidCallback onViewMembers;
   final bool isJoiningOrLeaving;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        child: Text(team.name[0].toUpperCase()),
-      ),
-      title: Text(team.name),
-      subtitle: Text(
-        'Created ${team.createdAt.day}/${team.createdAt.month}/${team.createdAt.year}',
-      ),
-      trailing: isJoiningOrLeaving
-          ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : isInTeam
-              ? IconButton(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0, left: 8, right: 8),
+      child: GestureDetector(
+        onTap: onViewMembers,
+        child: ListTile(
+          leading: CircleAvatar(child: Text(team.name[0].toUpperCase())),
+          title: Text(team.name),
+          subtitle: Text(
+            'Created ${team.createdAt.day}/${team.createdAt.month}/${team.createdAt.year}',
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isJoiningOrLeaving)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else if (isInTeam)
+                IconButton(
                   icon: const Icon(Icons.exit_to_app),
                   tooltip: 'Leave team',
                   onPressed: onLeave,
                 )
-              : IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
+              else
+                IconButton(
+                  icon: const Icon(Icons.group_add),
                   tooltip: 'Join team',
                   onPressed: onJoin,
                 ),
+            ],
+          ),
+          tileColor: Theme.of(context).colorScheme.surfaceContainer,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        ),
+      ),
     );
   }
 }

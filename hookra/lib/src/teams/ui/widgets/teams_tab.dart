@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/teams/ui/blocs/teams_bloc/teams_bloc.dart';
 import 'package:hookra/src/teams/ui/widgets/create_team_modal.dart';
 import 'package:hookra/src/teams/ui/widgets/team_card.dart';
+import 'package:hookra/src/teams/ui/widgets/team_members_modal.dart';
 
 class TeamsTab extends StatelessWidget {
   const TeamsTab({super.key});
@@ -55,23 +56,31 @@ class TeamsTab extends StatelessWidget {
                 ),
               )
             else
-               ListView.builder(
-                 itemCount: state.teams.length,
-                 itemBuilder: (context, index) {
-                   final team = state.teams[index];
-                   final isInThisTeam = state.isInTeam(team.id);
-                   return TeamCard(
-                     team: team,
-                     isInTeam: isInThisTeam,
-                     onJoin: () {
-                       context.read<TeamsBloc>().add(JoinTeam(team.id));
-                     },
-                     onLeave: () {
-                       context.read<TeamsBloc>().add(LeaveTeam(team.id));
-                     },
-                     isJoiningOrLeaving: isLoading,
-                   );
-                 },
+               Padding(
+                 padding: const EdgeInsets.symmetric(vertical: 6),
+                 child: ListView.builder(
+                   itemCount: state.teams.length,
+                   itemBuilder: (context, index) {
+                     final team = state.teams[index];
+                     final isInThisTeam = state.isInTeam(team.id);
+                     return TeamCard(
+                       team: team,
+                       isInTeam: isInThisTeam,
+                       onJoin: () {
+                         context.read<TeamsBloc>().add(JoinTeam(team.id));
+                       },
+                       onLeave: () {
+                         context.read<TeamsBloc>().add(LeaveTeam(team.id));
+                       },
+                       onViewMembers: () => showModalBottomSheet<void>(
+                         context: context,
+                         isScrollControlled: true,
+                         builder: (_) => TeamMembersModal(team: team),
+                       ),
+                       isJoiningOrLeaving: isLoading,
+                     );
+                   },
+                 ),
                ),
             Positioned(
               right: 16,

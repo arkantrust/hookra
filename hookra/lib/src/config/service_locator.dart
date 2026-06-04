@@ -123,6 +123,9 @@ void initServiceLocator() {
   sl.registerFactory<GetUserTeamIdsUseCase>(
     () => GetUserTeamIdsUseCase(sl<TeamRepository>()),
   );
+  sl.registerFactory<GetTeamMembersUseCase>(
+    () => GetTeamMembersUseCase(sl<TeamRepository>()),
+  );
 
   sl.registerFactoryParam<TeamsBloc, String, String>(
     (organizationId, creatorId) => TeamsBloc(

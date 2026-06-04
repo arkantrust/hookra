@@ -1,4 +1,5 @@
 import 'package:hookra/src/teams/domain/entities/team.dart';
+import 'package:hookra/src/teams/domain/entities/team_member.dart';
 import 'package:hookra/src/teams/domain/repo/team_repository.dart';
 import 'package:hookra/src/utils/result.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -147,6 +148,27 @@ final class SupabaseTeamRepository extends TeamRepository {
     } catch (e, s) {
       return Result.unknown(
         name: 'SupabaseTeamRepository.leaveTeam',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<TeamMember>>> getTeamMembers(String teamId) async {
+    try {
+      final data = await _supabase
+          .from('team_members')
+          .select('profiles!team_members_profile_id_fkey(id, first_name, last_name, email)')
+          .eq('team_id', teamId);
+      final members = (data as List).map((row) {
+        final profile = row['profiles'] as Map<String, dynamic>;
+        return TeamMember.fromJson(profile);
+      }).toList();
+      return Result.success(members);
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseTeamRepository.getTeamMembers',
         error: e,
         stackTrace: s,
       );
