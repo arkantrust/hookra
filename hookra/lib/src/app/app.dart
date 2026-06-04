@@ -90,7 +90,7 @@ class _AppViewState extends State<_AppView> {
     return MaterialApp.router(
       title: 'Hookra',
       debugShowCheckedModeBanner: false,
-      theme: darkTheme,
+      theme: lightTheme,
       routerConfig: _appRouter.router,
     );
   }

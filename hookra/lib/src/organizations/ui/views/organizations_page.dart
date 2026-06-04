@@ -43,15 +43,7 @@ class _OrganizationsView extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Organizations'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () {
-                  context.read<AuthBloc>().add(AuthSignOutPressed());
-                },
-              ),
-            ],
+            title: Text('Your Organizations', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
           ),
           body: _buildBody(context, state),
           floatingActionButton: FloatingActionButton(
