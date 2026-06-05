@@ -26,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        super(AuthState.unknown()) {
     on<AuthSubscriptionRequested>(_onSubscriptionRequested);
     on<AuthSignOutPressed>(_onSignOutPressed);
+    on<AuthProfileUpdated>(_onProfileUpdated);
   }
 
   Future<void> _onSubscriptionRequested(
@@ -49,6 +50,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onSignOutPressed(AuthSignOutPressed event, Emitter<AuthState> emit) {
     _signOut();
     _getUser.dispose(); // Remove user from cache
+  }
+
+  void _onProfileUpdated(AuthProfileUpdated event, Emitter<AuthState> emit) {
+    emit(AuthState.authenticated(event.user));
   }
 
   Future<void> _emitUserIfExists(Emitter<AuthState> emit) async {

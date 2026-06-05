@@ -10,3 +10,12 @@ sealed class AuthEvent extends Equatable {
 final class AuthSubscriptionRequested extends AuthEvent {}
 
 final class AuthSignOutPressed extends AuthEvent {}
+
+final class AuthProfileUpdated extends AuthEvent {
+  const AuthProfileUpdated(this.user);
+
+  final User user;
+
+  @override
+  List<Object> get props => [user];
+}
