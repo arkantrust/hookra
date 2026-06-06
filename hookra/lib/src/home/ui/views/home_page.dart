@@ -30,6 +30,19 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+      // TEMP: remove when content detail screen provides entry point
+      floatingActionButton: FloatingActionButton.extended(
+        label: const Text('Test AI Chat'),
+        icon: const Icon(Icons.chat_bubble_outline),
+        onPressed: () => context.push(
+          '/content/REPLACE_WITH_REAL_CONTENT_ID/chat',
+          extra: <String, String>{
+            'platform': 'instagram',
+            'format': 'reel',
+            'title': 'Test Content',
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         child: Column(
