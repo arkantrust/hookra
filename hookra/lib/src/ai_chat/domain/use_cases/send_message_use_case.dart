@@ -12,9 +12,9 @@ class SendMessageUseCase {
     required String prompt,
     required List<AgentMessage> history,
   }) => _repository.sendMessage(
-        orgId: orgId,
-        teamId: teamId,
-        prompt: prompt,
-        history: history,
-      );
+    orgId: orgId,
+    teamId: teamId,
+    prompt: prompt,
+    history: history,
+  );
 }

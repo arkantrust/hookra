@@ -113,8 +113,9 @@ class _AiChatPageState extends State<AiChatPage> {
                     enableAttachments: false,
                     enableVoiceNotes: false,
                     style: LlmChatViewStyle(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerLowest,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerLowest,
                       userMessageStyle: UserMessageStyle(
                         textStyle: const TextStyle(color: Colors.white),
                         decoration: BoxDecoration(
