@@ -59,15 +59,15 @@ class AppRouter {
           builder: (context, state, child) => MainLayout(child: child),
           routes: [
             HomePage.route(), // route: /
-            ProfilePage.route(), // route: /profile
+            AiChatPage.route(), // route: /ai-chat
             OrganizationsPage.route(), // route: /organizations
+            ProfilePage.route(), // route: /profile
           ],
         ),
         // Detail pages live outside the shell — they are full-screen without the
         // bottom navigation bar, but still protected by the top-level redirect.
         OrganizationDetailsPage.route(), // route: /organizations/:id
         AcceptInvitePage.route(), // route: /invite?token=
-        AiChatPage.route(), // route: /content/:contentId/chat
         EditProfilePage.route(), // route: /settings/edit-profile
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up

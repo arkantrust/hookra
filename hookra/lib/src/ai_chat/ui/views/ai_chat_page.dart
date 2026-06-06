@@ -8,33 +8,15 @@ import 'package:hookra/src/ai_chat/data/repos/hookra_chat_provider.dart';
 import 'package:hookra/src/ai_chat/domain/use_cases/send_message_use_case.dart';
 import 'package:hookra/src/ai_chat/ui/blocs/ai_chat_bloc/ai_chat_bloc.dart';
 import 'package:hookra/src/config/service_locator.dart';
+import 'package:hookra/src/selection/selection.dart';
 
 class AiChatPage extends StatefulWidget {
-  const AiChatPage({
-    super.key,
-    required this.contentId,
-    required this.platform,
-    required this.format,
-    required this.title,
-  });
-
-  final String contentId;
-  final String platform;
-  final String format;
-  final String title;
+  const AiChatPage({super.key});
 
   static GoRoute route() {
     return GoRoute(
-      path: '/content/:contentId/chat',
-      builder: (context, state) {
-        final extra = state.extra as Map<String, String>;
-        return AiChatPage(
-          contentId: state.pathParameters['contentId']!,
-          platform: extra['platform']!,
-          format: extra['format']!,
-          title: extra['title']!,
-        );
-      },
+      path: '/ai-chat',
+      builder: (context, state) => const AiChatPage(),
     );
   }
 
@@ -43,30 +25,64 @@ class AiChatPage extends StatefulWidget {
 }
 
 class _AiChatPageState extends State<AiChatPage> {
-  late final AiChatBloc _bloc;
+  AiChatBloc? _bloc;
+  String? _orgId;
+  String? _teamId;
 
   @override
   void initState() {
     super.initState();
-    _bloc = AiChatBloc(
-      sendMessage: sl<SendMessageUseCase>(),
-      contentId: widget.contentId,
-      platform: widget.platform,
-      format: widget.format,
-      title: widget.title,
-    )..add(const AiChatStarted());
+    final selection = context.read<SelectionCubit>().state;
+    _orgId = selection.selectedOrgId;
+    _teamId = selection.selectedTeamId;
+
+    if (_orgId != null && _teamId != null) {
+      _bloc = AiChatBloc(
+        sendMessage: sl<SendMessageUseCase>(),
+        orgId: _orgId!,
+        teamId: _teamId!,
+      )..add(const AiChatStarted());
+    }
   }
 
   @override
   void dispose() {
-    _bloc.close();
+    _bloc?.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_orgId == null || _teamId == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Content Assistant')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.group_outlined, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                const Text(
+                  'Select an organization and team to start chatting.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: () => context.go('/profile'),
+                  child: const Text('Go to Profile'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return BlocProvider.value(
-      value: _bloc,
+      value: _bloc!,
       child: BlocBuilder<AiChatBloc, AiChatState>(
         builder: (context, state) {
           return switch (state) {
@@ -82,34 +98,23 @@ class _AiChatPageState extends State<AiChatPage> {
               ChangeNotifierProvider<HookraChatProvider>.value(
                 value: provider,
                 child: Scaffold(
-                  appBar: AppBar(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Content Assistant'),
-                        Text(
-                          widget.title,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: Colors.white70),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
+                  appBar: AppBar(title: const Text('Content Assistant')),
                   body: LlmChatView(
                     provider: provider,
                     welcomeMessage:
-                        "Hi! I'm your content assistant. Ready to generate "
-                        'the script for your **${widget.format}** on '
-                        '**${widget.platform}** — *"${widget.title}"*. '
-                        'Describe the brief, tone, and goal.',
-                    suggestions: _suggestionsFor(widget.platform),
+                        "Hi! I'm your content assistant. Tell me what you "
+                        'want to create — describe the platform, format, and topic.',
+                    suggestions: const [
+                      'Create an Instagram Reel',
+                      'Write a LinkedIn post',
+                      'Generate a TikTok script',
+                      'Draft a YouTube Short',
+                    ],
                     enableAttachments: false,
                     enableVoiceNotes: false,
                     style: LlmChatViewStyle(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainerLowest,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerLowest,
                       userMessageStyle: UserMessageStyle(
                         textStyle: const TextStyle(color: Colors.white),
                         decoration: BoxDecoration(
@@ -144,34 +149,4 @@ class _AiChatPageState extends State<AiChatPage> {
       ),
     );
   }
-
-  static List<String> _suggestionsFor(String platform) => switch (platform) {
-    'instagram' => [
-      'Generate the script with a curiosity hook',
-      'Create an emotional script that drives comments',
-      'Make it funny with a CTA to follow the profile',
-    ],
-    'tiktok' => [
-      'Script with a shock hook in the first 2 seconds',
-      'TikTok storytelling trend format',
-      'Question-answer-surprise format',
-    ],
-    'linkedin' => [
-      'Thought leadership post with data',
-      'Personal professional learning story',
-      'Controversial opinion in my industry',
-    ],
-    'twitter' => [
-      'Thread of 5 tweets with a strong hook',
-      'Short high-impact tweet with a question',
-    ],
-    'youtube' => [
-      'Script for a 60-second YouTube Short',
-      'Hook intro + development + subscribe CTA',
-    ],
-    _ => [
-      'Generate the script for this content',
-      'Suggest a hook for this post',
-    ],
-  };
 }
