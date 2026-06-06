@@ -72,9 +72,9 @@ class _AppViewState extends State<_AppView> {
   void _initDeepLinks() {
     final appLinks = AppLinks();
     _linkSub = appLinks.stringLinkStream.listen(
-      (link) => WidgetsBinding.instance.addPostFrameCallback(
-        (_) { if (mounted) _handleLink(link); },
-      ),
+      (link) => WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _handleLink(link);
+      }),
     );
   }
 

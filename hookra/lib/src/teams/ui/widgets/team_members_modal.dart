@@ -54,11 +54,19 @@ class _TeamMembersModalState extends State<TeamMembersModal> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: members.length,
                   itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0, left: 2, right: 2),
+                    padding: const EdgeInsets.only(
+                      bottom: 4.0,
+                      left: 2,
+                      right: 2,
+                    ),
                     child: ListTile(
                       title: Text(members[index].fullName),
-                      tileColor: Theme.of(context).colorScheme.secondaryContainer,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      tileColor: Theme.of(
+                        context,
+                      ).colorScheme.secondaryContainer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
                   ),
                 ),

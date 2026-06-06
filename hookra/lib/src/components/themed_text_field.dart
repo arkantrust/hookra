@@ -34,28 +34,26 @@ class ThemedTextField extends StatelessWidget {
       lazy: true,
       create: (context) => _VisibilityCubit(),
       child: Builder(
-        builder:
-            (context) => TextField(
-              key: key,
-              obscureText:
-                  obscure
-                      ? context.select((_VisibilityCubit cubit) => cubit.state)
-                      : false,
-              onChanged: onChanged,
-              enableSuggestions: enableSuggestions,
-              autocorrect: autocorrect,
-              keyboardType: keyboardType,
-              textCapitalization: textCapitalization,
-              textInputAction: textInputAction,
-              onSubmitted: onSubmitted,
-              decoration: InputDecoration(
-                labelText: label,
-                labelStyle: TextStyle(color: palette.onSurface),
-                suffixIcon: obscure ? _VisibilityButton() : null,
-                errorText: error,
-                errorStyle: TextStyle(color: palette.error),
-              ),
-            ),
+        builder: (context) => TextField(
+          key: key,
+          obscureText: obscure
+              ? context.select((_VisibilityCubit cubit) => cubit.state)
+              : false,
+          onChanged: onChanged,
+          enableSuggestions: enableSuggestions,
+          autocorrect: autocorrect,
+          keyboardType: keyboardType,
+          textCapitalization: textCapitalization,
+          textInputAction: textInputAction,
+          onSubmitted: onSubmitted,
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(color: palette.onSurface),
+            suffixIcon: obscure ? _VisibilityButton() : null,
+            errorText: error,
+            errorStyle: TextStyle(color: palette.error),
+          ),
+        ),
       ),
     );
   }

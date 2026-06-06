@@ -12,9 +12,9 @@ class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
 
   static GoRoute route() => GoRoute(
-        path: '/settings/edit-profile',
-        builder: (_, _) => const EditProfilePage(),
-      );
+    path: '/settings/edit-profile',
+    builder: (_, _) => const EditProfilePage(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +65,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
       listener: (context, state) {
         if (state.status == FormzSubmissionStatus.success &&
             state.updatedUser != null) {
-          context
-              .read<AuthBloc>()
-              .add(AuthProfileUpdated(state.updatedUser!));
+          context.read<AuthBloc>().add(AuthProfileUpdated(state.updatedUser!));
           context.pop();
         }
         if (state.status == FormzSubmissionStatus.failure) {
@@ -188,8 +186,9 @@ class _FormSection extends StatelessWidget {
                 controller: firstController,
                 textCapitalization: TextCapitalization.words,
                 textInputAction: TextInputAction.next,
-                onChanged: (v) =>
-                    context.read<EditProfileBloc>().add(EditProfileFirstChanged(v)),
+                onChanged: (v) => context.read<EditProfileBloc>().add(
+                  EditProfileFirstChanged(v),
+                ),
                 decoration: InputDecoration(
                   labelText: 'Nombre',
                   errorText: state.first.displayError != null
@@ -205,10 +204,12 @@ class _FormSection extends StatelessWidget {
                 controller: lastController,
                 textCapitalization: TextCapitalization.words,
                 textInputAction: TextInputAction.done,
-                onChanged: (v) =>
-                    context.read<EditProfileBloc>().add(EditProfileLastChanged(v)),
-                onSubmitted: (_) =>
-                    context.read<EditProfileBloc>().add(const EditProfileSubmitted()),
+                onChanged: (v) => context.read<EditProfileBloc>().add(
+                  EditProfileLastChanged(v),
+                ),
+                onSubmitted: (_) => context.read<EditProfileBloc>().add(
+                  const EditProfileSubmitted(),
+                ),
                 decoration: InputDecoration(
                   labelText: 'Apellido',
                   errorText: state.last.displayError != null
@@ -229,14 +230,15 @@ class _FormSection extends StatelessWidget {
                   child: FilledButton(
                     onPressed: loading || !state.isValid
                         ? null
-                        : () => context
-                            .read<EditProfileBloc>()
-                            .add(const EditProfileSubmitted()),
+                        : () => context.read<EditProfileBloc>().add(
+                            const EditProfileSubmitted(),
+                          ),
                     style: FilledButton.styleFrom(
                       backgroundColor: palette.primary,
                       foregroundColor: palette.onPrimary,
-                      disabledBackgroundColor:
-                          palette.onSurface.withValues(alpha: 0.12),
+                      disabledBackgroundColor: palette.onSurface.withValues(
+                        alpha: 0.12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

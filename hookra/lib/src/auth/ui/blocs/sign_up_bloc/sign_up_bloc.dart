@@ -15,8 +15,7 @@ part 'sign_up_state.dart';
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   final SignUpWithOrganizationUseCase _signUp;
 
-  SignUpBloc({required this._signUp})
-    : super(SignUpState()) {
+  SignUpBloc({required this._signUp}) : super(SignUpState()) {
     on<SignUpFirstChanged>(_onFirstChanged);
     on<SignUpLastChanged>(_onLastChanged);
     on<SignUpEmailChanged>(_onEmailChanged);

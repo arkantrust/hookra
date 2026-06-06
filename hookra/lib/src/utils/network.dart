@@ -17,8 +17,7 @@ Future<bool> isReachable(String url) async {
     final request = await HttpClient()
         .getUrl(uri)
         .timeout(const Duration(seconds: 5));
-    final response = await request.close()
-        .timeout(const Duration(seconds: 5));
+    final response = await request.close().timeout(const Duration(seconds: 5));
     return response.statusCode < 500;
   } catch (_) {
     return false;

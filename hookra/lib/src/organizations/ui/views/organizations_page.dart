@@ -20,7 +20,8 @@ class OrganizationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<OrganizationsBloc>()..add(const OrganizationsLoadRequested()),
+      create: (_) =>
+          sl<OrganizationsBloc>()..add(const OrganizationsLoadRequested()),
       child: const _OrganizationsView(),
     );
   }
@@ -43,7 +44,13 @@ class _OrganizationsView extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Your Organizations', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
+            title: Text(
+              'Your Organizations',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
           body: _buildBody(context, state),
           floatingActionButton: FloatingActionButton(
@@ -72,9 +79,9 @@ class _OrganizationsView extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context
-                    .read<OrganizationsBloc>()
-                    .add(const OrganizationsLoadRequested());
+                context.read<OrganizationsBloc>().add(
+                  const OrganizationsLoadRequested(),
+                );
               },
               child: const Text('Retry'),
             ),
@@ -88,11 +95,7 @@ class _OrganizationsView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.business_outlined,
-              size: 64,
-              color: Colors.grey,
-            ),
+            const Icon(Icons.business_outlined, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             const Text(
               'No organizations yet',
@@ -110,9 +113,9 @@ class _OrganizationsView extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        context
-            .read<OrganizationsBloc>()
-            .add(const OrganizationsLoadRequested());
+        context.read<OrganizationsBloc>().add(
+          const OrganizationsLoadRequested(),
+        );
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -134,39 +137,38 @@ class _OrganizationsView extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('Create Organization'),
-            content: TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Organization Name',
-                hintText: 'Enter organization name',
-              ),
-              autofocus: true,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final name = nameController.text.trim();
-                  if (name.isEmpty || currentUserId.isEmpty) return;
-
-                  context.read<OrganizationsBloc>().add(
-                    OrganizationsCreateRequested(
-                      name: name,
-                      ownerId: currentUserId,
-                    ),
-                  );
-                  Navigator.pop(dialogContext);
-                },
-                child: const Text('Create'),
-              ),
-            ],
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Create Organization'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(
+            labelText: 'Organization Name',
+            hintText: 'Enter organization name',
           ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final name = nameController.text.trim();
+              if (name.isEmpty || currentUserId.isEmpty) return;
+
+              context.read<OrganizationsBloc>().add(
+                OrganizationsCreateRequested(
+                  name: name,
+                  ownerId: currentUserId,
+                ),
+              );
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
     );
   }
 }

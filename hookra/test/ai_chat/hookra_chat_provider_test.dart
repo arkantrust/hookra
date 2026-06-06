@@ -29,12 +29,12 @@ final class _FakeRepository extends AgentChatRepository {
 }
 
 HookraChatProvider _makeProvider(List<String> chunks) => HookraChatProvider(
-      sendMessage: SendMessageUseCase(_FakeRepository(chunks)),
-      contentId: 'c-1',
-      platform: 'instagram',
-      format: 'reel',
-      title: 'Test',
-    );
+  sendMessage: SendMessageUseCase(_FakeRepository(chunks)),
+  contentId: 'c-1',
+  platform: 'instagram',
+  format: 'reel',
+  title: 'Test',
+);
 
 void main() {
   group('HookraChatProvider', () {

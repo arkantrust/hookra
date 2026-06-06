@@ -71,13 +71,13 @@ class _AiChatPageState extends State<AiChatPage> {
         builder: (context, state) {
           return switch (state) {
             AiChatInitial() => Scaffold(
-                appBar: AppBar(title: const Text('Content Assistant')),
-                body: const Center(child: CircularProgressIndicator()),
-              ),
+              appBar: AppBar(title: const Text('Content Assistant')),
+              body: const Center(child: CircularProgressIndicator()),
+            ),
             AiChatError(:final failure) => Scaffold(
-                appBar: AppBar(title: const Text('Content Assistant')),
-                body: Center(child: Text('Error: $failure')),
-              ),
+              appBar: AppBar(title: const Text('Content Assistant')),
+              body: Center(child: Text('Error: $failure')),
+            ),
             AiChatReady(:final provider) =>
               ChangeNotifierProvider<HookraChatProvider>.value(
                 value: provider,
@@ -89,9 +89,7 @@ class _AiChatPageState extends State<AiChatPage> {
                         const Text('Content Assistant'),
                         Text(
                           widget.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
+                          style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: Colors.white70),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -109,8 +107,9 @@ class _AiChatPageState extends State<AiChatPage> {
                     enableAttachments: false,
                     enableVoiceNotes: false,
                     style: LlmChatViewStyle(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerLowest,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerLowest,
                       userMessageStyle: UserMessageStyle(
                         textStyle: const TextStyle(color: Colors.white),
                         decoration: BoxDecoration(
@@ -125,9 +124,9 @@ class _AiChatPageState extends State<AiChatPage> {
                       ),
                       llmMessageStyle: LlmMessageStyle(
                         decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.zero,
                             topRight: Radius.circular(20),
@@ -147,32 +146,32 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   static List<String> _suggestionsFor(String platform) => switch (platform) {
-        'instagram' => [
-            'Generate the script with a curiosity hook',
-            'Create an emotional script that drives comments',
-            'Make it funny with a CTA to follow the profile',
-          ],
-        'tiktok' => [
-            'Script with a shock hook in the first 2 seconds',
-            'TikTok storytelling trend format',
-            'Question-answer-surprise format',
-          ],
-        'linkedin' => [
-            'Thought leadership post with data',
-            'Personal professional learning story',
-            'Controversial opinion in my industry',
-          ],
-        'twitter' => [
-            'Thread of 5 tweets with a strong hook',
-            'Short high-impact tweet with a question',
-          ],
-        'youtube' => [
-            'Script for a 60-second YouTube Short',
-            'Hook intro + development + subscribe CTA',
-          ],
-        _ => [
-            'Generate the script for this content',
-            'Suggest a hook for this post',
-          ],
-      };
+    'instagram' => [
+      'Generate the script with a curiosity hook',
+      'Create an emotional script that drives comments',
+      'Make it funny with a CTA to follow the profile',
+    ],
+    'tiktok' => [
+      'Script with a shock hook in the first 2 seconds',
+      'TikTok storytelling trend format',
+      'Question-answer-surprise format',
+    ],
+    'linkedin' => [
+      'Thought leadership post with data',
+      'Personal professional learning story',
+      'Controversial opinion in my industry',
+    ],
+    'twitter' => [
+      'Thread of 5 tweets with a strong hook',
+      'Short high-impact tweet with a question',
+    ],
+    'youtube' => [
+      'Script for a 60-second YouTube Short',
+      'Hook intro + development + subscribe CTA',
+    ],
+    _ => [
+      'Generate the script for this content',
+      'Suggest a hook for this post',
+    ],
+  };
 }

@@ -72,10 +72,9 @@ class AppRouter {
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
       ],
-      errorBuilder:
-          (context, state) => SafeArea(
-            child: Scaffold(body: Center(child: Text('Error: ${state.error}'))),
-          ),
+      errorBuilder: (context, state) => SafeArea(
+        child: Scaffold(body: Center(child: Text('Error: ${state.error}'))),
+      ),
     );
   }
 }

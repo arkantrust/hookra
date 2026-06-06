@@ -28,12 +28,11 @@ final class SupabaseUserRepository extends UserRepository {
 
     Map<String, dynamic>? data = {};
     try {
-      data =
-          await _supabase
-              .from('profiles')
-              .select('id, first_name, last_name, email, avatar_url')
-              .eq('id', supabaseUser.id)
-              .maybeSingle();
+      data = await _supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email, avatar_url')
+          .eq('id', supabaseUser.id)
+          .maybeSingle();
     } on PostgrestException {
       final connected = await hasInternetAccess();
       if (!connected) {

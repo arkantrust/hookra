@@ -38,13 +38,13 @@ class HookraChatProvider extends LlmProvider with ChangeNotifier {
     String prompt, {
     Iterable<Attachment> attachments = const [],
   }) => _sendMessage(
-        contentId: contentId,
-        prompt: prompt,
-        history: _toAgentHistory(_history),
-        platform: platform,
-        format: format,
-        title: title,
-      );
+    contentId: contentId,
+    prompt: prompt,
+    history: _toAgentHistory(_history),
+    platform: platform,
+    format: format,
+    title: title,
+  );
 
   @override
   Stream<String> sendMessageStream(

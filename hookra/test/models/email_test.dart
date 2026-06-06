@@ -21,7 +21,11 @@ void main() {
     test('FirstName.LastName@EasierReading.org should be valid', () {
       email = const Email.dirty('FirstName.LastName@EasierReading.org');
       expect(email.error, null);
-      expect(email.isValid, true, reason: 'case is always ignored after the @ and usually before');
+      expect(
+        email.isValid,
+        true,
+        reason: 'case is always ignored after the @ and usually before',
+      );
     });
 
     test('x@example.com should be valid', () {
@@ -30,11 +34,16 @@ void main() {
       expect(email.isValid, true, reason: 'x is a valid one-letter local-part');
     });
 
-    test('long.email-address-with-hyphens@and.subdomains.example.com should be valid', () {
-      email = const Email.dirty('long.email-address-with-hyphens@and.subdomains.example.com');
-      expect(email.error, null);
-      expect(email.isValid, true);
-    });
+    test(
+      'long.email-address-with-hyphens@and.subdomains.example.com should be valid',
+      () {
+        email = const Email.dirty(
+          'long.email-address-with-hyphens@and.subdomains.example.com',
+        );
+        expect(email.error, null);
+        expect(email.isValid, true);
+      },
+    );
 
     test('user.name+tag+sorting@example.com should be valid', () {
       email = const Email.dirty('user.name+tag+sorting@example.com');
@@ -42,7 +51,8 @@ void main() {
       expect(
         email.isValid,
         true,
-        reason: 'may be routed to user.name@example.com inbox depending on mail server',
+        reason:
+            'may be routed to user.name@example.com inbox depending on mail server',
       );
     });
 
@@ -52,7 +62,8 @@ void main() {
       expect(
         email.isValid,
         true,
-        reason: 'slashes are a printable character, and allowed in the local-part',
+        reason:
+            'slashes are a printable character, and allowed in the local-part',
       );
     });
 
@@ -81,13 +92,21 @@ void main() {
     test('" "@example.org should be valid', () {
       email = const Email.dirty('" "@example.org');
       expect(email.error, null);
-      expect(email.isValid, true, reason: 'quoted string with a space is valid');
+      expect(
+        email.isValid,
+        true,
+        reason: 'quoted string with a space is valid',
+      );
     });
 
     test('"john..doe"@example.org should be valid', () {
       email = const Email.dirty('"john..doe"@example.org');
       expect(email.error, null);
-      expect(email.isValid, true, reason: 'quoted string with two dots is valid');
+      expect(
+        email.isValid,
+        true,
+        reason: 'quoted string with two dots is valid',
+      );
     });
 
     test('mailhost!username@example.org should be valid', () {
@@ -96,7 +115,8 @@ void main() {
       expect(
         email.isValid,
         true,
-        reason: 'bangified host route used for uucp mailers, not common anymore',
+        reason:
+            'bangified host route used for uucp mailers, not common anymore',
       );
     });
 
@@ -148,17 +168,31 @@ void main() {
       );
     });
 
-    test('postmaster@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334] should be valid', () {
-      email = const Email.dirty('postmaster@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334]');
-      expect(email.error, null);
-      expect(email.isValid, true, reason: 'IPv6 uses a different syntax');
-    });
+    test(
+      'postmaster@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334] should be valid',
+      () {
+        email = const Email.dirty(
+          'postmaster@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334]',
+        );
+        expect(email.error, null);
+        expect(email.isValid, true, reason: 'IPv6 uses a different syntax');
+      },
+    );
 
-    test('_test@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334] should be valid', () {
-      email = const Email.dirty('_test@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334]');
-      expect(email.error, null);
-      expect(email.isValid, true, reason: 'begin with underscore different syntax');
-    });
+    test(
+      '_test@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334] should be valid',
+      () {
+        email = const Email.dirty(
+          '_test@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334]',
+        );
+        expect(email.error, null);
+        expect(
+          email.isValid,
+          true,
+          reason: 'begin with underscore different syntax',
+        );
+      },
+    );
   });
 
   // Examples taken from https://en.wikipedia.org/wiki/Email_address#Invalid_email_addresses
@@ -189,40 +223,62 @@ void main() {
 
     test('a@b@c@example.com (multiple @) should be invalid', () {
       email = const Email.dirty('a@b@c@example.com');
-      expect(email.isValid, false, reason: 'only one @ is allowed outside quotation marks');
-    });
-
-    test('a"b(c)d,e:f;g<h>i[j\\k]l@example.com (invalid special chars) should be invalid', () {
-      email = const Email.dirty('a"b(c)d,e:f;g<h>i[j\\k]l@example.com');
-      expect(email.isValid, false, reason: 'special characters not allowed outside quotes');
-    });
-
-    test('just"not"right@example.com (invalid quoted string) should be invalid', () {
-      email = const Email.dirty('just"not"right@example.com');
       expect(
         email.isValid,
         false,
-        reason: 'quoted strings must be dot separated or the only element',
+        reason: 'only one @ is allowed outside quotation marks',
       );
     });
 
-    test('this is"not\\allowed@example.com (invalid space/quote) should be invalid', () {
-      email = const Email.dirty('this is"not\\allowed@example.com');
-      expect(
-        email.isValid,
-        false,
-        reason: 'spaces, quotes, and backslashes must be within quoted strings and escaped',
-      );
-    });
+    test(
+      'a"b(c)d,e:f;g<h>i[j\\k]l@example.com (invalid special chars) should be invalid',
+      () {
+        email = const Email.dirty('a"b(c)d,e:f;g<h>i[j\\k]l@example.com');
+        expect(
+          email.isValid,
+          false,
+          reason: 'special characters not allowed outside quotes',
+        );
+      },
+    );
 
-    test('this\\ still\\"not\\\\allowed@example.com (invalid escaped chars) should be invalid', () {
-      email = const Email.dirty('this\\ still\\"not\\\\allowed@example.com');
-      expect(
-        email.isValid,
-        false,
-        reason: 'escaped spaces, quotes, and backslashes must be inside quotes',
-      );
-    });
+    test(
+      'just"not"right@example.com (invalid quoted string) should be invalid',
+      () {
+        email = const Email.dirty('just"not"right@example.com');
+        expect(
+          email.isValid,
+          false,
+          reason: 'quoted strings must be dot separated or the only element',
+        );
+      },
+    );
+
+    test(
+      'this is"not\\allowed@example.com (invalid space/quote) should be invalid',
+      () {
+        email = const Email.dirty('this is"not\\allowed@example.com');
+        expect(
+          email.isValid,
+          false,
+          reason:
+              'spaces, quotes, and backslashes must be within quoted strings and escaped',
+        );
+      },
+    );
+
+    test(
+      'this\\ still\\"not\\\\allowed@example.com (invalid escaped chars) should be invalid',
+      () {
+        email = const Email.dirty('this\\ still\\"not\\\\allowed@example.com');
+        expect(
+          email.isValid,
+          false,
+          reason:
+              'escaped spaces, quotes, and backslashes must be inside quotes',
+        );
+      },
+    );
 
     test(
       '1234567890123456789012345678901234567890123456789012345678901234+x@example.com (local-part too long) should be invalid',
@@ -230,15 +286,25 @@ void main() {
         email = const Email.dirty(
           '1234567890123456789012345678901234567890123456789012345678901234+x@example.com',
         );
-        expect(email.isValid, false, reason: 'local-part is longer than 64 characters');
+        expect(
+          email.isValid,
+          false,
+          reason: 'local-part is longer than 64 characters',
+        );
       },
     );
 
     test(
       'i.like.underscores@but_they_are_not_allowed_in_this_part (underscore in domain) should be invalid',
       () {
-        email = const Email.dirty('i.like.underscores@but_they_are_not_allowed_in_this_part');
-        expect(email.isValid, false, reason: 'underscore is not allowed in domain part');
+        email = const Email.dirty(
+          'i.like.underscores@but_they_are_not_allowed_in_this_part',
+        );
+        expect(
+          email.isValid,
+          false,
+          reason: 'underscore is not allowed in domain part',
+        );
       },
     );
   });

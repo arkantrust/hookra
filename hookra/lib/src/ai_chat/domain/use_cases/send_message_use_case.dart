@@ -14,11 +14,11 @@ class SendMessageUseCase {
     required String format,
     required String title,
   }) => _repository.sendMessage(
-        contentId: contentId,
-        prompt: prompt,
-        history: history,
-        platform: platform,
-        format: format,
-        title: title,
-      );
+    contentId: contentId,
+    prompt: prompt,
+    history: history,
+    platform: platform,
+    format: format,
+    title: title,
+  );
 }

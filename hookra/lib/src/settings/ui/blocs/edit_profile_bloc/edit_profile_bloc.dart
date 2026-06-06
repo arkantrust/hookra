@@ -13,7 +13,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   final UpdateProfileUseCase _updateProfile;
 
   EditProfileBloc({required this._updateProfile})
-      : super(const EditProfileState()) {
+    : super(const EditProfileState()) {
     on<EditProfileFirstChanged>(_onFirstChanged);
     on<EditProfileLastChanged>(_onLastChanged);
     on<EditProfileSubmitted>(_onSubmitted);
