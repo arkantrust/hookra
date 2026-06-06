@@ -7,18 +7,14 @@ class SendMessageUseCase {
   final AgentChatRepository _repository;
 
   Stream<String> call({
-    required String contentId,
+    required String orgId,
+    required String teamId,
     required String prompt,
     required List<AgentMessage> history,
-    required String platform,
-    required String format,
-    required String title,
   }) => _repository.sendMessage(
-    contentId: contentId,
-    prompt: prompt,
-    history: history,
-    platform: platform,
-    format: format,
-    title: title,
-  );
+        orgId: orgId,
+        teamId: teamId,
+        prompt: prompt,
+        history: history,
+      );
 }

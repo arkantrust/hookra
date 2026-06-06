@@ -18,12 +18,10 @@ final class HookraAgentChatRepository extends AgentChatRepository {
 
   @override
   Stream<String> sendMessage({
-    required String contentId,
+    required String orgId,
+    required String teamId,
     required String prompt,
     required List<AgentMessage> history,
-    required String platform,
-    required String format,
-    required String title,
   }) async* {
     final session = _supabase.auth.currentSession;
     if (session == null) {
@@ -36,12 +34,10 @@ final class HookraAgentChatRepository extends AgentChatRepository {
       ..headers['Authorization'] = 'Bearer ${session.accessToken}'
       ..headers['Content-Type'] = 'application/json'
       ..body = jsonEncode({
-        'content_id': contentId,
+        'org_id': orgId,
+        'team_id': teamId,
         'prompt': prompt,
         'history': history.map((m) => m.toJson()).toList(),
-        'platform': platform,
-        'format': format,
-        'title': title,
       });
 
     final client = http.Client();
@@ -49,6 +45,10 @@ final class HookraAgentChatRepository extends AgentChatRepository {
       final response = await client.send(request);
 
       if (response.statusCode == 401) {
+        yield* Stream.error(const AiChatAuthFailure());
+        return;
+      }
+      if (response.statusCode == 403) {
         yield* Stream.error(const AiChatAuthFailure());
         return;
       }

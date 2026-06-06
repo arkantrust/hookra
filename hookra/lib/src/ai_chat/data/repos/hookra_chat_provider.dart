@@ -8,17 +8,13 @@ import 'package:hookra/src/ai_chat/domain/use_cases/send_message_use_case.dart';
 class HookraChatProvider extends LlmProvider with ChangeNotifier {
   HookraChatProvider({
     required SendMessageUseCase sendMessage,
-    required this.contentId,
-    required this.platform,
-    required this.format,
-    required this.title,
+    required this.orgId,
+    required this.teamId,
   }) : _sendMessage = sendMessage;
 
   final SendMessageUseCase _sendMessage;
-  final String contentId;
-  final String platform;
-  final String format;
-  final String title;
+  final String orgId;
+  final String teamId;
 
   final List<ChatMessage> _history = [];
 
@@ -38,12 +34,10 @@ class HookraChatProvider extends LlmProvider with ChangeNotifier {
     String prompt, {
     Iterable<Attachment> attachments = const [],
   }) => _sendMessage(
-    contentId: contentId,
+    orgId: orgId,
+    teamId: teamId,
     prompt: prompt,
     history: _toAgentHistory(_history),
-    platform: platform,
-    format: format,
-    title: title,
   );
 
   @override
@@ -54,21 +48,17 @@ class HookraChatProvider extends LlmProvider with ChangeNotifier {
     _history.add(ChatMessage.user(prompt, attachments));
     notifyListeners();
 
-    // Snapshot history for API before adding the response placeholder
     final historyForApi = _toAgentHistory(_history);
 
-    // Pre-create the LLM message so it appears immediately in the UI
     final llmMessage = ChatMessage.llm();
     _history.add(llmMessage);
     notifyListeners();
 
     return _sendMessage(
-      contentId: contentId,
+      orgId: orgId,
+      teamId: teamId,
       prompt: prompt,
       history: historyForApi,
-      platform: platform,
-      format: format,
-      title: title,
     ).map((chunk) {
       llmMessage.append(chunk);
       notifyListeners();

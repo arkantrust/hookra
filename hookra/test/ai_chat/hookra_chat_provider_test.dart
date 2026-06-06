@@ -12,12 +12,10 @@ final class _FakeRepository extends AgentChatRepository {
 
   @override
   Stream<String> sendMessage({
-    required String contentId,
+    required String orgId,
+    required String teamId,
     required String prompt,
     required List<AgentMessage> history,
-    required String platform,
-    required String format,
-    required String title,
   }) async* {
     for (final chunk in _chunks) {
       yield chunk;
@@ -30,10 +28,8 @@ final class _FakeRepository extends AgentChatRepository {
 
 HookraChatProvider _makeProvider(List<String> chunks) => HookraChatProvider(
   sendMessage: SendMessageUseCase(_FakeRepository(chunks)),
-  contentId: 'c-1',
-  platform: 'instagram',
-  format: 'reel',
-  title: 'Test',
+  orgId: 'org-1',
+  teamId: 'team-1',
 );
 
 void main() {
