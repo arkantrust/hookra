@@ -2,35 +2,35 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const LLM_API_KEY = Deno.env.get('LLM_API_KEY')!;
 const LLM_API_URL =
-  Deno.env.get('LLM_API_URL') ?? 'https://api.groq.com/openai/v1/chat/completions';
+  Deno.env.get('LLM_API_URL') ??
+  'https://api.groq.com/openai/v1/chat/completions';
 const LLM_MODEL = Deno.env.get('LLM_MODEL') ?? 'llama-3.3-70b-versatile';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-function buildSystemPrompt(platform: string, format: string, title: string) {
-  return `You are an expert social media content creator working inside Hookra.
+const SYSTEM_PROMPT = `You are an expert social media content creator working inside Hookra.
 
-Your task is to generate a structured script for the following content piece:
-- Platform: ${platform}
-- Format: ${format}
-- Title: ${title}
+When the user gives you a brief, you must:
+1. Confirm you understood the brief (1 short feedback line).
+2. Determine the best platform and format for the content based on what the user describes.
+3. Generate the full structured script.
+4. At the very end, output ---JSON--- followed by the JSON object on the next line.
 
-Your process:
-1. Confirm you understood the brief (1 line of feedback).
-2. Generate the structured content internally.
-3. At the end, return ONLY a JSON block with this exact structure:
-   {"hook":"...","script":"...","caption":"...","cta":"...","hashtags":["...","..."]}
+Platform must be exactly one of: instagram, tiktok, facebook, linkedin, twitter, youtube
+Format must be exactly one of: reel, story, post, video, image, carousel, text
 
 Content rules:
-- Hook: max 2 sentences, captures attention in the first 3 seconds.
-- Script: adapted to platform/format. For reels/tiktok max 150 words.
-- Caption: post text, include relevant emojis.
-- CTA: clear and specific.
-- Hashtags: 5-15, mix of popularity levels.
+- title: short descriptive name for this content piece (max 60 chars)
+- hook: max 2 sentences, captures attention in the first 3 seconds
+- script: adapted to platform/format; for reels/tiktok max 150 words
+- caption: post text, include relevant emojis
+- cta: clear and specific call to action
+- hashtags: 5-15, mix of popularity levels
 
-Send ONLY brief feedback lines to the chat while working.
-End your response with ---JSON--- followed by the JSON block on a new line.`;
-}
+During generation, send ONLY brief feedback lines to the chat (no JSON yet).
+End your entire response with:
+---JSON---
+{"title":"...","platform":"...","format":"...","hook":"...","script":"...","caption":"...","cta":"...","hashtags":["..."]}`;
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
@@ -55,25 +55,38 @@ Deno.serve(async (req: Request) => {
   }
 
   const body = await req.json();
-  const { content_id, prompt, history, platform, format, title } = body;
+  const { org_id, team_id, prompt, history } = body;
 
-  if (!content_id || !prompt || !platform || !format || !title) {
-    return new Response('Bad Request: missing required fields', { status: 400 });
+  if (!org_id || !team_id || !prompt) {
+    return new Response('Bad Request: missing org_id, team_id, or prompt', {
+      status: 400,
+    });
   }
 
-  // Verify content access via user-scoped client (respects RLS)
-  const { data: content, error: contentError } = await userClient
-    .from('content')
+  // Verify user is a member of the team
+  const { data: membership, error: memberError } = await userClient
+    .from('team_members')
     .select('id')
-    .eq('id', content_id)
+    .eq('team_id', team_id)
+    .eq('profile_id', user.id)
     .single();
 
-  if (contentError || !content) {
-    return new Response('Content not found', { status: 404 });
+  if (memberError || !membership) {
+    return new Response('Forbidden: not a member of this team', {
+      status: 403,
+    });
   }
 
+  // Get the first project for this team
+  const { data: project, error: projectError } = await userClient
+    .from('projects')
+    .select('id')
+    .eq('team_id', team_id)
+    .limit(1)
+    .single();
+
   const messages = [
-    { role: 'system', content: buildSystemPrompt(platform, format, title) },
+    { role: 'system', content: SYSTEM_PROMPT },
     ...(history ?? []).map((m: { role: string; text: string }) => ({
       role: m.role === 'user' ? 'user' : 'assistant',
       content: m.text,
@@ -134,46 +147,69 @@ Deno.serve(async (req: Request) => {
 
       // Parse and persist structured output
       const separatorIndex = fullResponse.indexOf('---JSON---');
-      if (separatorIndex !== -1) {
-        try {
-          const jsonBlock = fullResponse.slice(separatorIndex + 10).trim();
-          const structured = JSON.parse(jsonBlock);
-          const serviceClient = createClient(
-            SUPABASE_URL,
-            SUPABASE_SERVICE_ROLE_KEY,
-          );
-          const { error: updateError } = await serviceClient
-            .from('content')
-            .update({
-              hook: structured.hook,
-              script: structured.script,
-              caption: structured.caption,
-              cta: structured.cta,
-              hashtags: structured.hashtags,
-              ai_model: LLM_MODEL,
-              ai_prompt: prompt,
-            })
-            .eq('id', content_id);
+      if (separatorIndex === -1) {
+        controller.enqueue(
+          encoder.encode(
+            'data: ⚠ No structured output found in response.\n\n',
+          ),
+        );
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+        return;
+      }
 
-          if (updateError) {
-            console.error('DB update error:', updateError);
-            controller.enqueue(
-              encoder.encode(`data: ⚠ Could not save script: ${updateError.message}\n\n`),
-            );
-          } else {
-            controller.enqueue(
-              encoder.encode('data: ✓ Script saved successfully.\n\n'),
-            );
-          }
-        } catch (e) {
-          console.error('Parse/update error:', e);
+      if (projectError || !project) {
+        controller.enqueue(
+          encoder.encode(
+            'data: ⚠ No projects found for this team. Create one first.\n\n',
+          ),
+        );
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+        return;
+      }
+
+      try {
+        const jsonBlock = fullResponse.slice(separatorIndex + 10).trim();
+        const structured = JSON.parse(jsonBlock);
+
+        const serviceClient = createClient(
+          SUPABASE_URL,
+          SUPABASE_SERVICE_ROLE_KEY,
+        );
+        const { error: insertError } = await serviceClient
+          .from('content')
+          .insert({
+            project_id: project.id,
+            created_by: user.id,
+            title: structured.title,
+            platform: structured.platform,
+            format: structured.format,
+            hook: structured.hook,
+            script: structured.script,
+            caption: structured.caption,
+            cta: structured.cta,
+            hashtags: structured.hashtags,
+            ai_model: LLM_MODEL,
+            ai_prompt: prompt,
+          });
+
+        if (insertError) {
+          console.error('DB insert error:', insertError);
           controller.enqueue(
-            encoder.encode(`data: ⚠ Could not save script: ${e}\n\n`),
+            encoder.encode(
+              `data: ⚠ Could not save content: ${insertError.message}\n\n`,
+            ),
+          );
+        } else {
+          controller.enqueue(
+            encoder.encode('data: ✓ Content saved to your project.\n\n'),
           );
         }
-      } else {
+      } catch (e) {
+        console.error('Parse/insert error:', e);
         controller.enqueue(
-          encoder.encode('data: ⚠ No structured script found in response.\n\n'),
+          encoder.encode(`data: ⚠ Could not save content: ${e}\n\n`),
         );
       }
 
@@ -186,7 +222,7 @@ Deno.serve(async (req: Request) => {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   });
 });
