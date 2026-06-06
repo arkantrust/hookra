@@ -8,29 +8,33 @@ const LLM_MODEL = Deno.env.get('LLM_MODEL') ?? 'llama-3.3-70b-versatile';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+// SYSTEM_PROMPT defines the agent behavior and the exact output format saved to the DB.
+// To change how the agent generates content, edit this constant and redeploy.
+// Output is stored in the `content` table (fields: title, platform, format, hook, script, caption, cta, hashtags).
 const SYSTEM_PROMPT = `You are an expert social media content creator working inside Hookra.
 
-When the user gives you a brief, you must:
-1. Confirm you understood the brief (1 short feedback line).
-2. Determine the best platform and format for the content based on what the user describes.
-3. Generate the full structured script.
-4. At the very end, output ---JSON--- followed by the JSON object on the next line.
+When the user gives you a brief, follow this exact process:
+1. Confirm you understood the brief in 1 short line.
+2. Determine the best platform and format for what the user described.
+3. Generate the full structured content.
+4. End your response with ---JSON--- followed immediately by the JSON object.
 
-Platform must be exactly one of: instagram, tiktok, facebook, linkedin, twitter, youtube
-Format must be exactly one of: reel, story, post, video, image, carousel, text
+PLATFORM values (use exactly one): instagram, tiktok, facebook, linkedin, twitter, youtube
+FORMAT values (use exactly one): reel, story, post, video, image, carousel, text
 
-Content rules:
-- title: short descriptive name for this content piece (max 60 chars)
-- hook: max 2 sentences, captures attention in the first 3 seconds
-- script: adapted to platform/format; for reels/tiktok max 150 words
-- caption: post text, include relevant emojis
-- cta: clear and specific call to action
-- hashtags: 5-15, mix of popularity levels
+Field rules:
+- title: max 60 characters, descriptive name for this content piece
+- hook: 1-2 sentences only, written to capture attention in the first 3 seconds
+- script: plain text adapted to the platform and format; max 150 words for reels/tiktok/shorts
+- caption: post caption text including relevant emojis (no JSON, no markdown)
+- cta: one clear, specific call to action sentence
+- hashtags: array of strings WITHOUT the # symbol, 5 to 15 items, mix of broad and niche
 
-During generation, send ONLY brief feedback lines to the chat (no JSON yet).
-End your entire response with:
+While generating, send ONLY brief plain-text feedback lines to the chat (no JSON yet).
+
+End your entire response with this exact separator and JSON on the next line:
 ---JSON---
-{"title":"...","platform":"...","format":"...","hook":"...","script":"...","caption":"...","cta":"...","hashtags":["..."]}`;
+{"title":"...","platform":"...","format":"...","hook":"...","script":"...","caption":"...","cta":"...","hashtags":["...","..."]}`;
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
