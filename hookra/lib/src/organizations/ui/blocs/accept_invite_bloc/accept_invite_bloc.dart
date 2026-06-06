@@ -13,10 +13,9 @@ class AcceptInviteBloc extends Bloc<AcceptInviteEvent, AcceptInviteState> {
   final AcceptInviteUseCase _acceptInvite;
 
   AcceptInviteBloc({
-    required GetInviteByTokenUseCase getInviteByToken,
+    required this._getInviteByToken,
     required AcceptInviteUseCase acceptInvite,
-  })  : _getInviteByToken = getInviteByToken,
-        _acceptInvite = acceptInvite,
+  })  : _acceptInvite = acceptInvite,
         super(const AcceptInviteInitial()) {
     on<AcceptInviteLoadRequested>(_onLoadRequested);
     on<AcceptInviteAcceptPressed>(_onAcceptPressed);

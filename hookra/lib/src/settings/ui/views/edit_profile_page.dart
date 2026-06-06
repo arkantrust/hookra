@@ -13,7 +13,7 @@ class EditProfilePage extends StatelessWidget {
 
   static GoRoute route() => GoRoute(
         path: '/settings/edit-profile',
-        builder: (_, __) => const EditProfilePage(),
+        builder: (_, _) => const EditProfilePage(),
       );
 
   @override

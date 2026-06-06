@@ -10,10 +10,9 @@ import 'package:hookra/src/utils/result.dart';
 
 class SupabaseOrganizationRepository extends OrganizationRepository {
   SupabaseOrganizationRepository({
-    required SupabaseClient supabase,
+    required this._supabase,
     required UserRepository userRepository,
-  }) : _supabase = supabase,
-       _userRepository = userRepository;
+  }) : _userRepository = userRepository;
 
   final SupabaseClient _supabase;
   final UserRepository _userRepository;

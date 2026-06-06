@@ -8,8 +8,7 @@ import 'package:hookra/src/organizations/domain/failures/org_invite_failure.dart
 import 'package:hookra/src/utils/result.dart';
 
 class SupabaseInviteRepository extends InviteRepository {
-  SupabaseInviteRepository({required SupabaseClient supabase})
-      : _supabase = supabase;
+  SupabaseInviteRepository({required this._supabase});
 
   final SupabaseClient _supabase;
 

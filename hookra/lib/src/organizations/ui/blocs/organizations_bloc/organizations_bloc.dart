@@ -12,10 +12,9 @@ class OrganizationsBloc extends Bloc<OrganizationsEvent, OrganizationsState> {
   final CreateOrganizationUseCase _createOrganization;
 
   OrganizationsBloc({
-    required GetOrganizationsUseCase getOrganizations,
+    required this._getOrganizations,
     required CreateOrganizationUseCase createOrganization,
-  }) : _getOrganizations = getOrganizations,
-       _createOrganization = createOrganization,
+  }) : _createOrganization = createOrganization,
        super(const OrganizationsState()) {
     on<OrganizationsLoadRequested>(_onLoadRequested);
     on<OrganizationsCreateRequested>(_onCreateRequested);

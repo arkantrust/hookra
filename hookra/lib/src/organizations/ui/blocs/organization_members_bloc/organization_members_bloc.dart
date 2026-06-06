@@ -17,12 +17,10 @@ class OrganizationMembersBloc
   final UpdateOrganizationNameUseCase _updateOrgName;
 
   OrganizationMembersBloc({
-    required GetOrganizationDetailsUseCase getDetails,
+    required this._getDetails,
     required UpdateMemberRoleUseCase updateMemberRole,
-    required UpdateOrganizationNameUseCase updateOrgName,
-  }) : _getDetails = getDetails,
-       _updateMemberRole = updateMemberRole,
-       _updateOrgName = updateOrgName,
+    required this._updateOrgName,
+  }) : _updateMemberRole = updateMemberRole,
        super(const OrganizationMembersState()) {
     on<LoadMembers>(_onLoadMembers);
     on<UpdateMemberRole>(_onUpdateMemberRole);

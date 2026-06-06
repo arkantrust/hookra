@@ -12,10 +12,9 @@ part 'selection_state.dart';
 /// cleared on sign-out via [clear].
 class SelectionCubit extends Cubit<SelectionState> {
   SelectionCubit({
-    required GetOrganizationsUseCase getOrganizations,
+    required this._getOrganizations,
     required GetTeamsUseCase getTeams,
-  }) : _getOrganizations = getOrganizations,
-       _getTeams = getTeams,
+  }) : _getTeams = getTeams,
        super(const SelectionState());
 
   final GetOrganizationsUseCase _getOrganizations;

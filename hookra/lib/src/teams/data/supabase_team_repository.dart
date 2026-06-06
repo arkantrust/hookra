@@ -5,8 +5,7 @@ import 'package:hookra/src/utils/result.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final class SupabaseTeamRepository extends TeamRepository {
-  SupabaseTeamRepository({required SupabaseClient supabase})
-    : _supabase = supabase;
+  SupabaseTeamRepository({required this._supabase});
 
   final SupabaseClient _supabase;
 

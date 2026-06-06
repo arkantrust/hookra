@@ -17,12 +17,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GetUserUseCase _getUser;
 
   AuthBloc({
-    required WatchAuthStatusUseCase watchStatus,
+    required this._watchStatus,
     required SignOutUseCase signOut,
-    required GetUserUseCase getUser,
-  }) : _watchStatus = watchStatus,
-       _signOut = signOut,
-       _getUser = getUser,
+    required this._getUser,
+  }) : _signOut = signOut,
        super(AuthState.unknown()) {
     on<AuthSubscriptionRequested>(_onSubscriptionRequested);
     on<AuthSignOutPressed>(_onSignOutPressed);
