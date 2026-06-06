@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/app/main_layout.dart';
 
+import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/home/home.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
@@ -66,6 +67,7 @@ class AppRouter {
         // bottom navigation bar, but still protected by the top-level redirect.
         OrganizationDetailsPage.route(), // route: /organizations/:id
         AcceptInvitePage.route(), // route: /invite?token=
+        AiChatPage.route(), // route: /content/:contentId/chat
         EditProfilePage.route(), // route: /settings/edit-profile
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up

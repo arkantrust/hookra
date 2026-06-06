@@ -19,7 +19,9 @@ final class _FakeRepository extends AgentChatRepository {
     required String format,
     required String title,
   }) async* {
-    for (final chunk in _chunks) yield chunk;
+    for (final chunk in _chunks) {
+      yield chunk;
+    }
   }
 
   @override
