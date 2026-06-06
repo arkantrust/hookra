@@ -30,6 +30,8 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   url_launcher: ^6.3.2
   app_links: ^7.0.0
+  flutter_ai_toolkit: ^1.0.0
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
