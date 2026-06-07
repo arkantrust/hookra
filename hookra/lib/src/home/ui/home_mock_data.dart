@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-
-/// Mock/demo data backing the home dashboard.
-///
-/// These are hardcoded placeholders so the home screen looks alive during
-/// demos. Replace with real data sources when the dashboard is wired up.
+import 'package:hookra/src/teams/teams.dart';
 
 class StatTileData {
   const StatTileData({
@@ -33,34 +29,14 @@ class ActivityData {
   final IconData icon;
 }
 
-const mockStats = <StatTileData>[
-  StatTileData(
-    label: 'Campañas',
-    value: '12',
-    icon: Icons.campaign_outlined,
-    color: Color(0xFF6750A4),
-  ),
-  StatTileData(
-    label: 'Clientes',
-    value: '8',
-    icon: Icons.handshake_outlined,
-    color: Color(0xFF1E88E5),
-  ),
-  StatTileData(
-    label: 'Reels',
-    value: '34',
-    icon: Icons.movie_outlined,
-    color: Color(0xFF43A047),
-  ),
-  StatTileData(
-    label: 'Aprobados',
-    value: '57',
-    icon: Icons.check_circle_outline,
-    color: Color(0xFFF4511E),
-  ),
-];
+class HomeData {
+  const HomeData({required this.stats, required this.activity});
 
-const mockActivity = <ActivityData>[
+  final List<StatTileData> stats;
+  final List<ActivityData> activity;
+}
+
+const _mockActivity = [
   ActivityData(
     title: 'Client approved Summer 25% video',
     subtitle: 'Summer Sale · Bella Boutique',
@@ -92,3 +68,45 @@ const mockActivity = <ActivityData>[
     icon: Icons.image_outlined,
   ),
 ];
+
+/// Builds real stats from the org's loaded teams.
+///
+/// - Clientes   = total teams
+/// - Campañas   = total teams
+/// - Reels      = teams with state == 'published'
+/// - Aprobados  = teams with state == 'approved'
+HomeData homeDataFromTeams(List<Team> teams) {
+  final total = teams.length;
+  final published = teams.where((t) => t.state == 'published').length;
+  final approved = teams.where((t) => t.state == 'approved').length;
+
+  return HomeData(
+    stats: [
+      StatTileData(
+        label: 'Clientes',
+        value: '$total',
+        icon: Icons.handshake_outlined,
+        color: const Color(0xFF1E88E5),
+      ),
+      StatTileData(
+        label: 'Campañas',
+        value: '$total',
+        icon: Icons.campaign_outlined,
+        color: const Color(0xFF6750A4),
+      ),
+      StatTileData(
+        label: 'Reels',
+        value: '$published',
+        icon: Icons.movie_outlined,
+        color: const Color(0xFF43A047),
+      ),
+      StatTileData(
+        label: 'Aprobados',
+        value: '$approved',
+        icon: Icons.check_circle_outline,
+        color: const Color(0xFFF4511E),
+      ),
+    ],
+    activity: _mockActivity,
+  );
+}

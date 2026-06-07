@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/home/ui/home_mock_data.dart';
 import 'package:hookra/src/home/ui/widgets/activity_tile.dart';
 import 'package:hookra/src/home/ui/widgets/stat_card.dart';
+import 'package:hookra/src/selection/selection.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,28 +32,36 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _SectionTitle('Resumen', palette: palette),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.45,
-              children: [for (final s in mockStats) StatCard(data: s)],
+      body: BlocBuilder<SelectionCubit, SelectionState>(
+        buildWhen: (prev, curr) =>
+            prev.selectedOrgId != curr.selectedOrgId ||
+            prev.teams != curr.teams,
+        builder: (context, state) {
+          final data = homeDataFromTeams(state.teams);
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionTitle('Resumen', palette: palette),
+                const SizedBox(height: 12),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.45,
+                  children: [for (final s in data.stats) StatCard(data: s)],
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle('Actividad reciente', palette: palette),
+                const SizedBox(height: 12),
+                for (final a in data.activity) ActivityTile(data: a),
+              ],
             ),
-            const SizedBox(height: 24),
-            _SectionTitle('Actividad reciente', palette: palette),
-            const SizedBox(height: 12),
-            for (final a in mockActivity) ActivityTile(data: a),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
