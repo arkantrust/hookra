@@ -6,6 +6,7 @@ import 'package:hookra/src/config/service_locator.dart';
 import 'package:hookra/src/organizations/domain/model/organization.dart';
 import 'package:hookra/src/organizations/domain/model/organization_member.dart';
 import 'package:hookra/src/organizations/ui/blocs/organizations_bloc/organizations_bloc.dart';
+import 'package:hookra/src/selection/selection.dart';
 
 class OrganizationsPage extends StatelessWidget {
   const OrganizationsPage({super.key});
@@ -38,6 +39,9 @@ class _OrganizationsView extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: ${state.errorMessage}')),
           );
+        }
+        if (state.status == OrganizationsStatus.createSuccess) {
+          context.read<SelectionCubit>().refresh();
         }
       },
       builder: (context, state) {
