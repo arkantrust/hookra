@@ -14,7 +14,9 @@ part 'sign_in_state.dart';
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
   final SignInUseCase _signIn;
 
-  SignInBloc({required this._signIn}) : super(SignInState()) {
+  SignInBloc({required SignInUseCase signIn})
+    : _signIn = signIn,
+      super(SignInState()) {
     on<SignInEmailChanged>(_onEmailChanged);
     on<SignInPasswordChanged>(_onPasswordChanged);
     on<SignInSubmitted>(_onSubmitted);

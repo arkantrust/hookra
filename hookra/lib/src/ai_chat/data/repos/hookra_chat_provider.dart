@@ -45,10 +45,10 @@ class HookraChatProvider extends LlmProvider with ChangeNotifier {
     String prompt, {
     Iterable<Attachment> attachments = const [],
   }) {
+    final historyForApi = _toAgentHistory(_history);
+
     _history.add(ChatMessage.user(prompt, attachments));
     notifyListeners();
-
-    final historyForApi = _toAgentHistory(_history);
 
     final llmMessage = ChatMessage.llm();
     _history.add(llmMessage);

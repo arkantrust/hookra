@@ -67,6 +67,12 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  if (history !== undefined && !Array.isArray(history)) {
+    return new Response('Bad Request: history must be an array', {
+      status: 400,
+    });
+  }
+
   // Verify user is a member of the team
   const { data: membership, error: memberError } = await userClient
     .from('team_members')
@@ -77,6 +83,20 @@ Deno.serve(async (req: Request) => {
 
   if (memberError || !membership) {
     return new Response('Forbidden: not a member of this team', {
+      status: 403,
+    });
+  }
+
+  // Verify team belongs to the specified org
+  const { data: teamCheck, error: teamCheckError } = await userClient
+    .from('teams')
+    .select('id')
+    .eq('id', team_id)
+    .eq('organization_id', org_id)
+    .single();
+
+  if (teamCheckError || !teamCheck) {
+    return new Response('Forbidden: team does not belong to organization', {
       status: 403,
     });
   }
@@ -126,7 +146,7 @@ Deno.serve(async (req: Request) => {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const text = decoder.decode(value);
+          const text = decoder.decode(value, { stream: true });
           for (const line of text.split('\n')) {
             if (!line.startsWith('data: ')) continue;
             const data = line.slice(6).trim();
@@ -138,7 +158,11 @@ Deno.serve(async (req: Request) => {
               fullResponse += chunk;
               // Stream only feedback text (before the ---JSON--- separator)
               if (!fullResponse.includes('---JSON---')) {
-                controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+                const sseData = chunk
+                  .split('\n')
+                  .map((l: string) => `data: ${l}`)
+                  .join('\n');
+                controller.enqueue(encoder.encode(`${sseData}\n\n`));
               }
             } catch {
               // skip malformed SSE lines

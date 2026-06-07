@@ -12,8 +12,9 @@ const _deepLinkScheme = 'app.ddulce.hookra://invite?token=';
 class InviteBloc extends Bloc<InviteEvent, InviteState> {
   final CreateInviteUseCase _createInvite;
 
-  InviteBloc({required this._createInvite})
-    : super(const InviteState.initial()) {
+  InviteBloc({required CreateInviteUseCase createInvite})
+    : _createInvite = createInvite,
+      super(const InviteState.initial()) {
     on<InviteSubmitted>(_onInviteSubmitted);
   }
 

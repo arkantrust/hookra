@@ -17,7 +17,8 @@ final class SupabaseAuthRepository extends AuthRepository {
 
   final _controller = StreamController<AuthStatus>();
 
-  SupabaseAuthRepository({required this._supabase});
+  SupabaseAuthRepository({required SupabaseClient supabase})
+    : _supabase = supabase;
 
   @override
   Future<Result> signUp({

@@ -33,16 +33,26 @@ class _AiChatPageState extends State<AiChatPage> {
   void initState() {
     super.initState();
     final selection = context.read<SelectionCubit>().state;
-    _orgId = selection.selectedOrgId;
-    _teamId = selection.selectedTeamId;
+    _rebuildBlocIfNeeded(selection.selectedOrgId, selection.selectedTeamId);
+  }
 
-    if (_orgId != null && _teamId != null) {
-      _bloc = AiChatBloc(
-        sendMessage: sl<SendMessageUseCase>(),
-        orgId: _orgId!,
-        teamId: _teamId!,
-      )..add(const AiChatStarted());
+  void _rebuildBlocIfNeeded(String? orgId, String? teamId) {
+    if (orgId == null || teamId == null) {
+      _bloc?.close();
+      _bloc = null;
+      _orgId = null;
+      _teamId = null;
+      return;
     }
+    if (orgId == _orgId && teamId == _teamId) return;
+    _bloc?.close();
+    _orgId = orgId;
+    _teamId = teamId;
+    _bloc = AiChatBloc(
+      sendMessage: sl<SendMessageUseCase>(),
+      orgId: orgId,
+      teamId: teamId,
+    )..add(const AiChatStarted());
   }
 
   @override
@@ -53,6 +63,23 @@ class _AiChatPageState extends State<AiChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<SelectionCubit, SelectionState>(
+      listenWhen: (prev, curr) =>
+          prev.selectedOrgId != curr.selectedOrgId ||
+          prev.selectedTeamId != curr.selectedTeamId,
+      listener: (context, selection) {
+        setState(() {
+          _rebuildBlocIfNeeded(
+            selection.selectedOrgId,
+            selection.selectedTeamId,
+          );
+        });
+      },
+      child: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     if (_orgId == null || _teamId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Content Assistant')),

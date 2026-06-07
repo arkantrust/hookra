@@ -12,14 +12,20 @@ part 'teams_state.dart';
 
 class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
   TeamsBloc({
-    required this._organizationId,
+    required String organizationId,
     required String creatorId,
-    required this._getTeams,
-    required this._createTeam,
-    required this._joinTeam,
-    required this._leaveTeam,
-    required this._getUserTeamIds,
-  }) : _creatorId = creatorId,
+    required GetTeamsUseCase getTeams,
+    required CreateTeamUseCase createTeam,
+    required JoinTeamUseCase joinTeam,
+    required LeaveTeamUseCase leaveTeam,
+    required GetUserTeamIdsUseCase getUserTeamIds,
+  }) : _organizationId = organizationId,
+       _creatorId = creatorId,
+       _getTeams = getTeams,
+       _createTeam = createTeam,
+       _joinTeam = joinTeam,
+       _leaveTeam = leaveTeam,
+       _getUserTeamIds = getUserTeamIds,
        super(const TeamsState()) {
     on<LoadTeams>(_onLoadTeams);
     on<CreateTeam>(_onCreateTeam);

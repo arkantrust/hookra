@@ -13,7 +13,8 @@ import 'package:hookra/src/utils/result.dart';
 /// Caches the resulting [User] in memory until [dispose] is called.
 /// {@endtemplate}
 final class SupabaseUserRepository extends UserRepository {
-  SupabaseUserRepository({required this._supabase});
+  SupabaseUserRepository({required SupabaseClient supabase})
+    : _supabase = supabase;
 
   final SupabaseClient _supabase;
 

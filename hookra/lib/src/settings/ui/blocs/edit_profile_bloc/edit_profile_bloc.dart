@@ -12,8 +12,9 @@ part 'edit_profile_state.dart';
 class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   final UpdateProfileUseCase _updateProfile;
 
-  EditProfileBloc({required this._updateProfile})
-    : super(const EditProfileState()) {
+  EditProfileBloc({required UpdateProfileUseCase updateProfile})
+    : _updateProfile = updateProfile,
+      super(const EditProfileState()) {
     on<EditProfileFirstChanged>(_onFirstChanged);
     on<EditProfileLastChanged>(_onLastChanged);
     on<EditProfileSubmitted>(_onSubmitted);

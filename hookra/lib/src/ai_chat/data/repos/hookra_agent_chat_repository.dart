@@ -9,9 +9,10 @@ import 'package:hookra/src/ai_chat/domain/repos/agent_chat_repository.dart';
 
 final class HookraAgentChatRepository extends AgentChatRepository {
   HookraAgentChatRepository({
-    required this._supabase,
-    required this._supabaseUrl,
-  });
+    required SupabaseClient supabase,
+    required String supabaseUrl,
+  }) : _supabase = supabase,
+       _supabaseUrl = supabaseUrl;
 
   final SupabaseClient _supabase;
   final String _supabaseUrl;
