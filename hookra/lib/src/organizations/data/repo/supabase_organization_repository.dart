@@ -44,10 +44,9 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
   /// Uniqueness enforcement must be handled at the database level
   /// via a unique constraint — this only normalizes the string.
   String _normalizeSlug(String baseName) {
-    final name =
-        baseName.isEmpty
-            ? 'org-${DateTime.now().millisecondsSinceEpoch}'
-            : baseName;
+    final name = baseName.isEmpty
+        ? 'org-${DateTime.now().millisecondsSinceEpoch}'
+        : baseName;
     return name
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9\s-]'), '')
@@ -105,12 +104,11 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
   ) async {
     try {
       final slug = _normalizeSlug(name);
-      final response =
-          await _supabase
-              .from('organizations')
-              .insert({'name': name, 'slug': slug, 'owner_id': ownerId})
-              .select()
-              .single();
+      final response = await _supabase
+          .from('organizations')
+          .insert({'name': name, 'slug': slug, 'owner_id': ownerId})
+          .select()
+          .single();
 
       return Result.success(OrganizationDto.fromJson(response));
     } on PostgrestException catch (e) {
@@ -136,13 +134,12 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
     OrganizationRole role,
   ) async {
     try {
-      final existing =
-          await _supabase
-              .from('organization_members')
-              .select()
-              .eq('organization_id', organizationId)
-              .eq('profile_id', profileId)
-              .maybeSingle();
+      final existing = await _supabase
+          .from('organization_members')
+          .select()
+          .eq('organization_id', organizationId)
+          .eq('profile_id', profileId)
+          .maybeSingle();
 
       if (existing != null) {
         return const Result.voidResult();
@@ -178,12 +175,11 @@ class SupabaseOrganizationRepository extends OrganizationRepository {
     String organizationId,
   ) async {
     try {
-      final res =
-          await _supabase
-              .from('organizations')
-              .select()
-              .eq('id', organizationId)
-              .maybeSingle();
+      final res = await _supabase
+          .from('organizations')
+          .select()
+          .eq('id', organizationId)
+          .maybeSingle();
       return Result.success(res != null ? OrganizationDto.fromJson(res) : null);
     } catch (e, st) {
       return Result.unknown(

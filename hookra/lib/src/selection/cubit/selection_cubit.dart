@@ -66,7 +66,9 @@ class SelectionCubit extends Cubit<SelectionState> {
   /// clearing any previously selected team.
   Future<void> selectOrg(String orgId) async {
     if (orgId == state.selectedOrgId) return;
-    emit(state.copyWith(selectedOrgId: orgId, clearTeam: true, teamsLoading: true));
+    emit(
+      state.copyWith(selectedOrgId: orgId, clearTeam: true, teamsLoading: true),
+    );
 
     final teamsResult = await _getTeams(orgId);
     emit(

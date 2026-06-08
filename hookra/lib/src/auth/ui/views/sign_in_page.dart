@@ -37,10 +37,8 @@ class SignInPage extends StatelessWidget {
               return sl<SignInBloc>();
             },
             child: BlocListener<SignInBloc, SignInState>(
-              listenWhen:
-                  (previous, current) =>
-                      previous.status != current.status &&
-                      current.status.isFailure,
+              listenWhen: (previous, current) =>
+                  previous.status != current.status && current.status.isFailure,
               listener: (context, state) {
                 if (state.status.isFailure) {
                   HapticFeedback.mediumImpact();
@@ -80,9 +78,11 @@ class SignInPage extends StatelessWidget {
                                 );
                               },
                               validationError: context.select(
-                                (SignInBloc bloc) =>
-                                    bloc.state.email.displayError
-                                        ?.toFieldError(),
+                                (SignInBloc bloc) => bloc
+                                    .state
+                                    .email
+                                    .displayError
+                                    ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -101,9 +101,11 @@ class SignInPage extends StatelessWidget {
                                 );
                               },
                               validationError: context.select(
-                                (SignInBloc bloc) =>
-                                    bloc.state.password.displayError
-                                        ?.toFieldError(),
+                                (SignInBloc bloc) => bloc
+                                    .state
+                                    .password
+                                    .displayError
+                                    ?.toFieldError(),
                               ),
                               onSubmitted: (_) {
                                 context.read<SignInBloc>().add(
@@ -124,16 +126,18 @@ class SignInPage extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: GestureDetector(
-                                onTap:
-                                    () => launchUrl(
-                                      Uri.parse('$webUrl/auth/forgot-password'),
-                                      mode: LaunchMode.externalApplication,
-                                    ),
+                                onTap: () => launchUrl(
+                                  Uri.parse('$webUrl/auth/forgot-password'),
+                                  mode: LaunchMode.externalApplication,
+                                ),
                                 child: Text(
                                   '¿Olvidaste tu contraseña?',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.primaryContainer,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primaryContainer,
+                                      ),
                                 ),
                               ),
                             ),
@@ -148,15 +152,15 @@ class SignInPage extends StatelessWidget {
                             ),
                             onPressed:
                                 context.select(
-                                      (SignInBloc bloc) => bloc.state.isValid,
-                                    )
-                                    ? () {
-                                      context.read<SignInBloc>().add(
-                                        const SignInSubmitted(),
-                                      );
-                                      context.go(HomePage.route().path);
-                                    }
-                                    : null,
+                                  (SignInBloc bloc) => bloc.state.isValid,
+                                )
+                                ? () {
+                                    context.read<SignInBloc>().add(
+                                      const SignInSubmitted(),
+                                    );
+                                    context.go(HomePage.route().path);
+                                  }
+                                : null,
                             text: 'Iniciar sesión',
                           ),
                           const SizedBox(height: 120),
@@ -169,20 +173,15 @@ class SignInPage extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodyMedium,
                               children: [
                                 TextSpan(
-                                  recognizer:
-                                      TapGestureRecognizer()
-                                        ..onTap =
-                                            () => context.go(
-                                              SignUpPage.route().path,
-                                            ),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(
-                                    color:
-                                        Theme.of(
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () =>
+                                        context.go(SignUpPage.route().path),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
                                           context,
                                         ).colorScheme.primaryContainer,
-                                  ),
+                                      ),
                                   text: 'Regístrate',
                                 ),
                               ],

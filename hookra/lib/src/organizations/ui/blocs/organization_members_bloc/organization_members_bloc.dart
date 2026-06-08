@@ -61,19 +61,18 @@ class OrganizationMembersBloc
   ) async {
     final previousMembers = List<MemberWithProfile>.from(state.members);
 
-    final optimisticMembers =
-        state.members.map((m) {
-          if (m.profileId == event.profileId) {
-            return MemberWithProfile(
-              profileId: m.profileId,
-              firstName: m.firstName,
-              lastName: m.lastName,
-              email: m.email,
-              role: event.newRole,
-            );
-          }
-          return m;
-        }).toList();
+    final optimisticMembers = state.members.map((m) {
+      if (m.profileId == event.profileId) {
+        return MemberWithProfile(
+          profileId: m.profileId,
+          firstName: m.firstName,
+          lastName: m.lastName,
+          email: m.email,
+          role: event.newRole,
+        );
+      }
+      return m;
+    }).toList();
 
     emit(state.copyWith(members: optimisticMembers));
 

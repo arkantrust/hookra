@@ -32,10 +32,8 @@ class SignUpPage extends StatelessWidget {
               return sl<SignUpBloc>();
             },
             child: BlocListener<SignUpBloc, SignUpState>(
-              listenWhen:
-                  (previous, current) =>
-                      previous.status != current.status &&
-                      current.status.isFailure,
+              listenWhen: (previous, current) =>
+                  previous.status != current.status && current.status.isFailure,
               listener: (context, state) {
                 if (state.status.isFailure) {
                   HapticFeedback.mediumImpact();
@@ -78,9 +76,8 @@ class SignUpPage extends StatelessWidget {
                                         SignUpFirstChanged(first),
                                       );
                                     },
-                                    validationError:
-                                        state.first.displayError
-                                            ?.toFieldError(),
+                                    validationError: state.first.displayError
+                                        ?.toFieldError(),
                                     textInputAction: TextInputAction.next,
                                     label: 'Nombre',
                                   ),
@@ -92,8 +89,8 @@ class SignUpPage extends StatelessWidget {
                                         SignUpLastChanged(last),
                                       );
                                     },
-                                    validationError:
-                                        state.last.displayError?.toFieldError(),
+                                    validationError: state.last.displayError
+                                        ?.toFieldError(),
                                     textInputAction: TextInputAction.next,
                                     label: 'Apellido',
                                   ),
@@ -115,9 +112,11 @@ class SignUpPage extends StatelessWidget {
                                 );
                               },
                               validationError: context.select(
-                                (SignUpBloc bloc) =>
-                                    bloc.state.email.displayError
-                                        ?.toFieldError(),
+                                (SignUpBloc bloc) => bloc
+                                    .state
+                                    .email
+                                    .displayError
+                                    ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -141,9 +140,11 @@ class SignUpPage extends StatelessWidget {
                                 );
                               },
                               validationError: context.select(
-                                (SignUpBloc bloc) =>
-                                    bloc.state.password.displayError
-                                        ?.toFieldError(),
+                                (SignUpBloc bloc) => bloc
+                                    .state
+                                    .password
+                                    .displayError
+                                    ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.send,
                             ),
@@ -167,9 +168,11 @@ class SignUpPage extends StatelessWidget {
                                 );
                               },
                               validationError: context.select(
-                                (SignUpBloc bloc) =>
-                                    bloc.state.confirm.displayError
-                                        ?.toFieldError(),
+                                (SignUpBloc bloc) => bloc
+                                    .state
+                                    .confirm
+                                    .displayError
+                                    ?.toFieldError(),
                               ),
                               textInputAction: TextInputAction.send,
                             ),
@@ -184,14 +187,14 @@ class SignUpPage extends StatelessWidget {
                             ),
                             onPressed:
                                 context.select(
-                                      (SignUpBloc bloc) => bloc.state.isValid,
-                                    )
-                                    ? () {
-                                      context.read<SignUpBloc>().add(
-                                        const SignUpSubmitted(),
-                                      );
-                                    }
-                                    : null,
+                                  (SignUpBloc bloc) => bloc.state.isValid,
+                                )
+                                ? () {
+                                    context.read<SignUpBloc>().add(
+                                      const SignUpSubmitted(),
+                                    );
+                                  }
+                                : null,
                             text: 'Registrarme',
                           ),
                           const SizedBox(height: 120),
@@ -204,20 +207,15 @@ class SignUpPage extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodyMedium,
                               children: [
                                 TextSpan(
-                                  recognizer:
-                                      TapGestureRecognizer()
-                                        ..onTap =
-                                            () => context.go(
-                                              SignInPage.route().path,
-                                            ),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(
-                                    color:
-                                        Theme.of(
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () =>
+                                        context.go(SignInPage.route().path),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
                                           context,
                                         ).colorScheme.primaryContainer,
-                                  ),
+                                      ),
                                   text: 'Inicia sesión',
                                 ),
                               ],

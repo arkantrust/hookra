@@ -65,8 +65,7 @@ class RolePicker extends StatelessWidget {
       onSelected: onRoleSelected,
       offset: const Offset(0, 40),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      itemBuilder:
-          (context) => allowedRoles.map(_buildMenuItem).toList(),
+      itemBuilder: (context) => allowedRoles.map(_buildMenuItem).toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(

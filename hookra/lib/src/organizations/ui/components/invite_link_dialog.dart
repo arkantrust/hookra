@@ -24,9 +24,9 @@ class InviteLinkDialog extends StatelessWidget {
             ),
             child: SelectableText(
               inviteLink,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
             ),
           ),
         ],

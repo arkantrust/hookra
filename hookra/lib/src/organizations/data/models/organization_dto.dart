@@ -7,10 +7,9 @@ class OrganizationDto {
       name: json['name'] as String,
       slug: json['slug'] as String,
       ownerId: json['owner_id'] as String,
-      createdAt:
-          json['created_at'] != null
-              ? DateTime.parse(json['created_at'] as String)
-              : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
     );
   }
 }

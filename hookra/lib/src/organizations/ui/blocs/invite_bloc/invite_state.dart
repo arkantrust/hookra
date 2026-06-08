@@ -18,10 +18,10 @@ final class InviteState extends Equatable {
   const InviteState.loading() : this._(status: InviteStatus.loading);
 
   const InviteState.success(String link)
-      : this._(status: InviteStatus.success, inviteLink: link);
+    : this._(status: InviteStatus.success, inviteLink: link);
 
   const InviteState.failure(String message)
-      : this._(status: InviteStatus.failure, errorMessage: message);
+    : this._(status: InviteStatus.failure, errorMessage: message);
 
   @override
   List<Object?> get props => [status, inviteLink, errorMessage];

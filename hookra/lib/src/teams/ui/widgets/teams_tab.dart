@@ -18,9 +18,7 @@ class TeamsTab extends StatelessWidget {
       listener: (context, state) {
         if (state.status == TeamsStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? 'An error occurred'),
-            ),
+            SnackBar(content: Text(state.errorMessage ?? 'An error occurred')),
           );
         } else if (state.lastAction == TeamsAction.joined) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -56,32 +54,32 @@ class TeamsTab extends StatelessWidget {
                 ),
               )
             else
-               Padding(
-                 padding: const EdgeInsets.symmetric(vertical: 6),
-                 child: ListView.builder(
-                   itemCount: state.teams.length,
-                   itemBuilder: (context, index) {
-                     final team = state.teams[index];
-                     final isInThisTeam = state.isInTeam(team.id);
-                     return TeamCard(
-                       team: team,
-                       isInTeam: isInThisTeam,
-                       onJoin: () {
-                         context.read<TeamsBloc>().add(JoinTeam(team.id));
-                       },
-                       onLeave: () {
-                         context.read<TeamsBloc>().add(LeaveTeam(team.id));
-                       },
-                       onViewMembers: () => showModalBottomSheet<void>(
-                         context: context,
-                         isScrollControlled: true,
-                         builder: (_) => TeamMembersModal(team: team),
-                       ),
-                       isJoiningOrLeaving: isLoading,
-                     );
-                   },
-                 ),
-               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: ListView.builder(
+                  itemCount: state.teams.length,
+                  itemBuilder: (context, index) {
+                    final team = state.teams[index];
+                    final isInThisTeam = state.isInTeam(team.id);
+                    return TeamCard(
+                      team: team,
+                      isInTeam: isInThisTeam,
+                      onJoin: () {
+                        context.read<TeamsBloc>().add(JoinTeam(team.id));
+                      },
+                      onLeave: () {
+                        context.read<TeamsBloc>().add(LeaveTeam(team.id));
+                      },
+                      onViewMembers: () => showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => TeamMembersModal(team: team),
+                      ),
+                      isJoiningOrLeaving: isLoading,
+                    );
+                  },
+                ),
+              ),
             Positioned(
               right: 16,
               bottom: 16,

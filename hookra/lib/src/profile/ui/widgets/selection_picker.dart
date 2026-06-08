@@ -67,10 +67,12 @@ Future<String?> showSelectionPicker<T>({
                       title: Text(
                         labelOf(item),
                         style: TextStyle(
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w400,
-                          color:
-                              isSelected ? palette.primary : palette.onSurface,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                          color: isSelected
+                              ? palette.primary
+                              : palette.onSurface,
                         ),
                       ),
                       trailing: isSelected

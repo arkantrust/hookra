@@ -9,7 +9,7 @@ import 'package:hookra/src/utils/result.dart';
 
 class SupabaseInviteRepository extends InviteRepository {
   SupabaseInviteRepository({required SupabaseClient supabase})
-      : _supabase = supabase;
+    : _supabase = supabase;
 
   final SupabaseClient _supabase;
 
@@ -72,10 +72,11 @@ class SupabaseInviteRepository extends InviteRepository {
       if (row == null) return Result.failure(const InviteNotFound());
 
       final invite = OrgInviteDto.fromJson(row);
-      final orgName = (row['organizations'] as Map<String, dynamic>)['name'] as String;
+      final orgName =
+          (row['organizations'] as Map<String, dynamic>)['name'] as String;
       final creator = row['profiles'] as Map<String, dynamic>;
-      final ownerFullName =
-          '${creator['first_name']} ${creator['last_name']}'.trim();
+      final ownerFullName = '${creator['first_name']} ${creator['last_name']}'
+          .trim();
 
       return Result.success(
         OrgInviteDetails(
