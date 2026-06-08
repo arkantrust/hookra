@@ -67,6 +67,17 @@ class OrganizationsBloc extends Bloc<OrganizationsEvent, OrganizationsState> {
       return;
     }
 
-    add(const OrganizationsLoadRequested());
+    final listResult = await _getOrganizations();
+    emit(
+      listResult.isSuccess
+          ? state.copyWith(
+              status: OrganizationsStatus.createSuccess,
+              organizations: listResult.value,
+            )
+          : state.copyWith(
+              status: OrganizationsStatus.createFailure,
+              errorMessage: listResult.error.toString(),
+            ),
+    );
   }
 }

@@ -49,6 +49,7 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
       creatorId: currentUserId,
       getTeams: sl<GetTeamsUseCase>(),
       createTeam: sl<CreateTeamUseCase>(),
+      deleteTeam: sl<DeleteTeamUseCase>(),
       joinTeam: sl<JoinTeamUseCase>(),
       leaveTeam: sl<LeaveTeamUseCase>(),
       getUserTeamIds: sl<GetUserTeamIdsUseCase>(),

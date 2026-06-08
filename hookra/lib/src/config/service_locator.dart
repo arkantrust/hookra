@@ -123,6 +123,9 @@ void initServiceLocator() {
   sl.registerFactory<LeaveTeamUseCase>(
     () => LeaveTeamUseCase(sl<TeamRepository>()),
   );
+  sl.registerFactory<DeleteTeamUseCase>(
+    () => DeleteTeamUseCase(sl<TeamRepository>()),
+  );
   sl.registerFactory<GetUserTeamIdsUseCase>(
     () => GetUserTeamIdsUseCase(sl<TeamRepository>()),
   );
@@ -143,6 +146,7 @@ void initServiceLocator() {
       creatorId: creatorId,
       getTeams: sl<GetTeamsUseCase>(),
       createTeam: sl<CreateTeamUseCase>(),
+      deleteTeam: sl<DeleteTeamUseCase>(),
       joinTeam: sl<JoinTeamUseCase>(),
       leaveTeam: sl<LeaveTeamUseCase>(),
       getUserTeamIds: sl<GetUserTeamIdsUseCase>(),

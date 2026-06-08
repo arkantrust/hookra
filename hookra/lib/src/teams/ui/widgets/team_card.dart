@@ -9,6 +9,7 @@ class TeamCard extends StatelessWidget {
     required this.onJoin,
     required this.onLeave,
     required this.onViewMembers,
+    this.onDelete,
     this.isJoiningOrLeaving = false,
   });
 
@@ -17,6 +18,7 @@ class TeamCard extends StatelessWidget {
   final VoidCallback onJoin;
   final VoidCallback onLeave;
   final VoidCallback onViewMembers;
+  final VoidCallback? onDelete;
   final bool isJoiningOrLeaving;
 
   @override
@@ -52,6 +54,17 @@ class TeamCard extends StatelessWidget {
                   tooltip: 'Join team',
                   onPressed: onJoin,
                 ),
+              if (onDelete != null) ...[
+                const SizedBox(width: 4),
+                const VerticalDivider(width: 1, indent: 12, endIndent: 12),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: 'Delete team',
+                  color: Colors.red,
+                  onPressed: onDelete,
+                ),
+              ],
             ],
           ),
           tileColor: Theme.of(context).colorScheme.surfaceContainer,

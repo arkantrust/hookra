@@ -37,3 +37,12 @@ final class LeaveTeam extends TeamsEvent {
   @override
   List<Object?> get props => [teamId];
 }
+
+final class DeleteTeam extends TeamsEvent {
+  const DeleteTeam(this.teamId);
+
+  final String teamId;
+
+  @override
+  List<Object?> get props => [teamId];
+}

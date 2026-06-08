@@ -17,7 +17,7 @@ class _CreateTeamModalState extends State<CreateTeamModal> {
   Widget build(BuildContext context) {
     return BlocConsumer<TeamsBloc, TeamsState>(
       listenWhen: (prev, curr) =>
-          prev.status != curr.status && curr.status == TeamsStatus.loaded,
+          prev.status != curr.status && curr.status == TeamsStatus.createSuccess,
       listener: (context, state) => Navigator.of(context).pop(),
       builder: (context, state) {
         final isCreating = state.status == TeamsStatus.creating;

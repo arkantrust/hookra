@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hookra/src/organizations/domain/model/organization_member.dart';
+import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/teams/ui/blocs/teams_bloc/teams_bloc.dart';
 import 'package:hookra/src/teams/ui/widgets/create_team_modal.dart';
 import 'package:hookra/src/teams/ui/widgets/team_card.dart';
@@ -13,10 +15,15 @@ class TeamsTab extends StatelessWidget {
     return BlocConsumer<TeamsBloc, TeamsState>(
       listenWhen: (prev, curr) =>
           curr.status == TeamsStatus.error ||
+          curr.status == TeamsStatus.createSuccess ||
+          curr.status == TeamsStatus.deleteSuccess ||
           (curr.lastAction != TeamsAction.none &&
               prev.lastAction != curr.lastAction),
       listener: (context, state) {
-        if (state.status == TeamsStatus.error) {
+        if (state.status == TeamsStatus.createSuccess ||
+            state.status == TeamsStatus.deleteSuccess) {
+          context.read<SelectionCubit>().refreshTeams();
+        } else if (state.status == TeamsStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.errorMessage ?? 'An error occurred')),
           );
@@ -41,6 +48,9 @@ class TeamsTab extends StatelessWidget {
             state.status == TeamsStatus.loading ||
             state.status == TeamsStatus.joining ||
             state.status == TeamsStatus.leaving;
+        final isOwner =
+            context.read<SelectionCubit>().state.selectedOrg?.role ==
+            OrganizationRole.owner;
 
         return Stack(
           children: [
@@ -54,32 +64,35 @@ class TeamsTab extends StatelessWidget {
                 ),
               )
             else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: ListView.builder(
-                  itemCount: state.teams.length,
-                  itemBuilder: (context, index) {
-                    final team = state.teams[index];
-                    final isInThisTeam = state.isInTeam(team.id);
-                    return TeamCard(
-                      team: team,
-                      isInTeam: isInThisTeam,
-                      onJoin: () {
-                        context.read<TeamsBloc>().add(JoinTeam(team.id));
-                      },
-                      onLeave: () {
-                        context.read<TeamsBloc>().add(LeaveTeam(team.id));
-                      },
-                      onViewMembers: () => showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (_) => TeamMembersModal(team: team),
-                      ),
-                      isJoiningOrLeaving: isLoading,
-                    );
-                  },
-                ),
-              ),
+               Padding(
+                 padding: const EdgeInsets.symmetric(vertical: 6),
+                 child: ListView.builder(
+                   itemCount: state.teams.length,
+                   itemBuilder: (context, index) {
+                     final team = state.teams[index];
+                     final isInThisTeam = state.isInTeam(team.id);
+                     return TeamCard(
+                       team: team,
+                       isInTeam: isInThisTeam,
+                       onJoin: () {
+                         context.read<TeamsBloc>().add(JoinTeam(team.id));
+                       },
+                       onLeave: () {
+                         context.read<TeamsBloc>().add(LeaveTeam(team.id));
+                       },
+                       onDelete: isOwner
+                           ? () => _confirmDelete(context, team.id, team.name)
+                           : null,
+                       onViewMembers: () => showModalBottomSheet<void>(
+                         context: context,
+                         isScrollControlled: true,
+                         builder: (_) => TeamMembersModal(team: team),
+                       ),
+                       isJoiningOrLeaving: isLoading,
+                     );
+                   },
+                 ),
+               ),
             Positioned(
               right: 16,
               bottom: 16,
@@ -102,6 +115,33 @@ class TeamsTab extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  void _confirmDelete(BuildContext context, String teamId, String teamName) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('¿Eliminar equipo?'),
+        content: Text(
+          '"$teamName" dejará de aparecer en la lista y no se contará en los stats. '
+          'Esta acción no se puede deshacer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              context.read<TeamsBloc>().add(DeleteTeam(teamId));
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
     );
   }
 }

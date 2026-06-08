@@ -19,6 +19,7 @@ final class SupabaseTeamRepository extends TeamRepository {
           .from('teams')
           .select()
           .eq('organization_id', organizationId)
+          .isFilter('deleted_at', null)
           .order('created_at');
       final teams = (data as List)
           .map((e) => Team.fromJson(e as Map<String, dynamic>))
@@ -148,6 +149,23 @@ final class SupabaseTeamRepository extends TeamRepository {
     } catch (e, s) {
       return Result.unknown(
         name: 'SupabaseTeamRepository.leaveTeam',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> deleteTeam(String teamId) async {
+    try {
+      await _supabase
+          .from('teams')
+          .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('id', teamId);
+      return Result.voidResult();
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseTeamRepository.deleteTeam',
         error: e,
         stackTrace: s,
       );
