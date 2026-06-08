@@ -266,6 +266,21 @@ $$;
 ALTER FUNCTION "public"."handle_new_organization"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."handle_new_team"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  BEGIN
+    INSERT INTO public.projects (team_id, name, created_by)
+    VALUES (NEW.id, NEW.name, NEW.created_by);
+    RETURN NEW;
+  END;
+  $$;
+
+
+ALTER FUNCTION "public"."handle_new_team"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -711,6 +726,10 @@ CREATE OR REPLACE TRIGGER "trg_content_version_snapshot" BEFORE UPDATE ON "publi
 
 
 CREATE OR REPLACE TRIGGER "trg_on_organization_created" AFTER INSERT ON "public"."organizations" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_organization"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_on_team_created" AFTER INSERT ON "public"."teams" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_team"();
 
 
 
@@ -1278,6 +1297,12 @@ GRANT ALL ON FUNCTION "public"."handle_content_version"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."handle_new_organization"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_new_organization"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_new_organization"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."handle_new_team"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_new_team"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_new_team"() TO "service_role";
 
 
 
