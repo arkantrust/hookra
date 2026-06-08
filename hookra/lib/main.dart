@@ -8,7 +8,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/app.dart';
 
-
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
 

@@ -13,8 +13,8 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
   final CreateInviteUseCase _createInvite;
 
   InviteBloc({required CreateInviteUseCase createInvite})
-      : _createInvite = createInvite,
-        super(const InviteState.initial()) {
+    : _createInvite = createInvite,
+      super(const InviteState.initial()) {
     on<InviteSubmitted>(_onInviteSubmitted);
   }
 
@@ -32,11 +32,13 @@ class InviteBloc extends Bloc<InviteEvent, InviteState> {
 
     result.fold(
       (invite) => emit(InviteState.success('$_deepLinkScheme${invite!.token}')),
-      (error) => emit(InviteState.failure(switch (error) {
-            UserNotFound() => 'El correo no tiene una cuenta en Hookra',
-            AlreadyMember() => 'Este usuario ya es miembro de la organización',
-            _ => 'Ocurrió un error al generar la invitación',
-          })),
+      (error) => emit(
+        InviteState.failure(switch (error) {
+          UserNotFound() => 'El correo no tiene una cuenta en Hookra',
+          AlreadyMember() => 'Este usuario ya es miembro de la organización',
+          _ => 'Ocurrió un error al generar la invitación',
+        }),
+      ),
     );
   }
 }

@@ -35,14 +35,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) {
     return emit.onEach(
       _watchStatus(),
-      onData:
-          (status) async => switch (status) {
-            AuthStatus.unauthenticated => emit(
-              const AuthState.unauthenticated(),
-            ),
-            AuthStatus.authenticated => await _emitUserIfExists(emit),
-            AuthStatus.unknown => emit(const AuthState.unknown()),
-          },
+      onData: (status) async => switch (status) {
+        AuthStatus.unauthenticated => emit(const AuthState.unauthenticated()),
+        AuthStatus.authenticated => await _emitUserIfExists(emit),
+        AuthStatus.unknown => emit(const AuthState.unknown()),
+      },
       onError: addError,
     );
   }

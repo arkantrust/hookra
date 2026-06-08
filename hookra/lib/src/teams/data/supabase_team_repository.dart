@@ -177,7 +177,9 @@ final class SupabaseTeamRepository extends TeamRepository {
     try {
       final data = await _supabase
           .from('team_members')
-          .select('profiles!team_members_profile_id_fkey(id, first_name, last_name, email)')
+          .select(
+            'profiles!team_members_profile_id_fkey(id, first_name, last_name, email)',
+          )
           .eq('team_id', teamId);
       final members = (data as List).map((row) {
         final profile = row['profiles'] as Map<String, dynamic>;

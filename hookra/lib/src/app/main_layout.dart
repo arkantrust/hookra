@@ -7,8 +7,9 @@ class MainLayout extends StatelessWidget {
   const MainLayout({super.key, required this.child});
 
   static const tabs = [
-    _TabItem(icon: Icons.home, route: '/', label: 'Home'),
-    _TabItem(icon: Icons.person, route: '/profile', label: 'Profile'),
+    _TabItem(icon: Icons.home_outlined, route: '/', label: 'Home'),
+    _TabItem(icon: Icons.chat_bubble_outline, route: '/ai-chat', label: 'Chat'),
+    _TabItem(icon: Icons.person_outline, route: '/profile', label: 'Profile'),
   ];
 
   int _locationToTabIndex(String location) {

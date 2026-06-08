@@ -1,4 +1,6 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
@@ -159,5 +161,16 @@ void initServiceLocator() {
       getInviteByToken: sl<GetInviteByTokenUseCase>(),
       acceptInvite: sl<AcceptInviteUseCase>(),
     ),
+  );
+
+  // AI Chat
+  sl.registerSingleton<AgentChatRepository>(
+    HookraAgentChatRepository(
+      supabase: supabase,
+      supabaseUrl: dotenv.get('SUPABASE_URL'),
+    ),
+  );
+  sl.registerFactory<SendMessageUseCase>(
+    () => SendMessageUseCase(sl<AgentChatRepository>()),
   );
 }

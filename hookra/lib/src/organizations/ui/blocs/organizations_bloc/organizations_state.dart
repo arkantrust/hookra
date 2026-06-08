@@ -1,6 +1,13 @@
 part of 'organizations_bloc.dart';
 
-enum OrganizationsStatus { initial, loading, success, failure, creating, createFailure, createSuccess }
+enum OrganizationsStatus {
+  initial,
+  loading,
+  success,
+  failure,
+  creating,
+  createFailure,
+}
 
 class OrganizationsState extends Equatable {
   final OrganizationsStatus status;

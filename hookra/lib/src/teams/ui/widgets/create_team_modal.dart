@@ -32,10 +32,7 @@ class _CreateTeamModalState extends State<CreateTeamModal> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'New Team',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text('New Team', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               ThemedTextField(
                 label: 'Client name',
@@ -48,17 +45,18 @@ class _CreateTeamModalState extends State<CreateTeamModal> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed:
-                        isCreating ? null : () => Navigator.of(context).pop(),
+                    onPressed: isCreating
+                        ? null
+                        : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: isCreating || _name.trim().isEmpty
                         ? null
-                        : () => context
-                            .read<TeamsBloc>()
-                            .add(CreateTeam(_name.trim())),
+                        : () => context.read<TeamsBloc>().add(
+                            CreateTeam(_name.trim()),
+                          ),
                     child: isCreating
                         ? const SizedBox(
                             width: 16,

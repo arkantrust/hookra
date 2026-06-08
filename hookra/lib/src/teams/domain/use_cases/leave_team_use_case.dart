@@ -9,6 +9,5 @@ class LeaveTeamUseCase {
   Future<Result<void>> call({
     required String teamId,
     required String profileId,
-  }) =>
-      _repository.leaveTeam(teamId: teamId, profileId: profileId);
+  }) => _repository.leaveTeam(teamId: teamId, profileId: profileId);
 }

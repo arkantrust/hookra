@@ -15,9 +15,8 @@ class OrganizationDetailsPage extends StatefulWidget {
   static GoRoute route() {
     return GoRoute(
       path: '/organizations/:id',
-      builder: (context, state) => OrganizationDetailsPage(
-        organizationId: state.pathParameters['id']!,
-      ),
+      builder: (context, state) =>
+          OrganizationDetailsPage(organizationId: state.pathParameters['id']!),
     );
   }
 
@@ -88,8 +87,9 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -110,8 +110,7 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
             Navigator.pop(context);
             showDialog(
               context: context,
-              builder: (_) =>
-                  InviteLinkDialog(inviteLink: state.inviteLink!),
+              builder: (_) => InviteLinkDialog(inviteLink: state.inviteLink!),
             );
           } else if (state.status == InviteStatus.failure) {
             Navigator.pop(context);
@@ -161,7 +160,8 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
 
             final canEditName = currentUserRole == OrganizationRole.owner;
 
-            final canInvite = currentUserId.isNotEmpty &&
+            final canInvite =
+                currentUserId.isNotEmpty &&
                 (currentUserRole == OrganizationRole.owner ||
                     currentUserRole == OrganizationRole.admin);
 
@@ -267,23 +267,21 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
 
                                     final canChangeRole =
                                         currentUserId.isNotEmpty &&
-                                            currentUserRole != null &&
-                                            _roleAuth.canChangeRole(
-                                              actorRole: currentUserRole,
-                                              targetRole: member.role,
-                                              targetProfileId:
-                                                  member.profileId,
-                                              organization:
-                                                  state.organization!,
-                                              currentUserId: currentUserId,
-                                            );
+                                        currentUserRole != null &&
+                                        _roleAuth.canChangeRole(
+                                          actorRole: currentUserRole,
+                                          targetRole: member.role,
+                                          targetProfileId: member.profileId,
+                                          organization: state.organization!,
+                                          currentUserId: currentUserId,
+                                        );
 
                                     return ListTile(
                                       leading: CircleAvatar(
                                         child: Text(
                                           member.firstName.isNotEmpty
                                               ? member.firstName[0]
-                                                  .toUpperCase()
+                                                    .toUpperCase()
                                               : '?',
                                         ),
                                       ),
@@ -311,8 +309,7 @@ class _OrganizationDetailsPageState extends State<OrganizationDetailsPage> {
                                           ),
                                           if (isCurrentUser)
                                             const Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 8),
+                                              padding: EdgeInsets.only(left: 8),
                                               child: Text(
                                                 '(You)',
                                                 style: TextStyle(

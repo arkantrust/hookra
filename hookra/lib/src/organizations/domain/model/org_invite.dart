@@ -24,5 +24,13 @@ class OrgInvite extends Equatable {
   bool get isAccepted => acceptedAt != null;
 
   @override
-  List<Object?> get props => [id, organizationId, email, role, token, expiresAt, acceptedAt];
+  List<Object?> get props => [
+    id,
+    organizationId,
+    email,
+    role,
+    token,
+    expiresAt,
+    acceptedAt,
+  ];
 }

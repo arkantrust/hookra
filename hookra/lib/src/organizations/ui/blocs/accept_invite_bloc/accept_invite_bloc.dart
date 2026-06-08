@@ -15,9 +15,9 @@ class AcceptInviteBloc extends Bloc<AcceptInviteEvent, AcceptInviteState> {
   AcceptInviteBloc({
     required GetInviteByTokenUseCase getInviteByToken,
     required AcceptInviteUseCase acceptInvite,
-  })  : _getInviteByToken = getInviteByToken,
-        _acceptInvite = acceptInvite,
-        super(const AcceptInviteInitial()) {
+  }) : _getInviteByToken = getInviteByToken,
+       _acceptInvite = acceptInvite,
+       super(const AcceptInviteInitial()) {
     on<AcceptInviteLoadRequested>(_onLoadRequested);
     on<AcceptInviteAcceptPressed>(_onAcceptPressed);
   }
@@ -37,30 +37,33 @@ class AcceptInviteBloc extends Bloc<AcceptInviteEvent, AcceptInviteState> {
           return;
         }
         if (event.currentUserEmail == null) {
-          emit(AcceptInviteLoaded(
-            details: details,
-            canAccept: false,
-            token: event.token,
-          ));
+          emit(
+            AcceptInviteLoaded(
+              details: details,
+              canAccept: false,
+              token: event.token,
+            ),
+          );
           return;
         }
         if (event.currentUserEmail != details.invite.email) {
           emit(AcceptInviteNotForUser(details));
           return;
         }
-        emit(AcceptInviteLoaded(
-          details: details,
-          canAccept: true,
-          token: event.token,
-        ));
+        emit(
+          AcceptInviteLoaded(
+            details: details,
+            canAccept: true,
+            token: event.token,
+          ),
+        );
       },
-      (error) => emit(AcceptInviteError(
-        switch (error) {
+      (error) => emit(
+        AcceptInviteError(switch (error) {
           InviteNotFound() => 'Esta invitación no existe o ya no es válida',
           _ => 'Ocurrió un error al cargar la invitación',
-        },
-        token: event.token,
-      )),
+        }, token: event.token),
+      ),
     );
   }
 
@@ -77,14 +80,13 @@ class AcceptInviteBloc extends Bloc<AcceptInviteEvent, AcceptInviteState> {
 
     result.fold(
       (_) => emit(const AcceptInviteAccepted()),
-      (error) => emit(AcceptInviteError(
-        switch (error) {
+      (error) => emit(
+        AcceptInviteError(switch (error) {
           InviteExpired() => 'Esta invitación ha vencido',
           InviteNotFound() => 'Esta invitación no existe o ya no es válida',
           _ => 'Ocurrió un error al aceptar la invitación',
-        },
-        token: current.token,
-      )),
+        }, token: current.token),
+      ),
     );
   }
 }

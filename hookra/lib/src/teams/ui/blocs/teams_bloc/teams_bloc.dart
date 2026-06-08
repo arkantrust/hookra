@@ -111,7 +111,7 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
     );
     result.fold(
       (team) {
-        final updatedTeams = [if (team != null) team, ...state.teams];
+        final updatedTeams = [?team, ...state.teams];
         final updatedMemberIds = {
           ...state.memberTeamIds,
           if (team != null) team.id,

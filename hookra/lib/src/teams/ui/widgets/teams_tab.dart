@@ -25,9 +25,7 @@ class TeamsTab extends StatelessWidget {
           context.read<SelectionCubit>().refreshTeams();
         } else if (state.status == TeamsStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? 'An error occurred'),
-            ),
+            SnackBar(content: Text(state.errorMessage ?? 'An error occurred')),
           );
         } else if (state.lastAction == TeamsAction.joined) {
           ScaffoldMessenger.of(context).showSnackBar(
