@@ -9,6 +9,11 @@ class MainLayout extends StatelessWidget {
   static const tabs = [
     _TabItem(icon: Icons.home_outlined, route: '/', label: 'Home'),
     _TabItem(icon: Icons.chat_bubble_outline, route: '/ai-chat', label: 'Chat'),
+    _TabItem(
+      icon: Icons.visibility_outlined,
+      route: '/preview',
+      label: 'Preview',
+    ),
     _TabItem(icon: Icons.person_outline, route: '/profile', label: 'Profile'),
   ];
 
