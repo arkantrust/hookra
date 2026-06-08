@@ -6,6 +6,7 @@ enum OrganizationsStatus {
   success,
   failure,
   creating,
+  createSuccess,
   createFailure,
 }
 

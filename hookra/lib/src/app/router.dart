@@ -6,6 +6,7 @@ import 'package:hookra/src/app/main_layout.dart';
 
 import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/home/home.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
@@ -60,6 +61,7 @@ class AppRouter {
           routes: [
             HomePage.route(), // route: /
             AiChatPage.route(), // route: /ai-chat
+            PreviewPage.route(), // route: /preview
             OrganizationsPage.route(), // route: /organizations
             ProfilePage.route(), // route: /profile
           ],
