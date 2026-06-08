@@ -6,6 +6,7 @@ import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/settings/settings.dart';
@@ -172,5 +173,13 @@ void initServiceLocator() {
   );
   sl.registerFactory<SendMessageUseCase>(
     () => SendMessageUseCase(sl<AgentChatRepository>()),
+  );
+
+  // Preview
+  sl.registerSingleton<ContentRepository>(
+    SupabaseContentRepository(supabase: supabase),
+  );
+  sl.registerFactory<GetLatestContentUseCase>(
+    () => GetLatestContentUseCase(sl<ContentRepository>()),
   );
 }

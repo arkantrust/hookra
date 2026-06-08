@@ -105,6 +105,42 @@ CREATE TYPE "public"."team_role" AS ENUM (
 ALTER TYPE "public"."team_role" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."accept_org_invite"("p_token" "text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+DECLARE
+  v_invite org_invites%ROWTYPE;
+BEGIN
+  SELECT * INTO v_invite
+  FROM org_invites
+  WHERE token = p_token::uuid
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'invite_not_found';
+  END IF;
+
+  IF v_invite.expires_at < NOW() THEN
+    RAISE EXCEPTION 'invite_expired';
+  END IF;
+
+  IF v_invite.accepted_at IS NOT NULL THEN
+    RAISE EXCEPTION 'already_accepted';
+  END IF;
+
+  INSERT INTO organization_members (organization_id, profile_id, role)
+  VALUES (v_invite.organization_id, auth.uid(), v_invite.role);
+
+  UPDATE org_invites
+  SET accepted_at = NOW()
+  WHERE token = p_token::uuid;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."accept_org_invite"("p_token" "text") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."get_member_org_ids"("p_profile_id" "uuid") RETURNS SETOF "uuid"
     LANGUAGE "sql" STABLE SECURITY DEFINER
     SET "search_path" TO ''
@@ -493,7 +529,10 @@ CREATE TABLE IF NOT EXISTS "public"."teams" (
     "logo_url" "text",
     "created_by" "uuid",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "state" "text" DEFAULT 'draft'::"text",
+    "deleted_at" timestamp with time zone,
+    CONSTRAINT "teams_state_check" CHECK (("state" = ANY (ARRAY['draft'::"text", 'published'::"text", 'approved'::"text"])))
 );
 
 
@@ -1191,6 +1230,12 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+
+
+
+GRANT ALL ON FUNCTION "public"."accept_org_invite"("p_token" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."accept_org_invite"("p_token" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."accept_org_invite"("p_token" "text") TO "service_role";
 
 
 
