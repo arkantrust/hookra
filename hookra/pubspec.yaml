@@ -34,6 +34,11 @@ dependencies:
   flutter_ai_toolkit: ^1.0.0
   http: ^1.1.0
   provider: ^6.1.2
+  # Hookra does not use Firebase. flutter_ai_toolkit pulls firebase_auth in
+  # transitively; firebase_core is declared so we can configure a default
+  # FirebaseApp and stop the firebase_auth iOS plugin from crashing on deep
+  # links (see lib/firebase_options.dart).
+  firebase_core: ^4.10.0
 
 dev_dependencies:
   flutter_test:
