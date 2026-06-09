@@ -31,3 +31,10 @@ final class PreviewError extends PreviewState {
   @override
   List<Object?> get props => [failure];
 }
+
+/// Emitted when content has been successfully approved.
+/// This is a transient state used to trigger UI feedback; it is immediately
+/// followed by a loading/loaded cycle.
+final class ContentApproved extends PreviewState {
+  const ContentApproved();
+}

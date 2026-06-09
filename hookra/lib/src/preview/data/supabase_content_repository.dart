@@ -32,5 +32,26 @@ final class SupabaseContentRepository extends ContentRepository {
   }
 
   @override
+  Future<Result<void>> updateContentStatus({
+    required String contentId,
+    required ContentStatus status,
+  }) async {
+    try {
+      await _supabase
+          .from('content')
+          .update({'status': status.name})
+          .eq('id', contentId)
+          .single();
+      return Result.voidResult();
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseContentRepository.updateContentStatus',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
   void dispose() {}
 }

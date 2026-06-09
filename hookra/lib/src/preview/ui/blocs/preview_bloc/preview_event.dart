@@ -14,3 +14,11 @@ final class PreviewRequested extends PreviewEvent {
   @override
   List<Object?> get props => [teamId];
 }
+
+final class ApproveContent extends PreviewEvent {
+  const ApproveContent(this.contentId);
+  final String contentId;
+
+  @override
+  List<Object?> get props => [contentId];
+}
