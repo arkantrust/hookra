@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/config/config.dart';
@@ -34,6 +35,10 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider<AgentChatRepository>(
           create: (_) => sl<AgentChatRepository>(),
+          dispose: (repo) => repo.dispose(),
+        ),
+        RepositoryProvider<CommentRepository>(
+          create: (_) => sl<CommentRepository>(),
           dispose: (repo) => repo.dispose(),
         ),
       ],

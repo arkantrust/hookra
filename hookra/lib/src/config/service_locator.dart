@@ -182,4 +182,19 @@ void initServiceLocator() {
   sl.registerFactory<GetLatestContentUseCase>(
     () => GetLatestContentUseCase(sl<ContentRepository>()),
   );
+  sl.registerSingleton<CommentRepository>(
+    SupabaseCommentRepository(supabase: supabase),
+  );
+  sl.registerFactory<WatchCommentsUseCase>(
+    () => WatchCommentsUseCase(sl<CommentRepository>()),
+  );
+  sl.registerFactory<AddCommentUseCase>(
+    () => AddCommentUseCase(sl<CommentRepository>()),
+  );
+  sl.registerFactory<EditCommentUseCase>(
+    () => EditCommentUseCase(sl<CommentRepository>()),
+  );
+  sl.registerFactory<DeleteCommentUseCase>(
+    () => DeleteCommentUseCase(sl<CommentRepository>()),
+  );
 }

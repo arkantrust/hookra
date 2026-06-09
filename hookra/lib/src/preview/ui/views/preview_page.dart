@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:hookra/src/auth/ui/blocs/auth_bloc/auth_bloc.dart';
 import 'package:hookra/src/config/service_locator.dart';
-import 'package:hookra/src/preview/domain/use_cases/get_latest_content_use_case.dart';
-import 'package:hookra/src/preview/ui/blocs/preview_bloc/preview_bloc.dart';
-import 'package:hookra/src/preview/ui/widgets/content_card.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/selection/selection.dart';
 
 class PreviewPage extends StatelessWidget {
@@ -119,14 +118,47 @@ class _PreviewBody extends StatelessWidget {
                     icon: Icons.inbox_outlined,
                     text: 'Aún no hay nada generado',
                   )
-                : RefreshIndicator(
-                    onRefresh: () async => context.read<PreviewBloc>().add(
-                      PreviewRequested(teamId),
-                    ),
-                    child: ContentCard(content: content),
+                : Stack(
+                    children: [
+                      RefreshIndicator(
+                        onRefresh: () async =>
+                            context.read<PreviewBloc>().add(
+                              PreviewRequested(teamId),
+                            ),
+                        child: ContentCard(content: content),
+                      ),
+                      Positioned(
+                        bottom: 16,
+                        right: 16,
+                        child: FloatingActionButton(
+                          onPressed: () =>
+                              _openComments(context, content.id),
+                          child: const Icon(Icons.comment_outlined),
+                        ),
+                      ),
+                    ],
                   ),
         };
       },
+    );
+  }
+
+  void _openComments(BuildContext context, String contentId) {
+    final userId = context.read<AuthBloc>().state.user.id;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => CommentsSheet(
+        contentId: contentId,
+        currentUserId: userId,
+        watchComments: sl<WatchCommentsUseCase>(),
+        addComment: sl<AddCommentUseCase>(),
+        editComment: sl<EditCommentUseCase>(),
+        deleteComment: sl<DeleteCommentUseCase>(),
+      ),
     );
   }
 }
