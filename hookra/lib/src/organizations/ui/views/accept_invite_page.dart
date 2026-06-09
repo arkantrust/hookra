@@ -16,9 +16,8 @@ class AcceptInvitePage extends StatelessWidget {
   static GoRoute route() {
     return GoRoute(
       path: '/invite',
-      builder: (context, state) => AcceptInvitePage(
-        token: state.uri.queryParameters['token'] ?? '',
-      ),
+      builder: (context, state) =>
+          AcceptInvitePage(token: state.uri.queryParameters['token'] ?? ''),
     );
   }
 
@@ -37,12 +36,14 @@ class AcceptInvitePage extends StatelessWidget {
         }
         return BlocProvider(
           create: (context) => sl<AcceptInviteBloc>()
-            ..add(AcceptInviteLoadRequested(
-              token: token,
-              currentUserEmail: authState.status == AuthStatus.authenticated
-                  ? authState.user.email
-                  : null,
-            )),
+            ..add(
+              AcceptInviteLoadRequested(
+                token: token,
+                currentUserEmail: authState.status == AuthStatus.authenticated
+                    ? authState.user.email
+                    : null,
+              ),
+            ),
           child: BlocListener<AcceptInviteBloc, AcceptInviteState>(
             listener: (context, state) {
               if (state is AcceptInviteAccepted) {
@@ -89,28 +90,30 @@ class _AcceptInviteView extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: switch (state) {
-                AcceptInviteInitial() ||
-                AcceptInviteLoading() =>
-                  const Center(child: CircularProgressIndicator()),
+                AcceptInviteInitial() || AcceptInviteLoading() => const Center(
+                  child: CircularProgressIndicator(),
+                ),
                 AcceptInviteLoaded() => _LoadedBody(state: state, token: token),
                 AcceptInviteExpired(details: final d) => _InfoBody(
-                    details: d,
-                    message: 'Esta invitación ha vencido',
-                    messageColor: Theme.of(context).colorScheme.error,
-                  ),
+                  details: d,
+                  message: 'Esta invitación ha vencido',
+                  messageColor: Theme.of(context).colorScheme.error,
+                ),
                 AcceptInviteNotForUser(details: final d) => _InfoBody(
-                    details: d,
-                    message: 'Esta invitación no es para ti',
-                    messageColor: Theme.of(context).colorScheme.error,
-                    action: FilledButton(
-                      onPressed: () => context.go(HomePage.route().path),
-                      child: const Text('Ir al inicio'),
-                    ),
+                  details: d,
+                  message: 'Esta invitación no es para ti',
+                  messageColor: Theme.of(context).colorScheme.error,
+                  action: FilledButton(
+                    onPressed: () => context.go(HomePage.route().path),
+                    child: const Text('Ir al inicio'),
                   ),
-                AcceptInviteAccepting() =>
-                  const Center(child: CircularProgressIndicator()),
-                AcceptInviteAccepted() =>
-                  const Center(child: CircularProgressIndicator()),
+                ),
+                AcceptInviteAccepting() => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                AcceptInviteAccepted() => const Center(
+                  child: CircularProgressIndicator(),
+                ),
                 AcceptInviteError(message: final msg, token: final t) =>
                   _ErrorBody(
                     message: msg,
@@ -122,8 +125,8 @@ class _AcceptInviteView extends StatelessWidget {
                                 token: t,
                                 currentUserEmail:
                                     authState.status == AuthStatus.authenticated
-                                        ? authState.user.email
-                                        : null,
+                                    ? authState.user.email
+                                    : null,
                               ),
                             );
                           }
@@ -157,9 +160,9 @@ class _LoadedBody extends StatelessWidget {
           Text(
             'Debes iniciar sesión para aceptar esta invitación',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
           ),
         ] else
           BlocBuilder<AcceptInviteBloc, AcceptInviteState>(
@@ -168,9 +171,9 @@ class _LoadedBody extends StatelessWidget {
               return FilledButton(
                 onPressed: isAccepting
                     ? null
-                    : () => context
-                        .read<AcceptInviteBloc>()
-                        .add(const AcceptInviteAcceptPressed()),
+                    : () => context.read<AcceptInviteBloc>().add(
+                        const AcceptInviteAcceptPressed(),
+                      ),
                 child: isAccepting
                     ? const SizedBox(
                         height: 20,
@@ -205,7 +208,9 @@ class _InviteCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               details.organizationName,
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const Divider(height: 28),
             Text('Invitado por', style: textTheme.labelMedium),
@@ -267,15 +272,12 @@ class _InfoBody extends StatelessWidget {
         Text(
           message,
           textAlign: TextAlign.center,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(color: messageColor, fontWeight: FontWeight.w500),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: messageColor,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        if (action != null) ...[
-          const SizedBox(height: 16),
-          action!,
-        ],
+        if (action != null) ...[const SizedBox(height: 16), action!],
       ],
     );
   }
@@ -306,10 +308,7 @@ class _ErrorBody extends StatelessWidget {
         ),
         if (onRetry != null) ...[
           const SizedBox(height: 24),
-          OutlinedButton(
-            onPressed: onRetry,
-            child: const Text('Reintentar'),
-          ),
+          OutlinedButton(onPressed: onRetry, child: const Text('Reintentar')),
         ],
       ],
     );

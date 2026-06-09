@@ -1,6 +1,6 @@
 part of 'teams_bloc.dart';
 
-enum TeamsStatus { initial, loading, loaded, creating, joining, leaving, error }
+enum TeamsStatus { initial, loading, loaded, creating, createSuccess, joining, leaving, deleting, deleteSuccess, error }
 
 enum TeamsAction { none, joined, left }
 

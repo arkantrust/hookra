@@ -9,6 +9,8 @@ class Team extends Equatable {
     this.logoUrl,
     required this.createdBy,
     required this.createdAt,
+    this.state = 'draft',
+    this.deletedAt,
   });
 
   final String id;
@@ -18,6 +20,8 @@ class Team extends Equatable {
   final String? logoUrl;
   final String createdBy;
   final DateTime createdAt;
+  final String state;
+  final DateTime? deletedAt;
 
   factory Team.fromJson(Map<String, dynamic> json) => Team(
     id: json['id'] as String,
@@ -27,6 +31,10 @@ class Team extends Equatable {
     logoUrl: json['logo_url'] as String?,
     createdBy: json['created_by'] as String,
     createdAt: DateTime.parse(json['created_at'] as String),
+    state: json['state'] as String? ?? 'draft',
+    deletedAt: json['deleted_at'] != null
+        ? DateTime.parse(json['deleted_at'] as String)
+        : null,
   );
 
   @override
@@ -38,5 +46,7 @@ class Team extends Equatable {
     logoUrl,
     createdBy,
     createdAt,
+    state,
+    deletedAt,
   ];
 }

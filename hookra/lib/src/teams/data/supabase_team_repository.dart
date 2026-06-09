@@ -19,6 +19,7 @@ final class SupabaseTeamRepository extends TeamRepository {
           .from('teams')
           .select()
           .eq('organization_id', organizationId)
+          .isFilter('deleted_at', null)
           .order('created_at');
       final teams = (data as List)
           .map((e) => Team.fromJson(e as Map<String, dynamic>))
@@ -155,11 +156,30 @@ final class SupabaseTeamRepository extends TeamRepository {
   }
 
   @override
+  Future<Result<void>> deleteTeam(String teamId) async {
+    try {
+      await _supabase
+          .from('teams')
+          .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('id', teamId);
+      return Result.voidResult();
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseTeamRepository.deleteTeam',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
   Future<Result<List<TeamMember>>> getTeamMembers(String teamId) async {
     try {
       final data = await _supabase
           .from('team_members')
-          .select('profiles!team_members_profile_id_fkey(id, first_name, last_name, email)')
+          .select(
+            'profiles!team_members_profile_id_fkey(id, first_name, last_name, email)',
+          )
           .eq('team_id', teamId);
       final members = (data as List).map((row) {
         final profile = row['profiles'] as Map<String, dynamic>;

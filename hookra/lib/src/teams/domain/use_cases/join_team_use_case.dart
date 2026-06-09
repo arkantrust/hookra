@@ -10,10 +10,9 @@ class JoinTeamUseCase {
     required String teamId,
     required String profileId,
     required String organizationId,
-  }) =>
-      _repository.joinTeam(
-        teamId: teamId,
-        profileId: profileId,
-        organizationId: organizationId,
-      );
+  }) => _repository.joinTeam(
+    teamId: teamId,
+    profileId: profileId,
+    organizationId: organizationId,
+  );
 }

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hookra/src/teams/domain/entities/team.dart';
 import 'package:hookra/src/teams/domain/use_cases/create_team_use_case.dart';
+import 'package:hookra/src/teams/domain/use_cases/delete_team_use_case.dart';
 import 'package:hookra/src/teams/domain/use_cases/get_teams_use_case.dart';
 import 'package:hookra/src/teams/domain/use_cases/get_user_team_ids_use_case.dart';
 import 'package:hookra/src/teams/domain/use_cases/join_team_use_case.dart';
@@ -16,6 +17,7 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
     required String creatorId,
     required GetTeamsUseCase getTeams,
     required CreateTeamUseCase createTeam,
+    required DeleteTeamUseCase deleteTeam,
     required JoinTeamUseCase joinTeam,
     required LeaveTeamUseCase leaveTeam,
     required GetUserTeamIdsUseCase getUserTeamIds,
@@ -23,12 +25,14 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
        _creatorId = creatorId,
        _getTeams = getTeams,
        _createTeam = createTeam,
+       _deleteTeam = deleteTeam,
        _joinTeam = joinTeam,
        _leaveTeam = leaveTeam,
        _getUserTeamIds = getUserTeamIds,
        super(const TeamsState()) {
     on<LoadTeams>(_onLoadTeams);
     on<CreateTeam>(_onCreateTeam);
+    on<DeleteTeam>(_onDeleteTeam);
     on<JoinTeam>(_onJoinTeam);
     on<LeaveTeam>(_onLeaveTeam);
   }
@@ -37,6 +41,7 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
   final String _creatorId;
   final GetTeamsUseCase _getTeams;
   final CreateTeamUseCase _createTeam;
+  final DeleteTeamUseCase _deleteTeam;
   final JoinTeamUseCase _joinTeam;
   final LeaveTeamUseCase _leaveTeam;
   final GetUserTeamIdsUseCase _getUserTeamIds;
@@ -106,14 +111,14 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
     );
     result.fold(
       (team) {
-        final updatedTeams = [if (team != null) team, ...state.teams];
+        final updatedTeams = [?team, ...state.teams];
         final updatedMemberIds = {
           ...state.memberTeamIds,
           if (team != null) team.id,
         }.toList();
         emit(
           state.copyWith(
-            status: TeamsStatus.loaded,
+            status: TeamsStatus.createSuccess,
             teams: updatedTeams,
             memberTeamIds: updatedMemberIds,
             lastAction: TeamsAction.none,
@@ -127,6 +132,32 @@ class TeamsBloc extends Bloc<TeamsEvent, TeamsState> {
           errorMessage: error.toString(),
           lastAction: TeamsAction.none,
           lastActionTeamId: null,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onDeleteTeam(DeleteTeam event, Emitter<TeamsState> emit) async {
+    emit(state.copyWith(status: TeamsStatus.deleting));
+
+    final result = await _deleteTeam(event.teamId);
+    result.fold(
+      (_) {
+        final updatedTeams = state.teams.where((t) => t.id != event.teamId).toList();
+        final updatedMemberIds = List<String>.from(state.memberTeamIds)
+          ..remove(event.teamId);
+        emit(
+          state.copyWith(
+            status: TeamsStatus.deleteSuccess,
+            teams: updatedTeams,
+            memberTeamIds: updatedMemberIds,
+          ),
+        );
+      },
+      (error) => emit(
+        state.copyWith(
+          status: TeamsStatus.error,
+          errorMessage: error.toString(),
         ),
       ),
     );

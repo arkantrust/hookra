@@ -1,9 +1,13 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/home/ui/cubit/home_activity_cubit.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/settings/settings.dart';
@@ -121,6 +125,9 @@ void initServiceLocator() {
   sl.registerFactory<LeaveTeamUseCase>(
     () => LeaveTeamUseCase(sl<TeamRepository>()),
   );
+  sl.registerFactory<DeleteTeamUseCase>(
+    () => DeleteTeamUseCase(sl<TeamRepository>()),
+  );
   sl.registerFactory<GetUserTeamIdsUseCase>(
     () => GetUserTeamIdsUseCase(sl<TeamRepository>()),
   );
@@ -141,6 +148,7 @@ void initServiceLocator() {
       creatorId: creatorId,
       getTeams: sl<GetTeamsUseCase>(),
       createTeam: sl<CreateTeamUseCase>(),
+      deleteTeam: sl<DeleteTeamUseCase>(),
       joinTeam: sl<JoinTeamUseCase>(),
       leaveTeam: sl<LeaveTeamUseCase>(),
       getUserTeamIds: sl<GetUserTeamIdsUseCase>(),
@@ -156,4 +164,59 @@ void initServiceLocator() {
       acceptInvite: sl<AcceptInviteUseCase>(),
     ),
   );
+
+  // AI Chat
+  sl.registerSingleton<AgentChatRepository>(
+    HookraAgentChatRepository(
+      supabase: supabase,
+      supabaseUrl: dotenv.get('SUPABASE_URL'),
+    ),
+  );
+  sl.registerFactory<SendMessageUseCase>(
+    () => SendMessageUseCase(sl<AgentChatRepository>()),
+  );
+
+   // Preview
+   sl.registerSingleton<ContentRepository>(
+     SupabaseContentRepository(supabase: supabase),
+   );
+   sl.registerFactory<GetLatestContentUseCase>(
+     () => GetLatestContentUseCase(sl<ContentRepository>()),
+   );
+   sl.registerFactory<UpdateContentStatusUseCase>(
+     () => UpdateContentStatusUseCase(sl<ContentRepository>()),
+   );
+
+   // Preview BLoC
+   sl.registerFactory<PreviewBloc>(
+     () => PreviewBloc(
+       getLatestContent: sl<GetLatestContentUseCase>(),
+       updateContentStatus: sl<UpdateContentStatusUseCase>(),
+     ),
+   );
+
+   sl.registerSingleton<CommentRepository>(
+     SupabaseCommentRepository(supabase: supabase),
+   );
+   sl.registerFactory<WatchCommentsUseCase>(
+     () => WatchCommentsUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<AddCommentUseCase>(
+     () => AddCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<EditCommentUseCase>(
+     () => EditCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<DeleteCommentUseCase>(
+     () => DeleteCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<GetTeamCommentsUseCase>(
+     () => GetTeamCommentsUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<ResolveCommentUseCase>(
+     () => ResolveCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<HomeActivityCubit>(
+     () => HomeActivityCubit(sl<GetTeamCommentsUseCase>()),
+   );
 }

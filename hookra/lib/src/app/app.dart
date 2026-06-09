@@ -4,8 +4,10 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/selection/selection.dart';
 import 'package:hookra/src/config/config.dart';
@@ -29,6 +31,14 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider<OrganizationRepository>(
           create: (_) => sl<OrganizationRepository>(),
+          dispose: (repo) => repo.dispose(),
+        ),
+        RepositoryProvider<AgentChatRepository>(
+          create: (_) => sl<AgentChatRepository>(),
+          dispose: (repo) => repo.dispose(),
+        ),
+        RepositoryProvider<CommentRepository>(
+          create: (_) => sl<CommentRepository>(),
           dispose: (repo) => repo.dispose(),
         ),
       ],
@@ -67,9 +77,9 @@ class _AppViewState extends State<_AppView> {
   void _initDeepLinks() {
     final appLinks = AppLinks();
     _linkSub = appLinks.stringLinkStream.listen(
-      (link) => WidgetsBinding.instance.addPostFrameCallback(
-        (_) { if (mounted) _handleLink(link); },
-      ),
+      (link) => WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _handleLink(link);
+      }),
     );
   }
 

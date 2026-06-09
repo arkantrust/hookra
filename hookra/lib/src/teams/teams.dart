@@ -8,6 +8,7 @@ export 'domain/use_cases/get_teams_use_case.dart';
 export 'domain/use_cases/get_user_team_ids_use_case.dart';
 export 'domain/use_cases/join_team_use_case.dart';
 export 'domain/use_cases/get_team_members_use_case.dart';
+export 'domain/use_cases/delete_team_use_case.dart';
 export 'domain/use_cases/leave_team_use_case.dart';
 export 'data/supabase_team_repository.dart';
 export 'ui/blocs/teams_bloc/teams_bloc.dart';

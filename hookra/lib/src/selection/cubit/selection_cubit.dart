@@ -66,7 +66,9 @@ class SelectionCubit extends Cubit<SelectionState> {
   /// clearing any previously selected team.
   Future<void> selectOrg(String orgId) async {
     if (orgId == state.selectedOrgId) return;
-    emit(state.copyWith(selectedOrgId: orgId, clearTeam: true, teamsLoading: true));
+    emit(
+      state.copyWith(selectedOrgId: orgId, clearTeam: true, teamsLoading: true),
+    );
 
     final teamsResult = await _getTeams(orgId);
     emit(
@@ -80,6 +82,22 @@ class SelectionCubit extends Cubit<SelectionState> {
   /// Selects [teamId] as the active team within the current organization.
   void selectTeam(String teamId) =>
       emit(state.copyWith(selectedTeamId: teamId));
+
+  /// Forces a full reload, bypassing the initial-status guard.
+  Future<void> refresh() async {
+    emit(const SelectionState());
+    await load();
+  }
+
+  /// Reloads teams for the current org without resetting the full state.
+  Future<void> refreshTeams() async {
+    final orgId = state.selectedOrgId;
+    if (orgId == null) return;
+    final teamsResult = await _getTeams(orgId);
+    if (teamsResult.isSuccess) {
+      emit(state.copyWith(teams: teamsResult.value));
+    }
+  }
 
   /// Resets the selection (used on sign-out).
   void clear() => emit(const SelectionState());

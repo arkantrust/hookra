@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
-/// Mock/demo data backing the home dashboard.
-///
-/// These are hardcoded placeholders so the home screen looks alive during
-/// demos. Replace with real data sources when the dashboard is wired up.
+import 'package:hookra/src/preview/domain/entities/comment.dart';
+import 'package:hookra/src/teams/teams.dart';
 
 class StatTileData {
   const StatTileData({
@@ -25,70 +22,79 @@ class ActivityData {
     required this.subtitle,
     required this.time,
     required this.icon,
+    this.contentId,
   });
 
   final String title;
   final String subtitle;
   final String time;
   final IconData icon;
+  final String? contentId;
 }
 
-const mockStats = <StatTileData>[
-  StatTileData(
-    label: 'Campañas',
-    value: '12',
-    icon: Icons.campaign_outlined,
-    color: Color(0xFF6750A4),
-  ),
-  StatTileData(
-    label: 'Clientes',
-    value: '8',
-    icon: Icons.handshake_outlined,
-    color: Color(0xFF1E88E5),
-  ),
-  StatTileData(
-    label: 'Reels',
-    value: '34',
-    icon: Icons.movie_outlined,
-    color: Color(0xFF43A047),
-  ),
-  StatTileData(
-    label: 'Aprobados',
-    value: '57',
-    icon: Icons.check_circle_outline,
-    color: Color(0xFFF4511E),
-  ),
-];
+class HomeData {
+  const HomeData({required this.stats, required this.activity});
 
-const mockActivity = <ActivityData>[
-  ActivityData(
-    title: 'Client approved Summer 25% video',
-    subtitle: 'Summer Sale · Bella Boutique',
-    time: 'hace 12 min',
-    icon: Icons.check_circle_outline,
-  ),
-  ActivityData(
-    title: "Agent brainstormed for Caleñas VIP's grand opening",
-    subtitle: 'Caleñas VIP · Launch',
-    time: 'hace 1 h',
-    icon: Icons.auto_awesome_outlined,
-  ),
-  ActivityData(
-    title: 'New reel scheduled for review',
-    subtitle: 'Instagram · Fitfuel',
-    time: 'hace 3 h',
-    icon: Icons.movie_outlined,
-  ),
-  ActivityData(
-    title: 'Campaign brief generated',
-    subtitle: 'Black Friday 2025 · Acme',
-    time: 'ayer',
-    icon: Icons.description_outlined,
-  ),
-  ActivityData(
-    title: 'Ad creative exported to Meta Ads',
-    subtitle: 'Caleñas VIP · Grand Opening',
-    time: 'hace 2 días',
-    icon: Icons.image_outlined,
-  ),
-];
+  final List<StatTileData> stats;
+  final List<ActivityData> activity;
+}
+
+/// Builds real stats from the org's loaded teams and activity from comments.
+///
+/// - Clientes   = total teams
+/// - Campañas   = total teams
+/// - Reels      = teams with state == 'published'
+/// - Aprobados  = teams with state == 'approved'
+HomeData homeDataFromTeams(List<Team> teams, List<Comment> comments) {
+  final total = teams.length;
+  final published = teams.where((t) => t.state == 'published').length;
+  final approved = teams.where((t) => t.state == 'approved').length;
+
+  return HomeData(
+    stats: [
+      StatTileData(
+        label: 'Clients',
+        value: '$total',
+        icon: Icons.handshake_outlined,
+        color: const Color(0xFF1E88E5),
+      ),
+      StatTileData(
+        label: 'Projects',
+        value: '$total',
+        icon: Icons.campaign_outlined,
+        color: const Color(0xFF6750A4),
+      ),
+      StatTileData(
+        label: 'Reels',
+        value: '$published',
+        icon: Icons.movie_outlined,
+        color: const Color(0xFF43A047),
+      ),
+      StatTileData(
+        label: 'Approved',
+        value: '$approved',
+        icon: Icons.check_circle_outline,
+        color: const Color(0xFFF4511E),
+      ),
+    ],
+    activity: [
+      for (final c in comments)
+        ActivityData(
+          title: c.body,
+          subtitle: '${c.authorName} · ${c.contentTitle ?? 'Content'}',
+          time: _relativeTime(c.createdAt),
+          icon: Icons.comment_outlined,
+          contentId: c.contentId,
+        ),
+    ],
+  );
+}
+
+String _relativeTime(DateTime dt) {
+  final diff = DateTime.now().difference(dt);
+  if (diff.inMinutes < 1) return 'Now';
+  if (diff.inMinutes < 60) return ' ${diff.inMinutes} min';
+  if (diff.inHours < 24) return ' ${diff.inHours} h';
+  if (diff.inDays == 1) return 'Yesterday';
+  return ' ${diff.inDays} days';
+}

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hookra/src/app/main_layout.dart';
 
+import 'package:hookra/src/ai_chat/ai_chat.dart';
 import 'package:hookra/src/home/home.dart';
+import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/auth/auth.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/organizations/organizations.dart';
@@ -58,8 +60,10 @@ class AppRouter {
           builder: (context, state, child) => MainLayout(child: child),
           routes: [
             HomePage.route(), // route: /
-            ProfilePage.route(), // route: /profile
+            AiChatPage.route(), // route: /ai-chat
+            PreviewPage.route(), // route: /preview
             OrganizationsPage.route(), // route: /organizations
+            ProfilePage.route(), // route: /profile
           ],
         ),
         // Detail pages live outside the shell — they are full-screen without the
@@ -70,10 +74,9 @@ class AppRouter {
         SignInPage.route(), // route: /auth/sign-in
         SignUpPage.route(), // route: /auth/sign-up
       ],
-      errorBuilder:
-          (context, state) => SafeArea(
-            child: Scaffold(body: Center(child: Text('Error: ${state.error}'))),
-          ),
+      errorBuilder: (context, state) => SafeArea(
+        child: Scaffold(body: Center(child: Text('Error: ${state.error}'))),
+      ),
     );
   }
 }

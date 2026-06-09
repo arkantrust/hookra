@@ -27,6 +27,8 @@ abstract base class TeamRepository {
     required String profileId,
   });
 
+  Future<Result<void>> deleteTeam(String teamId);
+
   Future<Result<List<TeamMember>>> getTeamMembers(String teamId);
 
   void dispose();

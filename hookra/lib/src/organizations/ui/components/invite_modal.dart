@@ -57,9 +57,9 @@ class _InviteModalState extends State<InviteModal> {
             children: [
               Text(
                 'Invitar miembro',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
               TextField(
@@ -76,10 +76,7 @@ class _InviteModalState extends State<InviteModal> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Text(
-                    'Rol:',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text('Rol:', style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(width: 12),
                   RolePicker(
                     role: _selectedRole,
@@ -119,11 +116,11 @@ class _InviteModalState extends State<InviteModal> {
     if (!_isValidEmail) return;
 
     context.read<InviteBloc>().add(
-          InviteSubmitted(
-            organizationId: widget.organizationId,
-            email: email,
-            role: _selectedRole,
-          ),
-        );
+      InviteSubmitted(
+        organizationId: widget.organizationId,
+        email: email,
+        role: _selectedRole,
+      ),
+    );
   }
 }

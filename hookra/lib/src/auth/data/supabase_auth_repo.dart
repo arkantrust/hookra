@@ -74,12 +74,11 @@ final class SupabaseAuthRepository extends AuthRepository {
       return const Result.voidResult();
     } on AuthApiException catch (e) {
       if (e.code == 'invalid_credentials') {
-        final emailExistsRes =
-            await _supabase
-                .from('profiles')
-                .select()
-                .eq('email', email)
-                .maybeSingle();
+        final emailExistsRes = await _supabase
+            .from('profiles')
+            .select()
+            .eq('email', email)
+            .maybeSingle();
         final exists = emailExistsRes?.isNotEmpty ?? false;
         return Result.failure(
           exists ? const WrongPassword() : const EmailNotFound(),

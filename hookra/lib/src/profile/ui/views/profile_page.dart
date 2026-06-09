@@ -14,7 +14,8 @@ import 'package:hookra/src/teams/teams.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  static GoRoute route() => GoRoute(path: '/profile', builder: (_, _) => const ProfilePage());
+  static GoRoute route() =>
+      GoRoute(path: '/profile', builder: (_, _) => const ProfilePage());
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +94,11 @@ class _ProfileCard extends StatelessWidget {
                           height: 104,
                           fit: BoxFit.cover,
                           loadingBuilder: (_, child, progress) =>
-                              progress == null ? child : _avatarPlaceholder(palette),
-                          errorBuilder: (_, _, _) => _avatarPlaceholder(palette),
+                              progress == null
+                              ? child
+                              : _avatarPlaceholder(palette),
+                          errorBuilder: (_, _, _) =>
+                              _avatarPlaceholder(palette),
                         )
                       : _avatarPlaceholder(palette),
                 ),
@@ -109,7 +113,11 @@ class _ProfileCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: palette.surface, width: 2),
                     ),
-                    child: Icon(Icons.camera_alt_outlined, size: 14, color: palette.onPrimary),
+                    child: Icon(
+                      Icons.camera_alt_outlined,
+                      size: 14,
+                      color: palette.onPrimary,
+                    ),
                   ),
                 ),
               ],
@@ -148,7 +156,9 @@ class _ProfileCard extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: palette.primary,
                   foregroundColor: palette.onPrimary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
@@ -181,7 +191,11 @@ class _EmailCard extends StatelessWidget {
             color: palette.primaryContainer,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(Icons.email_outlined, size: 20, color: palette.onPrimaryContainer),
+          child: Icon(
+            Icons.email_outlined,
+            size: 20,
+            color: palette.onPrimaryContainer,
+          ),
         ),
         title: Text(
           'CORREO ELECTRÓNICO',
@@ -194,7 +208,11 @@ class _EmailCard extends StatelessWidget {
         ),
         subtitle: Text(
           email,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: palette.onSurface),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: palette.onSurface,
+          ),
         ),
       ),
     );
@@ -253,7 +271,8 @@ class _SelectorCardState extends State<_SelectorCard> {
 
     return BlocBuilder<SelectionCubit, SelectionState>(
       builder: (context, state) {
-        final teamEnabled = state.selectedOrgId != null &&
+        final teamEnabled =
+            state.selectedOrgId != null &&
             !state.teamsLoading &&
             state.teams.isNotEmpty;
 
@@ -282,8 +301,7 @@ class _SelectorCardState extends State<_SelectorCard> {
                   label: 'ORGANIZACIÓN',
                   value: state.selectedOrg?.organization.name,
                   icon: Icons.business_outlined,
-                  onTap:
-                      state.orgs.isEmpty ? null : () => _pickOrg(state),
+                  onTap: state.orgs.isEmpty ? null : () => _pickOrg(state),
                 ),
                 const SizedBox(height: 12),
                 SelectionField(
