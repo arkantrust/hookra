@@ -175,26 +175,38 @@ void initServiceLocator() {
     () => SendMessageUseCase(sl<AgentChatRepository>()),
   );
 
-  // Preview
-  sl.registerSingleton<ContentRepository>(
-    SupabaseContentRepository(supabase: supabase),
-  );
-  sl.registerFactory<GetLatestContentUseCase>(
-    () => GetLatestContentUseCase(sl<ContentRepository>()),
-  );
-  sl.registerSingleton<CommentRepository>(
-    SupabaseCommentRepository(supabase: supabase),
-  );
-  sl.registerFactory<WatchCommentsUseCase>(
-    () => WatchCommentsUseCase(sl<CommentRepository>()),
-  );
-  sl.registerFactory<AddCommentUseCase>(
-    () => AddCommentUseCase(sl<CommentRepository>()),
-  );
-  sl.registerFactory<EditCommentUseCase>(
-    () => EditCommentUseCase(sl<CommentRepository>()),
-  );
-  sl.registerFactory<DeleteCommentUseCase>(
-    () => DeleteCommentUseCase(sl<CommentRepository>()),
-  );
+   // Preview
+   sl.registerSingleton<ContentRepository>(
+     SupabaseContentRepository(supabase: supabase),
+   );
+   sl.registerFactory<GetLatestContentUseCase>(
+     () => GetLatestContentUseCase(sl<ContentRepository>()),
+   );
+   sl.registerFactory<UpdateContentStatusUseCase>(
+     () => UpdateContentStatusUseCase(sl<ContentRepository>()),
+   );
+
+   // Preview BLoC
+   sl.registerFactory<PreviewBloc>(
+     () => PreviewBloc(
+       getLatestContent: sl<GetLatestContentUseCase>(),
+       updateContentStatus: sl<UpdateContentStatusUseCase>(),
+     ),
+   );
+
+   sl.registerSingleton<CommentRepository>(
+     SupabaseCommentRepository(supabase: supabase),
+   );
+   sl.registerFactory<WatchCommentsUseCase>(
+     () => WatchCommentsUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<AddCommentUseCase>(
+     () => AddCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<EditCommentUseCase>(
+     () => EditCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<DeleteCommentUseCase>(
+     () => DeleteCommentUseCase(sl<CommentRepository>()),
+   );
 }

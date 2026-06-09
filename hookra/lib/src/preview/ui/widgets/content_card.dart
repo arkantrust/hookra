@@ -211,24 +211,49 @@ class _Badge extends StatelessWidget {
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status, required this.palette});
 
-  final String status;
+  final ContentStatus status;
   final ColorScheme palette;
+
+  Color _getStatusColor(ContentStatus status) {
+    switch (status) {
+      case ContentStatus.draft:
+        return Colors.orange;
+      case ContentStatus.approved:
+        return Colors.green;
+      case ContentStatus.published:
+        return Colors.blue;
+    }
+  }
+
+  String _getStatusLabel(ContentStatus status) {
+    return status.name.toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final color = _getStatusColor(status);
+    final label = _getStatusLabel(status);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: palette.secondaryContainer,
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        statusLabel(status),
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: palette.onSecondaryContainer,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.circle, size: 10, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

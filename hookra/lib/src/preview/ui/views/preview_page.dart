@@ -51,9 +51,7 @@ class PreviewPage extends StatelessWidget {
           // Keyed by teamId so switching teams recreates the bloc and reloads.
           return BlocProvider<PreviewBloc>(
             key: ValueKey(teamId),
-            create: (_) =>
-                PreviewBloc(getLatestContent: sl<GetLatestContentUseCase>())
-                  ..add(PreviewRequested(teamId)),
+            create: (_) => sl<PreviewBloc>()..add(PreviewRequested(teamId)),
             child: _PreviewBody(teamId: teamId),
           );
         },
@@ -100,18 +98,26 @@ class _PreviewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PreviewBloc, PreviewState>(
+    return BlocConsumer<PreviewBloc, PreviewState>(
+      listener: (context, state) {
+        if (state is ContentApproved) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Contenido aprobado exitosamente')),
+          );
+        }
+      },
       builder: (context, state) {
         return switch (state) {
           PreviewInitial() ||
-          PreviewLoading() => const Center(child: CircularProgressIndicator()),
+          PreviewLoading() ||
+          ContentApproved() => const Center(child: CircularProgressIndicator()),
           PreviewError() => _Message(
-            icon: Icons.error_outline,
-            text: 'No se pudo cargar el contenido.',
-            actionLabel: 'Reintentar',
-            onAction: () =>
-                context.read<PreviewBloc>().add(PreviewRequested(teamId)),
-          ),
+              icon: Icons.error_outline,
+              text: 'No se pudo cargar el contenido.',
+              actionLabel: 'Reintentar',
+              onAction: () =>
+                  context.read<PreviewBloc>().add(PreviewRequested(teamId)),
+            ),
           PreviewLoaded(:final content) =>
             content == null
                 ? const _Message(
@@ -131,11 +137,22 @@ class _PreviewBody extends StatelessWidget {
                         bottom: 16,
                         right: 16,
                         child: FloatingActionButton(
-                          onPressed: () =>
-                              _openComments(context, content.id),
+                          onPressed: () => _openComments(context, content.id),
                           child: const Icon(Icons.comment_outlined),
                         ),
                       ),
+                      if (content.status == ContentStatus.draft)
+                        Positioned(
+                          bottom: 80,
+                          right: 16,
+                          child: FloatingActionButton(
+                            heroTag: 'approve_content_fab',
+                            onPressed: () => context
+                                .read<PreviewBloc>()
+                                .add(ApproveContent(content.id)),
+                            child: const Icon(Icons.check),
+                          ),
+                        ),
                     ],
                   ),
         };

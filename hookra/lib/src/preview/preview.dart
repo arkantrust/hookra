@@ -8,6 +8,7 @@ export 'domain/use_cases/add_comment_use_case.dart';
 export 'domain/use_cases/delete_comment_use_case.dart';
 export 'domain/use_cases/edit_comment_use_case.dart';
 export 'domain/use_cases/get_latest_content_use_case.dart';
+export 'domain/use_cases/update_content_status_use_case.dart';
 export 'domain/use_cases/watch_comments_use_case.dart';
 export 'data/supabase_comment_repository.dart';
 export 'data/supabase_content_repository.dart';
