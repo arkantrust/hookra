@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:hookra/src/auth/ui/blocs/auth_bloc/auth_bloc.dart';
 import 'package:hookra/src/config/service_locator.dart';
 import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/selection/selection.dart';
@@ -137,7 +136,8 @@ class _PreviewBody extends StatelessWidget {
                         bottom: 16,
                         right: 16,
                         child: FloatingActionButton(
-                          onPressed: () => _openComments(context, content.id),
+                          onPressed: () =>
+                              openCommentsSheet(context, content.id),
                           child: const Icon(Icons.comment_outlined),
                         ),
                       ),
@@ -157,25 +157,6 @@ class _PreviewBody extends StatelessWidget {
                   ),
         };
       },
-    );
-  }
-
-  void _openComments(BuildContext context, String contentId) {
-    final userId = context.read<AuthBloc>().state.user.id;
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => CommentsSheet(
-        contentId: contentId,
-        currentUserId: userId,
-        watchComments: sl<WatchCommentsUseCase>(),
-        addComment: sl<AddCommentUseCase>(),
-        editComment: sl<EditCommentUseCase>(),
-        deleteComment: sl<DeleteCommentUseCase>(),
-      ),
     );
   }
 }

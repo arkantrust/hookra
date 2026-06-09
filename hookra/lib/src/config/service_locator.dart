@@ -6,6 +6,7 @@ import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/onboarding/onboarding.dart';
 import 'package:hookra/src/organizations/data/repo/supabase_invite_repository.dart';
 import 'package:hookra/src/organizations/organizations.dart';
+import 'package:hookra/src/home/ui/cubit/home_activity_cubit.dart';
 import 'package:hookra/src/preview/preview.dart';
 import 'package:hookra/src/profile/profile.dart';
 import 'package:hookra/src/selection/selection.dart';
@@ -208,5 +209,14 @@ void initServiceLocator() {
    );
    sl.registerFactory<DeleteCommentUseCase>(
      () => DeleteCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<GetTeamCommentsUseCase>(
+     () => GetTeamCommentsUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<ResolveCommentUseCase>(
+     () => ResolveCommentUseCase(sl<CommentRepository>()),
+   );
+   sl.registerFactory<HomeActivityCubit>(
+     () => HomeActivityCubit(sl<GetTeamCommentsUseCase>()),
    );
 }

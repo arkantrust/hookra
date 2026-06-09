@@ -6,6 +6,7 @@ import 'package:hookra/src/preview/domain/entities/comment.dart';
 import 'package:hookra/src/preview/domain/use_cases/add_comment_use_case.dart';
 import 'package:hookra/src/preview/domain/use_cases/delete_comment_use_case.dart';
 import 'package:hookra/src/preview/domain/use_cases/edit_comment_use_case.dart';
+import 'package:hookra/src/preview/domain/use_cases/resolve_comment_use_case.dart';
 import 'package:hookra/src/preview/domain/use_cases/watch_comments_use_case.dart';
 
 part 'comments_event.dart';
@@ -17,15 +18,18 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     required AddCommentUseCase addComment,
     required EditCommentUseCase editComment,
     required DeleteCommentUseCase deleteComment,
+    required ResolveCommentUseCase resolveComment,
   })  : _watchComments = watchComments,
         _addComment = addComment,
         _editComment = editComment,
         _deleteComment = deleteComment,
+        _resolveComment = resolveComment,
         super(const CommentsInitial()) {
     on<CommentsWatchRequested>(_onWatchRequested, transformer: restartable());
     on<CommentAdded>(_onAdded);
     on<CommentEdited>(_onEdited);
     on<CommentDeleted>(_onDeleted);
+    on<CommentResolved>(_onResolved);
     on<CommentsActionErrorCleared>(_onActionErrorCleared);
   }
 
@@ -33,6 +37,7 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
   final AddCommentUseCase _addComment;
   final EditCommentUseCase _editComment;
   final DeleteCommentUseCase _deleteComment;
+  final ResolveCommentUseCase _resolveComment;
 
   String? _contentId;
 
@@ -81,6 +86,16 @@ class CommentsBloc extends Bloc<CommentsEvent, CommentsState> {
     final result = await _deleteComment(event.commentId);
     if (result.isFailure && state is CommentsLoaded) {
       emit((state as CommentsLoaded).copyWithError('Could not delete comment.'));
+    }
+  }
+
+  Future<void> _onResolved(
+    CommentResolved event,
+    Emitter<CommentsState> emit,
+  ) async {
+    final result = await _resolveComment(event.commentId);
+    if (result.isFailure && state is CommentsLoaded) {
+      emit((state as CommentsLoaded).copyWithError('Could not resolve comment.'));
     }
   }
 

@@ -3,9 +3,10 @@ import 'package:hookra/src/home/ui/home_mock_data.dart';
 
 /// A single recent-activity row in the home dashboard.
 class ActivityTile extends StatelessWidget {
-  const ActivityTile({super.key, required this.data});
+  const ActivityTile({super.key, required this.data, this.onTap});
 
   final ActivityData data;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class ActivityTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
+        onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         leading: Container(
           width: 40,

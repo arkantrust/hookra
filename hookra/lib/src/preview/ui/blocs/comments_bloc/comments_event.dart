@@ -44,6 +44,15 @@ final class CommentDeleted extends CommentsEvent {
   List<Object?> get props => [commentId];
 }
 
+final class CommentResolved extends CommentsEvent {
+  const CommentResolved(this.commentId);
+
+  final String commentId;
+
+  @override
+  List<Object?> get props => [commentId];
+}
+
 final class CommentsActionErrorCleared extends CommentsEvent {
   const CommentsActionErrorCleared();
 }

@@ -14,6 +14,8 @@ class Comment extends Equatable {
     required this.body,
     required this.createdAt,
     required this.updatedAt,
+    required this.resolved,
+    this.contentTitle,
   });
 
   final String id;
@@ -23,12 +25,18 @@ class Comment extends Equatable {
   final String body;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool resolved;
+
+  /// Populated only when the comment is fetched via a team query that joins
+  /// the `content` table (e.g. [CommentRepository.getUnresolvedCommentsForTeam]).
+  final String? contentTitle;
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     final profile = json['profiles'] as Map<String, dynamic>?;
     final first = profile?['first_name'] as String? ?? '';
     final last = profile?['last_name'] as String? ?? '';
     final name = '$first $last'.trim();
+    final content = json['content'] as Map<String, dynamic>?;
     return Comment(
       id: json['id'] as String,
       contentId: json['content_id'] as String,
@@ -37,10 +45,21 @@ class Comment extends Equatable {
       body: json['body'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      resolved: json['resolved'] as bool? ?? false,
+      contentTitle: content?['title'] as String?,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [id, contentId, userId, authorName, body, createdAt, updatedAt];
+  List<Object?> get props => [
+        id,
+        contentId,
+        userId,
+        authorName,
+        body,
+        createdAt,
+        updatedAt,
+        resolved,
+        contentTitle,
+      ];
 }

@@ -120,5 +120,46 @@ final class SupabaseCommentRepository extends CommentRepository {
   }
 
   @override
+  Future<Result<List<Comment>>> getUnresolvedCommentsForTeam(
+    String teamId,
+  ) async {
+    try {
+      final data = await _supabase
+          .from('content_comments')
+          .select(
+            '*, profiles!user_id(first_name, last_name), '
+            'content!inner(title, projects!inner(team_id))',
+          )
+          .eq('content.projects.team_id', teamId)
+          .eq('resolved', false)
+          .order('created_at', ascending: false);
+      return Result.success(data.map(Comment.fromJson).toList());
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseCommentRepository.getUnresolvedCommentsForTeam',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> resolveComment(String commentId) async {
+    try {
+      await _supabase
+          .from('content_comments')
+          .update({'resolved': true})
+          .eq('id', commentId);
+      return Result.voidResult();
+    } catch (e, s) {
+      return Result.unknown(
+        name: 'SupabaseCommentRepository.resolveComment',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  @override
   void dispose() {}
 }

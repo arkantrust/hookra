@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hookra/src/preview/domain/entities/comment.dart';
 import 'package:hookra/src/teams/teams.dart';
 
 class StatTileData {
@@ -21,12 +22,14 @@ class ActivityData {
     required this.subtitle,
     required this.time,
     required this.icon,
+    this.contentId,
   });
 
   final String title;
   final String subtitle;
   final String time;
   final IconData icon;
+  final String? contentId;
 }
 
 class HomeData {
@@ -36,46 +39,13 @@ class HomeData {
   final List<ActivityData> activity;
 }
 
-const _mockActivity = [
-  ActivityData(
-    title: 'Client approved Summer 25% video',
-    subtitle: 'Summer Sale · Bella Boutique',
-    time: 'hace 12 min',
-    icon: Icons.check_circle_outline,
-  ),
-  ActivityData(
-    title: "Agent brainstormed for Caleñas VIP's grand opening",
-    subtitle: 'Caleñas VIP · Launch',
-    time: 'hace 1 h',
-    icon: Icons.auto_awesome_outlined,
-  ),
-  ActivityData(
-    title: 'New reel scheduled for review',
-    subtitle: 'Instagram · Fitfuel',
-    time: 'hace 3 h',
-    icon: Icons.movie_outlined,
-  ),
-  ActivityData(
-    title: 'Campaign brief generated',
-    subtitle: 'Black Friday 2025 · Acme',
-    time: 'ayer',
-    icon: Icons.description_outlined,
-  ),
-  ActivityData(
-    title: 'Ad creative exported to Meta Ads',
-    subtitle: 'Caleñas VIP · Grand Opening',
-    time: 'hace 2 días',
-    icon: Icons.image_outlined,
-  ),
-];
-
-/// Builds real stats from the org's loaded teams.
+/// Builds real stats from the org's loaded teams and activity from comments.
 ///
 /// - Clientes   = total teams
 /// - Campañas   = total teams
 /// - Reels      = teams with state == 'published'
 /// - Aprobados  = teams with state == 'approved'
-HomeData homeDataFromTeams(List<Team> teams) {
+HomeData homeDataFromTeams(List<Team> teams, List<Comment> comments) {
   final total = teams.length;
   final published = teams.where((t) => t.state == 'published').length;
   final approved = teams.where((t) => t.state == 'approved').length;
@@ -83,13 +53,13 @@ HomeData homeDataFromTeams(List<Team> teams) {
   return HomeData(
     stats: [
       StatTileData(
-        label: 'Clientes',
+        label: 'Clients',
         value: '$total',
         icon: Icons.handshake_outlined,
         color: const Color(0xFF1E88E5),
       ),
       StatTileData(
-        label: 'Campañas',
+        label: 'Projects',
         value: '$total',
         icon: Icons.campaign_outlined,
         color: const Color(0xFF6750A4),
@@ -101,12 +71,30 @@ HomeData homeDataFromTeams(List<Team> teams) {
         color: const Color(0xFF43A047),
       ),
       StatTileData(
-        label: 'Aprobados',
+        label: 'Approved',
         value: '$approved',
         icon: Icons.check_circle_outline,
         color: const Color(0xFFF4511E),
       ),
     ],
-    activity: _mockActivity,
+    activity: [
+      for (final c in comments)
+        ActivityData(
+          title: c.body,
+          subtitle: '${c.authorName} · ${c.contentTitle ?? 'Content'}',
+          time: _relativeTime(c.createdAt),
+          icon: Icons.comment_outlined,
+          contentId: c.contentId,
+        ),
+    ],
   );
+}
+
+String _relativeTime(DateTime dt) {
+  final diff = DateTime.now().difference(dt);
+  if (diff.inMinutes < 1) return 'Now';
+  if (diff.inMinutes < 60) return ' ${diff.inMinutes} min';
+  if (diff.inHours < 24) return ' ${diff.inHours} h';
+  if (diff.inDays == 1) return 'Yesterday';
+  return ' ${diff.inDays} days';
 }

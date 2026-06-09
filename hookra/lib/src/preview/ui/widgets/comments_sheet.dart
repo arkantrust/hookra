@@ -5,6 +5,7 @@ import 'package:hookra/src/preview/domain/entities/comment.dart';
 import 'package:hookra/src/preview/domain/use_cases/add_comment_use_case.dart';
 import 'package:hookra/src/preview/domain/use_cases/delete_comment_use_case.dart';
 import 'package:hookra/src/preview/domain/use_cases/edit_comment_use_case.dart';
+import 'package:hookra/src/preview/domain/use_cases/resolve_comment_use_case.dart';
 import 'package:hookra/src/preview/domain/use_cases/watch_comments_use_case.dart';
 import 'package:hookra/src/preview/ui/blocs/comments_bloc/comments_bloc.dart';
 
@@ -17,6 +18,7 @@ class CommentsSheet extends StatefulWidget {
     required this.addComment,
     required this.editComment,
     required this.deleteComment,
+    required this.resolveComment,
   });
 
   final String contentId;
@@ -25,6 +27,7 @@ class CommentsSheet extends StatefulWidget {
   final AddCommentUseCase addComment;
   final EditCommentUseCase editComment;
   final DeleteCommentUseCase deleteComment;
+  final ResolveCommentUseCase resolveComment;
 
   @override
   State<CommentsSheet> createState() => _CommentsSheetState();
@@ -32,6 +35,7 @@ class CommentsSheet extends StatefulWidget {
 
 class _CommentsSheetState extends State<CommentsSheet> {
   late final TextEditingController _inputController;
+  bool _showResolved = false;
 
   @override
   void initState() {
@@ -53,6 +57,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
         addComment: widget.addComment,
         editComment: widget.editComment,
         deleteComment: widget.deleteComment,
+        resolveComment: widget.resolveComment,
       )..add(CommentsWatchRequested(widget.contentId)),
       child: Padding(
         padding: EdgeInsets.only(
@@ -113,25 +118,61 @@ class _CommentsSheetState extends State<CommentsSheet> {
             ],
           ),
         ),
-      CommentsLoaded(:final comments) => comments.isEmpty
-          ? const _CenteredPadding(
-              child: Text('No comments yet. Be the first!'),
-            )
-          : ListView.builder(
-              shrinkWrap: true,
-              itemCount: comments.length,
-              itemBuilder: (_, i) => _CommentTile(
-                comment: comments[i],
-                isOwner: comments[i].userId == widget.currentUserId,
-                onEdit: (body) => context
-                    .read<CommentsBloc>()
-                    .add(CommentEdited(comments[i].id, body)),
-                onDelete: () => context
-                    .read<CommentsBloc>()
-                    .add(CommentDeleted(comments[i].id)),
+      CommentsLoaded(:final comments) => _buildLoaded(context, comments),
+    };
+  }
+
+  Widget _buildLoaded(BuildContext context, List<Comment> comments) {
+    final unresolved = comments.where((c) => !c.resolved).toList();
+    final resolved = comments.where((c) => c.resolved).toList();
+
+    if (unresolved.isEmpty && resolved.isEmpty) {
+      return const _CenteredPadding(
+        child: Text('No comments yet. Be the first!'),
+      );
+    }
+
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        for (final c in unresolved)
+          _CommentTile(
+            comment: c,
+            isOwner: c.userId == widget.currentUserId,
+            isResolved: false,
+            onEdit: (body) =>
+                context.read<CommentsBloc>().add(CommentEdited(c.id, body)),
+            onDelete: () =>
+                context.read<CommentsBloc>().add(CommentDeleted(c.id)),
+            onResolve: () =>
+                context.read<CommentsBloc>().add(CommentResolved(c.id)),
+          ),
+        if (resolved.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: TextButton(
+              onPressed: () => setState(() => _showResolved = !_showResolved),
+              child: Text(
+                _showResolved
+                    ? 'Hide resolved'
+                    : 'Show resolved (${resolved.length})',
               ),
             ),
-    };
+          ),
+        if (_showResolved)
+          for (final c in resolved)
+            _CommentTile(
+              comment: c,
+              isOwner: c.userId == widget.currentUserId,
+              isResolved: true,
+              onEdit: (body) =>
+                  context.read<CommentsBloc>().add(CommentEdited(c.id, body)),
+              onDelete: () =>
+                  context.read<CommentsBloc>().add(CommentDeleted(c.id)),
+              onResolve: null,
+            ),
+      ],
+    );
   }
 }
 
@@ -199,14 +240,18 @@ class _CommentTile extends StatefulWidget {
   const _CommentTile({
     required this.comment,
     required this.isOwner,
+    required this.isResolved,
     required this.onEdit,
     required this.onDelete,
+    required this.onResolve,
   });
 
   final Comment comment;
   final bool isOwner;
+  final bool isResolved;
   final void Function(String body) onEdit;
   final VoidCallback onDelete;
+  final VoidCallback? onResolve;
 
   @override
   State<_CommentTile> createState() => _CommentTileState();
@@ -239,6 +284,8 @@ class _CommentTileState extends State<_CommentTile> {
   @override
   Widget build(BuildContext context) {
     final palette = Theme.of(context).colorScheme;
+    final textColor =
+        widget.isResolved ? palette.onSurfaceVariant : palette.onSurface;
 
     if (_editing) {
       return Padding(
@@ -288,9 +335,10 @@ class _CommentTileState extends State<_CommentTile> {
         children: [
           Text(
             widget.comment.authorName,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 14,
+              color: textColor,
             ),
           ),
           const Spacer(),
@@ -302,10 +350,22 @@ class _CommentTileState extends State<_CommentTile> {
       ),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 4),
-        child: Text(widget.comment.body),
+        child: Text(
+          widget.comment.body,
+          style: TextStyle(color: textColor),
+        ),
       ),
-      trailing: widget.isOwner
-          ? PopupMenuButton<String>(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.onResolve != null)
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, size: 18),
+              tooltip: 'Resolve',
+              onPressed: widget.onResolve,
+            ),
+          if (widget.isOwner)
+            PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert, size: 18),
               itemBuilder: (_) => const [
                 PopupMenuItem(value: 'edit', child: Text('Edit')),
@@ -315,8 +375,9 @@ class _CommentTileState extends State<_CommentTile> {
                 if (value == 'edit') setState(() => _editing = true);
                 if (value == 'delete') widget.onDelete();
               },
-            )
-          : null,
+            ),
+        ],
+      ),
     );
   }
 
