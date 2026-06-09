@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
+import 'package:hookra/firebase_options.dart';
 import 'package:hookra/src/config/config.dart';
 import 'package:hookra/src/app/app.dart';
 
@@ -35,6 +37,12 @@ Future<void> main() async {
 
   try {
     await dotenv.load(fileName: '.env');
+    // Configures a default FirebaseApp so the transitively-pulled firebase_auth
+    // iOS plugin doesn't crash on deep links. Hookra uses Supabase, not Firebase
+    // — see lib/firebase_options.dart.
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     await initSupabase();
     initServiceLocator();
     runApp(const App());
